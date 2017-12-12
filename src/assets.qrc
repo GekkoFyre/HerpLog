@@ -1,8 +1,16 @@
 <RCC>
     <qresource prefix="/icons">
 	<file>assets/icons/original-logos-2015-Sep-3044-7944329.png</file>
+	<file>assets/icons/001-exit-2.png</file>
+	<file>assets/icons/003-exit.png</file>
+	<file>assets/icons/009-database-16.png</file>
+	<file>assets/icons/011-database-14.png</file>
     </qresource>
     <qresource lang="en">
 	<file alias="gekkofyre_logo.png">assets/icons/original-logos-2015-Sep-3044-7944329.png</file>
+	<file alias="exit_confirm.png">assets/icons/001-exit-2.png</file>
+	<file alias="exit.png">assets/icons/003-exit.png</file>
+	<file alias="database_create.png">assets/icons/009-database-16.png</file>
+	<file alias="database_click.png">assets/icons/011-database-14.png</file>
     </qresource>
 </RCC>
