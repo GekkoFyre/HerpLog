@@ -42,6 +42,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
+if(${CMAKE_VERSION} VERSION_EQUAL "3.10.0")
+    cmake_policy(SET CMP0071 NEW)
+    message("Policy 'CMP0071' has been set.")
+elseif(${CMAKE_VERSION} VERSION_GREATER "3.10.0")
+    cmake_policy(SET CMP0071 NEW)
+    message("Policy 'CMP0071' has been set.")
+endif()
+
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
@@ -88,7 +96,7 @@ set(SOURCE_FILES
 qt5_wrap_ui(UI_HEADERS
             src/gui/mainwindow.ui)
 
-# qt5_add_resources(UI_RESOURCES assets.qrc)
+qt5_add_resources(UI_RESOURCES src/assets.qrc)
 
 # Create the main executable and name it depending on the operating system
 INCLUDE(CMakeDetermineSystem)
