@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/icons">
+	<file>assets/icons/original-logos-2015-Sep-3044-7944329.png</file>
+    </qresource>
+    <qresource lang="en">
+	<file alias="gekkofyre_logo.png">assets/icons/original-logos-2015-Sep-3044-7944329.png</file>
+    </qresource>
+</RCC>
