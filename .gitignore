@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# GekkoFyre's modifications
+*.user
+.idea
+cmake-build-debug
