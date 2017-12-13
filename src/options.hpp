@@ -40,6 +40,17 @@
  * @brief Contains options, enums, etc. for the entire program.
  */
 
+#include <leveldb/db.h>
+#include <memory>
+
 namespace GekkoFyre {
     constexpr double FYREDL_DEFAULT_RESOLUTION_WIDTH = 1920.0;
+    constexpr unsigned long LEVELDB_CFG_CACHE_SIZE = 32UL * 1024UL * 1024UL;
+
+    namespace GkFile {
+        struct FileDb {
+            std::shared_ptr<leveldb::DB> db;
+            leveldb::Options options;
+        };
+    }
 }

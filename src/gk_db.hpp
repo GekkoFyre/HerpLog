@@ -43,18 +43,25 @@
 #ifndef GKDB_HPP
 #define GKDB_HPP
 
+#include "options.hpp"
 #include <QtCore/QObject>
 
 namespace GekkoFyre {
 class GkDb;
-}
 
 class GkDb : public QObject {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit GkDb(QObject *parent = 0);
     ~GkDb();
+
+protected:
+    GkFile::FileDb openDatabase(const std::string &dbFile);
+
+private:
+    void decompress_file(const std::string &file);
 };
+}
 
 #endif // GKDB_HPP

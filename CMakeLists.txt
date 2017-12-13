@@ -166,6 +166,17 @@ else()
 endif(LEVELDB_FOUND)
 
 #
+# Find snappy compression library
+#
+find_package(Snappy REQUIRED)
+if (SNAPPY_FOUND)
+    include_directories(${SNAPPY_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${SNAPPY_LIBRARIES})
+else()
+    message(SEND_ERROR "The 'Snappy' compression library could not be found!")
+endif(SNAPPY_FOUND)
+
+#
 # Qt5 translation routines
 # http://stackoverflow.com/questions/19193121/automated-translation-management-with-cmake-and-qt5
 # http://stackoverflow.com/questions/24095800/qt-internationalization-and-cmake-how-to-update-ts-and-dont-lose-them

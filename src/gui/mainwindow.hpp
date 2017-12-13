@@ -15,6 +15,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void on_button_create_new_db_clicked();
+    void on_button_open_db_clicked();
+    void on_button_exit_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

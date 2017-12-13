@@ -33,8 +33,6 @@
  **
  ********************************************************************************/
 
-#include "gk_db.hpp"
-
 /**
  * @file gk_db.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
@@ -42,6 +40,50 @@
  * @brief Contains any database-related routines, specifically ones related to Google LevelDB.
  */
 
+#include "gk_db.hpp"
+#include <leveldb/db.h>
+#include <leveldb/write_batch.h>
+#include <leveldb/cache.h>
+#include <boost/filesystem.hpp>
+#include <boost/exception/all.hpp>
+#include <snappy-c.h>
+#include <memory>
+#include <iostream>
+
+using namespace GekkoFyre;
+namespace sys = boost::system;
+namespace fs = boost::filesystem;
+
 GkDb::GkDb(QObject *parent) : QObject(parent) {}
 
 GkDb::~GkDb() {}
+
+GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
+{
+    leveldb::Status s;
+    GkFile::FileDb db_struct;
+    db_struct.options.create_if_missing = true;
+    std::shared_ptr<leveldb::Cache>(db_struct.options.block_cache).reset(leveldb::NewLRUCache(LEVELDB_CFG_CACHE_SIZE));
+    db_struct.options.compression = leveldb::CompressionType::kSnappyCompression;
+    if (!dbFile.empty()) {
+        sys::error_code ec;
+        bool doesExist;
+        doesExist = !fs::exists(dbFile, ec) ? false : true;
+
+        leveldb::DB *raw_db_ptr;
+        s = leveldb::DB::Open(db_struct.options, dbFile, &raw_db_ptr);
+        db_struct.db.reset(raw_db_ptr);
+        if (!s.ok()) {
+            throw std::runtime_error(tr("Unable to open/create database! %1").arg(QString::fromStdString(s.ToString())).toStdString());
+        }
+
+        if (fs::exists(dbFile, ec) && fs::is_directory(dbFile) && !doesExist) {
+            std::cout << tr("Database object created. Status: ").toStdString() << s.ToString() << std::endl;
+        }
+    }
+
+    return db_struct;
+}
+
+void GkDb::decompress_file(const std::string &file)
+{}

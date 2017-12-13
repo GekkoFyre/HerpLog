@@ -12,3 +12,12 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_button_create_new_db_clicked()
+{}
+
+void MainWindow::on_button_open_db_clicked()
+{}
+
+void MainWindow::on_button_exit_clicked()
+{}
