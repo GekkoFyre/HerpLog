@@ -55,8 +55,10 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
 
 using namespace GekkoFyre;
+using namespace zipper;
 namespace sys = boost::system;
 namespace fs = boost::filesystem;
 
@@ -96,8 +98,14 @@ GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
  * @param filesList
  * @return Whether the operation was successful or not.
  */
-bool GkDb::compress_files(const std::vector<std::string> &filesList)
+bool GkDb::compress_files(const std::vector<std::string> &filesList, const std::string &saveFileAsLoc)
 {
+    std::stringstream csv_out;
+    Zipper zipper(saveFileAsLoc);
+    for (size_t i = 0; i < filesList.size(); ++i) {
+
+    }
+
     return true;
 }
 
@@ -108,5 +116,7 @@ bool GkDb::compress_files(const std::vector<std::string> &filesList)
  */
 bool GkDb::decompress_file(const std::string &fileLoc)
 {
+    GkCsvReader csv_reader(3, GkFile::GkCsv::fileName, GkFile::GkCsv::fileHash, GkFile::GkCsv::hashType);
+
     return false;
 }

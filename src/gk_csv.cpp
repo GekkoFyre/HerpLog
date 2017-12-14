@@ -54,24 +54,16 @@ bool GekkoFyre::GkCsvReader::read_row()
 
 bool GekkoFyre::GkCsvReader::has_column(const std::string &name)
 {
-    if (key) {
-        for (const auto &header: headers) {
-            if (header == name) {
-                return true;
-            }
-        }
-    } else {
-        auto rows = read_rows(csv_raw_data.str());
-        if (!rows.empty()) {
-            for (const auto &row: rows) {
-                // Key is the row number and value is the row of raw data
-                auto cols = split_values(std::stringstream(row.second));
-                if (row.first == 1) {
-                    // Determine headers
-                    for (const auto &col: cols) {
-                        if (col.second == name) {
-                            return true;
-                        }
+    auto rows = read_rows(csv_raw_data.str());
+    if (!rows.empty()) {
+        for (const auto &row: rows) {
+            // Key is the row number and value is the row of raw data
+            auto cols = split_values(std::stringstream(row.second));
+            if (row.first == 1) {
+                // Determine headers
+                for (const auto &col: cols) {
+                    if (col.second == name) {
+                        return true;
                     }
                 }
             }
@@ -110,10 +102,6 @@ std::map<int, std::string> GekkoFyre::GkCsvReader::read_rows(std::string raw_dat
             ++rows_count;
             lines.insert(std::make_pair(rows_count, row));
         }
-
-        if (!key) {
-            rows_count = (rows_count - 1); // Remove the column containing the headers
-        }
     }
 
     return lines;
@@ -132,9 +120,6 @@ std::multimap<int, std::pair<int, std::string>> GekkoFyre::GkCsvReader::parse_cs
         csv_data.clear();
         std::multimap<int, std::pair<int, std::string>> output;
         size_t start_row = 0;
-        if (!key) {
-            start_row = 1;
-        }
 
         for (size_t i = start_row; i < rows.size(); ++i) {
             std::string csv;

@@ -45,6 +45,7 @@
 
 #include <leveldb/db.h>
 #include <memory>
+#include <string>
 
 namespace GekkoFyre {
     constexpr double FYREDL_DEFAULT_RESOLUTION_WIDTH = 1920.0;
@@ -55,6 +56,12 @@ namespace GekkoFyre {
             std::shared_ptr<leveldb::DB> db;
             leveldb::Options options;
         };
+
+        namespace GkCsv {
+            constexpr char fileName[] = "file_name";
+            constexpr char fileHash[] = "file_hash";
+            constexpr char hashType[] = "hash_type";
+        }
     }
 }
 

@@ -62,9 +62,8 @@ namespace GekkoFyre {
         GkCsvReader(const GkCsvReader&) = delete;
 
         template<typename ...Headers>
-        explicit GkCsvReader(const int &column_count, const bool &download_ids, const std::string &csv_data, const Headers& ...headers) {
+        explicit GkCsvReader(const int &column_count, const std::string &csv_data, const Headers& ...headers) {
             cols_count = column_count;
-            key = download_ids;
             if (!csv_data.empty()) {
                 csv_raw_data << csv_data;
                 rows_parsed = 0;
@@ -75,7 +74,6 @@ namespace GekkoFyre {
                 rows_count = 0;
                 rows_parsed = 0;
                 ret_parsed_cols = 0;
-                key = false;
             }
 
             return;
@@ -148,7 +146,6 @@ namespace GekkoFyre {
         static int ret_parsed_cols;                               // The amount of columns that have been parsed and returned successfully in `read_row()`
         std::recursive_mutex recur_mtx;
         std::mutex excl_mtx;
-        bool key;                                                 // Whether we are processing `CmnRoutines::extract_download_ids()` or its cousins
         std::list<std::string> headers;                           // The key is the column number, whilst the value is the header associated with that column.
         static QMultiMap<int, int> proc_cols;                     // The rows/columns we have already processed under `read_csv_helper()`
         std::multimap<int, std::pair<int, std::string>> csv_data; // The key is the row number whilst the values are are the column number and the comma-separated-values.

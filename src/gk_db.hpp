@@ -60,7 +60,7 @@ public:
 
 protected:
     GkFile::FileDb openDatabase(const std::string &dbFile);
-    bool compress_files(const std::vector<std::string> &filesList);
+    bool compress_files(const std::vector<std::string> &filesList, const std::string &saveFileAsLoc);
     bool decompress_file(const std::string &fileLoc);
 };
 }
