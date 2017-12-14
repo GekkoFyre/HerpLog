@@ -29,36 +29,36 @@
  ##
  #################################################################################
 
-# Try to find 'snappy'
+# Try to find 'zipper'
 #
-# SNAPPY_FOUND
-# SNAPPY_INCLUDE_DIR
-# SNAPPY_LIBRARIES
+# ZIPPER_FOUND
+# ZIPPER_INCLUDE_DIR
+# ZIPPER_LIBRARIES
 
-find_library(SNAPPY_LIBRARIES
-    NAMES "snappy"
-    HINTS "${SNAPPY_LOCATION}/lib" "${SNAPPY_LOCATION}/lib64" "${SNAPPY_LOCATION}/lib32"
-    DOC "The main snappy compression library"
+find_library(ZIPPER_LIBRARIES
+    NAMES "Zipper"
+    HINTS "${ZIPPER_LOCATION}/lib" "${ZIPPER_LOCATION}/lib64" "${ZIPPER_LOCATION}/lib32"
+    DOC "The main zipper compression library"
 )
 
 # -----------------------------------------------------
-# SNAPPY Include Directories
+# ZIPPER Include Directories
 # -----------------------------------------------------
-find_path(SNAPPY_INCLUDE_DIR
-    NAMES "snappy-c.h"
-    HINTS "${SNAPPY_LOCATION}" "${SNAPPY_LOCATION}/include/snappy" "${SNAPPY_LOCATION}/include/*" "/usr/include/snappy" "/usr/include"
-    DOC "The snappy include directory"
+find_path(ZIPPER_INCLUDE_DIR
+    NAMES "zipper.h" "unzipper.h"
+    HINTS "${ZIPPER_LOCATION}" "${ZIPPER_LOCATION}/include/zipper" "${ZIPPER_LOCATION}/include/*" "/usr/include/zipper" "/usr/include" "/usr/local/include/*"
+    DOC "The zipper include directory"
 )
 
-if(SNAPPY_INCLUDE_DIR)
-    message(STATUS "snappy includes found in ${SNAPPY_INCLUDE_DIR}")
+if(ZIPPER_INCLUDE_DIR)
+    message(STATUS "zipper includes found in ${ZIPPER_INCLUDE_DIR}")
 endif()
 
 # -----------------------------------------------------
-# Handle the QUIETLY and REQUIRED arguments and set SNAPPY_FOUND to TRUE if
+# Handle the QUIETLY and REQUIRED arguments and set ZIPPER_FOUND to TRUE if
 # all listed variables are TRUE
 # -----------------------------------------------------
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(snappy DEFAULT_MSG SNAPPY_LIBRARIES SNAPPY_INCLUDE_DIR)
-mark_as_advanced(SNAPPY_INCLUDE_DIR SNAPPY_LIBRARIES)
+find_package_handle_standard_args(zipper DEFAULT_MSG ZIPPER_LIBRARIES ZIPPER_INCLUDE_DIR)
+mark_as_advanced(ZIPPER_INCLUDE_DIR ZIPPER_LIBRARIES)
 

@@ -41,14 +41,20 @@
  */
 
 #include "gk_db.hpp"
+#include "gk_csv.hpp"
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
 #include <leveldb/cache.h>
 #include <boost/filesystem.hpp>
 #include <boost/exception/all.hpp>
-#include <snappy-c.h>
+#include <zipper.h>
+#include <unzipper.h>
+#include <QMessageBox>
 #include <memory>
+#include <exception>
 #include <iostream>
+#include <fstream>
+#include <vector>
 
 using namespace GekkoFyre;
 namespace sys = boost::system;
@@ -85,5 +91,22 @@ GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
     return db_struct;
 }
 
-void GkDb::decompress_file(const std::string &file)
-{}
+/**
+ * @note <https://github.com/sebastiandev/zipper>
+ * @param filesList
+ * @return Whether the operation was successful or not.
+ */
+bool GkDb::compress_files(const std::vector<std::string> &filesList)
+{
+    return true;
+}
+
+/**
+ * @note <https://github.com/sebastiandev/zipper>
+ * @param fileLoc
+ * @return Whether the operation was successful or not.
+ */
+bool GkDb::decompress_file(const std::string &fileLoc)
+{
+    return false;
+}

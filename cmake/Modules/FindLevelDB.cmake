@@ -46,7 +46,7 @@ find_library(LEVELDB_LIBRARIES
 # -----------------------------------------------------
 find_path(LEVELDB_INCLUDE_DIR
     NAMES "db.h"
-    HINTS "${LEVELDB_LOCATION}" "${LEVELDB_LOCATION}/include/leveldb" "${LEVELDB_LOCATION}/include/*" "/usr/include/leveldb"
+    HINTS "${LEVELDB_LOCATION}" "${LEVELDB_LOCATION}/include/leveldb" "${LEVELDB_LOCATION}/include/*" "/usr/include/leveldb" "/usr/local/include/*"
     DOC "The leveldb include directory"
 )
 

@@ -87,6 +87,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 set(SOURCE_FILES
             src/main.cpp
             src/options.hpp
+            src/gk_csv.hpp
+            src/gk_csv.cpp
             src/gk_db.hpp
             src/gk_db.cpp
             src/gui/mainwindow.hpp
@@ -166,15 +168,15 @@ else()
 endif(LEVELDB_FOUND)
 
 #
-# Find snappy compression library
+# Find zipper compression library
 #
-find_package(Snappy REQUIRED)
-if (SNAPPY_FOUND)
-    include_directories(${SNAPPY_INCLUDE_DIR})
-    set(LIBS ${LIBS} ${SNAPPY_LIBRARIES})
+find_package(Zipper REQUIRED)
+if (ZIPPER_FOUND)
+    include_directories(${ZIPPER_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${ZIPPER_LIBRARIES})
 else()
-    message(SEND_ERROR "The 'Snappy' compression library could not be found!")
-endif(SNAPPY_FOUND)
+    message(SEND_ERROR "The 'Zipper' compression library could not be found!")
+endif(ZIPPER_FOUND)
 
 #
 # Qt5 translation routines

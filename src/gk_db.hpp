@@ -45,6 +45,8 @@
 
 #include "options.hpp"
 #include <QtCore/QObject>
+#include <string>
+#include <vector>
 
 namespace GekkoFyre {
 class GkDb;
@@ -58,9 +60,8 @@ public:
 
 protected:
     GkFile::FileDb openDatabase(const std::string &dbFile);
-
-private:
-    void decompress_file(const std::string &file);
+    bool compress_files(const std::vector<std::string> &filesList);
+    bool decompress_file(const std::string &fileLoc);
 };
 }
 

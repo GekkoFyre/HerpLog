@@ -40,6 +40,9 @@
  * @brief Contains options, enums, etc. for the entire program.
  */
 
+#ifndef GKOPTIONS_HPP
+#define GKOPTIONS_HPP
+
 #include <leveldb/db.h>
 #include <memory>
 
@@ -54,3 +57,5 @@ namespace GekkoFyre {
         };
     }
 }
+
+#endif // GKOPTIONS_HPP
