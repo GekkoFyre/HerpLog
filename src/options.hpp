@@ -61,7 +61,14 @@ namespace GekkoFyre {
             constexpr char fileName[] = "file_name";
             constexpr char fileHash[] = "file_hash";
             constexpr char hashType[] = "hash_type";
+            constexpr char zip_contents[] = "zip_contents.csv";
+
+            constexpr char hashTypeCRC32[] = "CRC32";
         }
+
+        enum HashTypes {
+            CRC32
+        };
     }
 }
 

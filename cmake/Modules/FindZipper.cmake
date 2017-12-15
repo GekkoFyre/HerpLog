@@ -36,7 +36,7 @@
 # ZIPPER_LIBRARIES
 
 find_library(ZIPPER_LIBRARIES
-    NAMES "Zipper"
+    NAMES "Zipper-static"
     HINTS "${ZIPPER_LOCATION}/lib" "${ZIPPER_LOCATION}/lib64" "${ZIPPER_LOCATION}/lib32"
     DOC "The main zipper compression library"
 )

@@ -168,6 +168,15 @@ else()
 endif(LEVELDB_FOUND)
 
 #
+# Find ZLIB compression library
+#
+find_package(ZLIB REQUIRED)
+if (ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${ZLIB_LIBRARIES})
+endif(ZLIB_FOUND)
+
+#
 # Find zipper compression library
 #
 find_package(Zipper REQUIRED)
@@ -231,7 +240,7 @@ else()
     message(STATUS "Archive directory has been set to: \"${HERPLOG_ARCHIVE_DIR}\"")
 ENDIF()
 
-target_link_libraries(herplog ${Boost_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Charts ${LIBS})
+target_link_libraries(herplog ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${ZIPPER_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Charts ${LIBS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows" OR "cygwin" OR "mingw") # Check if we are on Microsoft Windows
     if (CMAKE_BUILD_TYPE MATCHES "Debug")

@@ -96,7 +96,6 @@ namespace GekkoFyre {
         template<typename T, typename ...ColTypes>
         bool read_row(T& col, ColTypes& ...cols) {
             static int cols_parsed;
-            static bool ret_val;
             cols_parsed = 0;
             if (!csv_data.empty()) {
                 if (rows_parsed <= rows_count) {
@@ -107,7 +106,6 @@ namespace GekkoFyre {
                             col_data = read_csv_helper(cols_parsed, (rows_parsed + 1));
                             if (!col_data.empty()) {
                                 col = col_data;
-                                ret_val = read_row(cols...);
                             }
                         }
 

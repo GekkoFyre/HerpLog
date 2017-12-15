@@ -58,10 +58,17 @@ public:
     explicit GkDb(QObject *parent = 0);
     ~GkDb();
 
-protected:
+public:
     GkFile::FileDb openDatabase(const std::string &dbFile);
+
+protected:
     bool compress_files(const std::vector<std::string> &filesList, const std::string &saveFileAsLoc);
     bool decompress_file(const std::string &fileLoc);
+
+private:
+    int getCrc32(const std::string &fileData);
+    std::string readFileToString(const std::string &fileLoc);
+    std::string convHashType_toStr(const GkFile::HashTypes &hashType);
 };
 }
 
