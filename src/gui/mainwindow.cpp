@@ -64,7 +64,37 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::on_button_create_new_db_clicked()
-{}
+{
+    fs::path home_dir(QDir::homePath().toStdString());
+    sys::error_code ec;
+    try {
+        if (fs::is_directory(home_dir, ec)) {
+            QString saveFileName = QFileDialog::getSaveFileName(this, tr("Create Database"), QString::fromStdString(home_dir.string()), tr("HerpLog Database Files (*.hdb)"));
+            if (!saveFileName.isEmpty()) {
+                fs::path dirName = fs::path(saveFileName.toStdString()).filename();
+                fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + dirName.string());
+                db_ptr = gkDb->openDatabase(temp_dir.string());
+                db_ptr.db.reset();
+
+                fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
+                fs::path zip_file = std::string(parent_path.string() + fs::path::preferred_separator + dirName.string() + "." + "hdb");
+                gkDb->compress_files(temp_dir.string(), zip_file.string());
+                if (!fs::remove_all(temp_dir, ec)) {
+                    QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+                    return;
+                }
+
+                return;
+            }
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), tr("A problem was encountered whilst trying to open a database. Error:\n\n")
+                .arg(e.what()), QMessageBox::Ok);
+        return;
+    }
+
+    return;
+}
 
 void MainWindow::on_button_open_db_clicked()
 {
@@ -73,17 +103,27 @@ void MainWindow::on_button_open_db_clicked()
     try {
         if (fs::is_directory(home_dir, ec)) {
             QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database"), QString::fromStdString(home_dir.string()), tr("HerpLog Database Files (*.hdb);;Any files (*.*)"));
-            if (fs::exists(fileName.toStdString(), ec)) {
-                db_ptr = gkDb->openDatabase(fileName.toStdString());
+            if (!fileName.isEmpty()) {
+                if (fs::exists(fileName.toStdString(), ec)) {
+                    db_ptr = gkDb->openDatabase(fileName.toStdString());
+                    return;
+                }
             }
         } else {
-            QMessageBox::warning(this, tr("Error!"), ec.message().c_str(), QMessageBox::Ok);
+            QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+            return;
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), tr("A problem was encountered whilst trying to open a database. Error:\n\n")
                 .arg(e.what()), QMessageBox::Ok);
+        return;
     }
+
+    return;
 }
 
 void MainWindow::on_button_exit_clicked()
-{}
+{
+    QApplication::exit(0);
+    return;
+}

@@ -51,12 +51,15 @@
 #include <zipper.h>
 #include <unzipper.h>
 #include <QMessageBox>
+#include <QDir>
+#include <ios>
 #include <memory>
 #include <exception>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 using namespace GekkoFyre;
 using namespace zipper;
@@ -69,8 +72,6 @@ GkDb::~GkDb() {}
 
 GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
 {
-    decompress_file(dbFile); // Decompress the archive firstly
-
     leveldb::Status s;
     GkFile::FileDb db_struct;
     db_struct.options.create_if_missing = true;
@@ -98,11 +99,11 @@ GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
 
 /**
  * @note <https://github.com/sebastiandev/zipper>
- * @param filesList
- * @param saveFileAsLoc The location of where you wish to save the zipped file as.
+ * @param folderLoc is the location of the folder to be compressed.
+ * @param saveFileAsLoc The location of where you wish to save the compressed archive as.
  * @return Whether the operation was successful or not.
  */
-bool GkDb::compress_files(const std::vector<std::string> &filesList, const std::string &saveFileAsLoc)
+bool GkDb::compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc)
 {
     std::stringstream csv_out;
     Zipper zipper(saveFileAsLoc);
@@ -110,27 +111,28 @@ bool GkDb::compress_files(const std::vector<std::string> &filesList, const std::
 
     try {
         const std::string dir_name = fs::path(saveFileAsLoc).filename().string();
-        const std::string path_to_zip = std::string(fs::path(saveFileAsLoc).remove_filename().string() + fs::path::preferred_separator + dir_name);
-        for (size_t i = 0; i < filesList.size(); ++i) {
-            if (fs::exists(filesList.at(i), ec)) {
-                std::string fileData = readFileToString(filesList.at(i));
-                csv_out << filesList.at(i) << "," << getCrc32(fileData.data()) << "," << "CRC32" << std::endl;
+        std::vector<std::string> dir_contents;
+        read_directory(folderLoc, dir_contents);
+        zipper.open();
+        for (const auto &file: dir_contents) {
+            fs::path file_path = std::string(folderLoc + fs::path::preferred_separator + file);
+            if (fs::exists(file_path, ec)) { // Check that the file(s) to be compressed do exist still
+                std::string fileData = readFileToString(file_path.string());
+                csv_out << file << "," << getCrc32(fileData) << "," << "CRC32" << std::endl; // Create the CSV strings
+                zipper.add(file_path.string());
             } else {
-                QMessageBox::warning(nullptr, tr("Error!"), ec.message().c_str(), QMessageBox::Ok);
+                QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
                 return false;
             }
         }
 
-        if (fs::create_directory(path_to_zip, ec)) {
-            const std::string csv_file = fs::path(path_to_zip + fs::path::preferred_separator + GkFile::GkCsv::zip_contents).string();
-            std::ofstream output;
-            output.open(csv_file, std::ios::out | std::ios::app);
-            output << csv_out.str();
-            output.close();
-        } else {
-            QMessageBox::warning(nullptr, tr("Error!"), ec.message().c_str(), QMessageBox::Ok);
-            return false;
-        }
+        const std::string csv_file = fs::path(folderLoc + fs::path::preferred_separator + GkFile::GkCsv::zip_contents_csv).string();
+        std::ofstream output;
+        output.open(csv_file, std::ios::out | std::ios::app);
+        output << csv_out.str();
+        output.close();
+        zipper.add(csv_file);
+        zipper.close();
     } catch (const std::exception &e) {
         QMessageBox::warning(nullptr, tr("Error!"), tr("An error has occurred during the saving of your database file.\n\n%1").arg(e.what()),
                              QMessageBox::Ok);
@@ -149,25 +151,57 @@ bool GkDb::decompress_file(const std::string &fileLoc)
 {
     Unzipper unzipper(fileLoc);
     std::vector<ZipEntry> entries = unzipper.entries();
-    std::vector<unsigned char> unzipped_csv;
-    unzipper.extractEntryToMemory(GkFile::GkCsv::zip_contents, unzipped_csv);
+    std::vector<unsigned char> unzipped_data_csv;
+    unzipper.extractEntryToMemory(GkFile::GkCsv::zip_contents_csv, unzipped_data_csv);
 
-    GkCsvReader csv_reader(3, std::string(reinterpret_cast<const char *>(unzipped_csv.data())), GkFile::GkCsv::fileName, GkFile::GkCsv::fileHash, GkFile::GkCsv::hashType);
-    std::string file, hash, hashType;
-    while (csv_reader.read_row(file, hash, hashType)) {
-        if (!file.empty() && !hash.empty() && !hashType.empty()) {
+    GkCsvReader csv_reader(3, std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())), GkFile::GkCsv::fileName, GkFile::GkCsv::fileHash, GkFile::GkCsv::hashType);
+    std::string csv_file_entry, csv_hash_entry, hashType;
+    std::string fileName = fs::path(fileLoc).filename().string();
+    fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName);
+
+    unzipper.extract(temp_dir.string());
+    while (csv_reader.read_row(csv_file_entry, csv_hash_entry, hashType)) {
+        if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) {
+            for (const auto &entry: entries) {
+                if (!entry.name.empty()) {
+                    const std::string cur_file = entry.name;
+                    if (cur_file == csv_file_entry) {
+                        fs::path cur_file_full_path = std::string(temp_dir.string() + fs::path::preferred_separator + cur_file);
+                        sys::error_code ec;
+                        if (fs::exists(cur_file_full_path, ec)) {
+                            std::string fileData = readFileToString(cur_file_full_path.string());
+                            std::string crc32 = getCrc32(fileData);
+                            if (crc32 == csv_hash_entry) {
+                                continue;
+                            } else {
+                                QMessageBox::warning(nullptr, tr("Error!"), tr("The database, \"%1\", appears to be corrupt. Aborting...")
+                                        .arg(QString::fromStdString(fileName)), QMessageBox::Ok);
+                                unzipper.close();
+                                return false;
+                            }
+                        } else {
+                            QMessageBox::warning(nullptr, tr("Error!"), tr("A problem was encountered whilst opening your saved database. Error:\n\n%1")
+                                    .arg(QString::fromStdString(ec.message())), QMessageBox::Ok);
+                            unzipper.close();
+                            return false;
+                        }
+                    }
+                }
+            }
         }
     }
 
     unzipper.close();
-    return false;
+    return true;
 }
 
-int GkDb::getCrc32(const std::string &fileData)
+std::string GkDb::getCrc32(const std::string &fileData)
 {
     boost::crc_32_type result;
     result.process_bytes(fileData.data(), fileData.length());
-    return result.checksum();
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << result.checksum();
+    return oss.str();
 }
 
 /**
@@ -199,4 +233,17 @@ std::string GkDb::convHashType_toStr(const GkFile::HashTypes &hashType)
     }
 
     return std::string();
+}
+
+/**
+ * @brief GkDb::read_directory reads the contents of a directory on the local storage into a STL vector.
+ * @param dirLoc The location of the directory to be read.
+ * @param output The contents of the directory.
+ */
+void GkDb::read_directory(const std::string &dirLoc, std::vector<std::string> &output)
+{
+    fs::path path(dirLoc);
+    fs::directory_iterator start(path);
+    fs::directory_iterator end;
+    std::transform(start, end, std::back_inserter(output), GkFile::path_leaf_string());
 }
