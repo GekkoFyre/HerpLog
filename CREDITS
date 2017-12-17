@@ -1,6 +1,6 @@
 Project (name, author, <URL>, license)
 -----------------------------------------
-It is with the help and hard work of these libraries that FyreDL was made possible. We owe our sincere thanks to the following authors, contributors, helpers, and communities below:
+It is with the help and hard work of these libraries that HerpLog was made possible. We owe our sincere thanks to the following authors, contributors, helpers, and communities below:
 
 
 Qt5 by Qt Project et al.
@@ -18,6 +18,10 @@ CMake (Cross Platform Makefile Generator) by Kitware
 LevelDB by Jeffrey Dean, Sanjay Ghemawat, et al. and Google Inc.
 	<https://github.com/google/leveldb>
 		BSD 3-clause
+
+Snappy by Robert Važan, et al. and Google Inc.
+	<https://snappy.machinezoo.com/>
+		BSD license
 
 Doxygen by Dimitri van Heesch et al.
 	<http://www.stack.nl/~dimitri/doxygen/>

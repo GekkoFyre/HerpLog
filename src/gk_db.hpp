@@ -43,18 +43,32 @@
 #ifndef GKDB_HPP
 #define GKDB_HPP
 
+#include "options.hpp"
 #include <QtCore/QObject>
+#include <string>
+#include <vector>
 
 namespace GekkoFyre {
 class GkDb;
-}
 
 class GkDb : public QObject {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit GkDb(QObject *parent = 0);
     ~GkDb();
+
+public:
+    GkFile::FileDb openDatabase(const std::string &dbFile);
+    bool compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc);
+    bool decompress_file(const std::string &fileLoc);
+
+private:
+    std::string getCrc32(const std::string &fileData);
+    std::string readFileToString(const std::string &fileLoc);
+    std::string convHashType_toStr(const GkFile::HashTypes &hashType);
+    void read_directory(const std::string &dirLoc, std::vector<std::string> &output);
 };
+}
 
 #endif // GKDB_HPP

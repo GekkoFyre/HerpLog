@@ -40,6 +40,44 @@
  * @brief Contains options, enums, etc. for the entire program.
  */
 
+#ifndef GKOPTIONS_HPP
+#define GKOPTIONS_HPP
+
+#include <boost/filesystem.hpp>
+#include <leveldb/db.h>
+#include <memory>
+#include <string>
+
+namespace fs = boost::filesystem;
 namespace GekkoFyre {
     constexpr double FYREDL_DEFAULT_RESOLUTION_WIDTH = 1920.0;
+    constexpr unsigned long LEVELDB_CFG_CACHE_SIZE = 32UL * 1024UL * 1024UL;
+
+    namespace GkFile {
+        struct path_leaf_string {
+            std::string operator()(const fs::directory_entry &entry) const {
+                return entry.path().leaf().string();
+            }
+        };
+
+        struct FileDb {
+            std::shared_ptr<leveldb::DB> db;
+            leveldb::Options options;
+        };
+
+        namespace GkCsv {
+            constexpr char fileName[] = "file_name";
+            constexpr char fileHash[] = "file_hash";
+            constexpr char hashType[] = "hash_type";
+            constexpr char zip_contents_csv[] = "zip_contents.csv";
+
+            constexpr char hashTypeCRC32[] = "CRC32";
+        }
+
+        enum HashTypes {
+            CRC32
+        };
+    }
 }
+
+#endif // GKOPTIONS_HPP

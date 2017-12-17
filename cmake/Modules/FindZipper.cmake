@@ -29,36 +29,36 @@
  ##
  #################################################################################
 
-# Try to find 'leveldb'
+# Try to find 'zipper'
 #
-# LEVELDB_FOUND
-# LEVELDB_INCLUDE_DIR
-# LEVELDB_LIBRARIES
+# ZIPPER_FOUND
+# ZIPPER_INCLUDE_DIR
+# ZIPPER_LIBRARIES
 
-find_library(LEVELDB_LIBRARIES
-    NAMES "leveldb"
-    HINTS "${LEVELDB_LOCATION}/lib" "${LEVELDB_LOCATION}/lib64" "${LEVELDB_LOCATION}/lib32"
-    DOC "The main leveldb library"
+find_library(ZIPPER_LIBRARIES
+    NAMES "Zipper-static"
+    HINTS "${ZIPPER_LOCATION}/lib" "${ZIPPER_LOCATION}/lib64" "${ZIPPER_LOCATION}/lib32"
+    DOC "The main zipper compression library"
 )
 
 # -----------------------------------------------------
-# LEVELDB Include Directories
+# ZIPPER Include Directories
 # -----------------------------------------------------
-find_path(LEVELDB_INCLUDE_DIR
-    NAMES "db.h"
-    HINTS "${LEVELDB_LOCATION}" "${LEVELDB_LOCATION}/include/leveldb" "${LEVELDB_LOCATION}/include/*" "/usr/include/leveldb" "/usr/local/include/*"
-    DOC "The leveldb include directory"
+find_path(ZIPPER_INCLUDE_DIR
+    NAMES "zipper.h" "unzipper.h"
+    HINTS "${ZIPPER_LOCATION}" "${ZIPPER_LOCATION}/include/zipper" "${ZIPPER_LOCATION}/include/*" "/usr/include/zipper" "/usr/include" "/usr/local/include/*"
+    DOC "The zipper include directory"
 )
 
-if(LEVELDB_INCLUDE_DIR)
-    message(STATUS "leveldb includes found in ${LEVELDB_INCLUDE_DIR}")
+if(ZIPPER_INCLUDE_DIR)
+    message(STATUS "zipper includes found in ${ZIPPER_INCLUDE_DIR}")
 endif()
 
 # -----------------------------------------------------
-# Handle the QUIETLY and REQUIRED arguments and set LEVELDB_FOUND to TRUE if
+# Handle the QUIETLY and REQUIRED arguments and set ZIPPER_FOUND to TRUE if
 # all listed variables are TRUE
 # -----------------------------------------------------
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(leveldb DEFAULT_MSG LEVELDB_LIBRARIES LEVELDB_INCLUDE_DIR)
-mark_as_advanced(LEVELDB_INCLUDE_DIR LEVELDB_LIBRARIES)
+find_package_handle_standard_args(zipper DEFAULT_MSG ZIPPER_LIBRARIES ZIPPER_INCLUDE_DIR)
+mark_as_advanced(ZIPPER_INCLUDE_DIR ZIPPER_LIBRARIES)
 

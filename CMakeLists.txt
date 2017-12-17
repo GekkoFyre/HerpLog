@@ -87,6 +87,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 set(SOURCE_FILES
             src/main.cpp
             src/options.hpp
+            src/gk_csv.hpp
+            src/gk_csv.cpp
             src/gk_db.hpp
             src/gk_db.cpp
             src/gui/mainwindow.hpp
@@ -166,6 +168,26 @@ else()
 endif(LEVELDB_FOUND)
 
 #
+# Find ZLIB compression library
+#
+find_package(ZLIB REQUIRED)
+if (ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    set(LIBS ${LIBS} ${ZLIB_LIBRARIES})
+endif(ZLIB_FOUND)
+
+#
+# Find zipper compression library
+#
+find_package(Zipper REQUIRED)
+if (ZIPPER_FOUND)
+    include_directories(${ZIPPER_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${ZIPPER_LIBRARIES})
+else()
+    message(SEND_ERROR "The 'Zipper' compression library could not be found!")
+endif(ZIPPER_FOUND)
+
+#
 # Qt5 translation routines
 # http://stackoverflow.com/questions/19193121/automated-translation-management-with-cmake-and-qt5
 # http://stackoverflow.com/questions/24095800/qt-internationalization-and-cmake-how-to-update-ts-and-dont-lose-them
@@ -218,7 +240,7 @@ else()
     message(STATUS "Archive directory has been set to: \"${HERPLOG_ARCHIVE_DIR}\"")
 ENDIF()
 
-target_link_libraries(herplog ${Boost_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Charts ${LIBS})
+target_link_libraries(herplog ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${ZIPPER_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::Gui Qt5::Charts ${LIBS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows" OR "cygwin" OR "mingw") # Check if we are on Microsoft Windows
     if (CMAKE_BUILD_TYPE MATCHES "Debug")
