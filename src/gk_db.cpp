@@ -70,6 +70,14 @@ GkDb::GkDb(QObject *parent) : QObject(parent) {}
 
 GkDb::~GkDb() {}
 
+/**
+ * @brief GkDb::openDatabase creates a database connection within the applications memory from the database files on
+ * the local storage of the users computer, ready to be used for inserting/modifying/deleting records.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2017-12-17
+ * @param dbFile The location of the database files on the local storage of the users computer.
+ * @return A pointer to the connection opened within memory with regard to the database.
+ */
 GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
 {
     leveldb::Status s;
@@ -98,6 +106,10 @@ GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
 }
 
 /**
+ * @brief GkDb::compress_files will create a HerpLog Database File for you, out of a typical Google LevelDB database and
+ * a CSV containing some information about the files within the archive itself, such as CRC32 Hashes.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2017-12-17
  * @note <https://github.com/sebastiandev/zipper>
  * @param folderLoc is the location of the folder to be compressed.
  * @param saveFileAsLoc The location of where you wish to save the compressed archive as.
@@ -143,8 +155,11 @@ bool GkDb::compress_files(const std::string &folderLoc, const std::string &saveF
 }
 
 /**
+ * @brief GkDb::decompress_file will decompress the given HerpLog Database File into a given directory location for you.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2017-12-17
  * @note <https://github.com/sebastiandev/zipper>
- * @param fileLoc
+ * @param fileLoc The location to the file to be decompressed, on local storage.
  * @return Whether the operation was successful or not.
  */
 bool GkDb::decompress_file(const std::string &fileLoc)
@@ -157,19 +172,24 @@ bool GkDb::decompress_file(const std::string &fileLoc)
     GkCsvReader csv_reader(3, std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())), GkFile::GkCsv::fileName, GkFile::GkCsv::fileHash, GkFile::GkCsv::hashType);
     std::string csv_file_entry, csv_hash_entry, hashType;
     std::string fileName = fs::path(fileLoc).filename().string();
-    fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName);
+    std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName);
 
-    unzipper.extract(temp_dir.string());
-    while (csv_reader.read_row(csv_file_entry, csv_hash_entry, hashType)) {
-        if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) {
-            for (const auto &entry: entries) {
-                if (!entry.name.empty()) {
+    unzipper.extract(temp_dir); // Extract the contents of the zip-file into a temporary directory
+    while (csv_reader.read_row(csv_file_entry, csv_hash_entry, hashType)) { // Read out the CSV information
+        if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) { // Make sure the CSV strings are not empty, otherwise abort
+            for (const auto &entry: entries) { // Read out the information contained within the zip-file datastream itself
+                if (!entry.name.empty()) { // Make sure the filename is valid
                     const std::string cur_file = entry.name;
                     if (cur_file == csv_file_entry) {
-                        fs::path cur_file_full_path = std::string(temp_dir.string() + fs::path::preferred_separator + cur_file);
+                        // The full-path to the currently addressed, unzipped file
+                        fs::path cur_file_full_path = std::string(temp_dir += fs::path::preferred_separator + cur_file);
+
                         sys::error_code ec;
                         if (fs::exists(cur_file_full_path, ec)) {
+                            // The binary data of the currently addressed file within a std::string
                             std::string fileData = readFileToString(cur_file_full_path.string());
+
+                            // The CRC32 Hash of the currently addressed file
                             std::string crc32 = getCrc32(fileData);
                             if (crc32 == csv_hash_entry) {
                                 continue;
@@ -195,6 +215,13 @@ bool GkDb::decompress_file(const std::string &fileLoc)
     return true;
 }
 
+/**
+ * @brief GkDb::getCrc32 will calculate the CRC32 hash of any given file when granted the binary data to it.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2017-12-17
+ * @param fileData The actual binary data of the file, for which the hash is to be calculated henceforth.
+ * @return The CRC32 hash of the given file.
+ */
 std::string GkDb::getCrc32(const std::string &fileData)
 {
     boost::crc_32_type result;
@@ -207,8 +234,8 @@ std::string GkDb::getCrc32(const std::string &fileData)
 /**
  * @brief GkDb::readFileToString reads a whole file, all at once, into a std::string() whether binary or not.
  * @author paxos1977 <https://stackoverflow.com/questions/116038/what-is-the-best-way-to-read-an-entire-file-into-a-stdstring-in-c>
- * @param fileLoc
- * @return
+ * @param fileLoc The full-path to the file itself, on local storage.
+ * @return The binary data of the given file, compartmentalized within a 'std::string()'.
  */
 std::string GkDb::readFileToString(const std::string &fileLoc)
 {
