@@ -34,44 +34,77 @@
  ********************************************************************************/
 
 /**
- * @file mainwindow.hpp
+ * @file herpapp.cpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-15
- * @brief The main, opening window to the program.
+ * @date 2017-12-18
+ * @brief The primary interface to the HerpLog applications' workings.
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
-
-#include "./../options.hpp"
-#include "./../gk_db.hpp"
 #include "herpapp.hpp"
-#include <QMainWindow>
-#include <memory>
+#include "ui_herpapp.h"
+#include <boost/filesystem.hpp>
+#include <boost/exception/all.hpp>
+#include <QMessageBox>
 
-using namespace GekkoFyre;
-namespace Ui {
-class MainWindow;
+namespace sys = boost::system;
+namespace fs = boost::filesystem;
+HerpApp::HerpApp(QWidget *parent) : QMainWindow(parent), ui(new Ui::HerpApp)
+{
+    ui->setupUi(this);
 }
 
-class MainWindow : public QMainWindow
+HerpApp::~HerpApp()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+void HerpApp::on_action_New_Database_triggered()
+{}
 
-private slots:
-    void on_button_create_new_db_clicked();
-    void on_button_open_db_clicked();
-    void on_button_exit_clicked();
+void HerpApp::on_action_Open_Database_triggered()
+{}
 
-private:
-    Ui::MainWindow *ui;
+void HerpApp::on_action_Disconnect_triggered()
+{}
 
-    std::unique_ptr<GkDb> gkDb;
-    GkFile::FileDb db_ptr;
-};
+void HerpApp::on_action_Save_triggered()
+{}
 
-#endif // MAINWINDOW_HPP
+void HerpApp::on_actionSave_As_triggered()
+{}
+
+void HerpApp::on_actionSave_A_ll_triggered()
+{}
+
+void HerpApp::on_action_Print_triggered()
+{}
+
+void HerpApp::on_actionE_xit_triggered()
+{}
+
+void HerpApp::on_action_Undo_triggered()
+{}
+
+void HerpApp::on_action_Redo_triggered()
+{}
+
+void HerpApp::on_actionCu_t_triggered()
+{}
+
+void HerpApp::on_action_Copy_triggered()
+{}
+
+void HerpApp::on_action_Paste_triggered()
+{}
+
+void HerpApp::on_actionF_ind_triggered()
+{}
+
+void HerpApp::on_action_Settings_triggered()
+{}
+
+void HerpApp::on_action_Documentation_triggered()
+{}
+
+void HerpApp::on_action_About_triggered()
+{}

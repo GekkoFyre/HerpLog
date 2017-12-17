@@ -44,6 +44,7 @@
 #define GKDB_HPP
 
 #include "options.hpp"
+#include <boost/filesystem.hpp>
 #include <QtCore/QObject>
 #include <string>
 #include <vector>
@@ -61,7 +62,8 @@ public:
 public:
     GkFile::FileDb openDatabase(const std::string &dbFile);
     bool compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc);
-    bool decompress_file(const std::string &fileLoc);
+    std::string decompress_file(const std::string &fileLoc);
+    bool remove_files(const fs::path &dirLoc);
 
 private:
     std::string getCrc32(const std::string &fileData);

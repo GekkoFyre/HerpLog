@@ -34,44 +34,55 @@
  ********************************************************************************/
 
 /**
- * @file mainwindow.hpp
+ * @file herpapp.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-15
- * @brief The main, opening window to the program.
+ * @date 2017-12-18
+ * @brief The primary interface to the HerpLog applications' workings.
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef HERPAPP_HPP
+#define HERPAPP_HPP
 
 #include "./../options.hpp"
-#include "./../gk_db.hpp"
-#include "herpapp.hpp"
 #include <QMainWindow>
 #include <memory>
 
 using namespace GekkoFyre;
 namespace Ui {
-class MainWindow;
+class HerpApp;
 }
 
-class MainWindow : public QMainWindow
+class HerpApp : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit HerpApp(QWidget *parent = 0);
+    ~HerpApp();
 
 private slots:
-    void on_button_create_new_db_clicked();
-    void on_button_open_db_clicked();
-    void on_button_exit_clicked();
+    void on_action_New_Database_triggered();
+    void on_action_Open_Database_triggered();
+    void on_action_Disconnect_triggered();
+    void on_action_Save_triggered();
+    void on_actionSave_As_triggered();
+    void on_actionSave_A_ll_triggered();
+    void on_action_Print_triggered();
+    void on_actionE_xit_triggered();
+    void on_action_Undo_triggered();
+    void on_action_Redo_triggered();
+    void on_actionCu_t_triggered();
+    void on_action_Copy_triggered();
+    void on_action_Paste_triggered();
+    void on_actionF_ind_triggered();
+    void on_action_Settings_triggered();
+    void on_action_Documentation_triggered();
+    void on_action_About_triggered();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::HerpApp *ui;
 
-    std::unique_ptr<GkDb> gkDb;
     GkFile::FileDb db_ptr;
 };
 
-#endif // MAINWINDOW_HPP
+#endif // HERPAPP_HPP

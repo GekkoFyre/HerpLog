@@ -45,7 +45,6 @@
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
 #include <leveldb/cache.h>
-#include <boost/filesystem.hpp>
 #include <boost/exception/all.hpp>
 #include <boost/crc.hpp>
 #include <zipper.h>
@@ -64,7 +63,6 @@
 using namespace GekkoFyre;
 using namespace zipper;
 namespace sys = boost::system;
-namespace fs = boost::filesystem;
 
 GkDb::GkDb(QObject *parent) : QObject(parent) {}
 
@@ -94,7 +92,7 @@ GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
         s = leveldb::DB::Open(db_struct.options, dbFile, &raw_db_ptr);
         db_struct.db.reset(raw_db_ptr);
         if (!s.ok()) {
-            throw std::runtime_error(tr("Unable to open/create database! %1").arg(QString::fromStdString(s.ToString())).toStdString());
+            throw std::runtime_error(s.ToString());
         }
 
         if (fs::exists(dbFile, ec) && fs::is_directory(dbFile) && !doesExist) {
@@ -160,9 +158,9 @@ bool GkDb::compress_files(const std::string &folderLoc, const std::string &saveF
  * @date 2017-12-17
  * @note <https://github.com/sebastiandev/zipper>
  * @param fileLoc The location to the file to be decompressed, on local storage.
- * @return Whether the operation was successful or not.
+ * @return The temporary location of where the files from the archive were decompressed.
  */
-bool GkDb::decompress_file(const std::string &fileLoc)
+std::string GkDb::decompress_file(const std::string &fileLoc)
 {
     Unzipper unzipper(fileLoc);
     std::vector<ZipEntry> entries = unzipper.entries();
@@ -197,13 +195,13 @@ bool GkDb::decompress_file(const std::string &fileLoc)
                                 QMessageBox::warning(nullptr, tr("Error!"), tr("The database, \"%1\", appears to be corrupt. Aborting...")
                                         .arg(QString::fromStdString(fileName)), QMessageBox::Ok);
                                 unzipper.close();
-                                return false;
+                                return nullptr;
                             }
                         } else {
                             QMessageBox::warning(nullptr, tr("Error!"), tr("A problem was encountered whilst opening your saved database. Error:\n\n%1")
                                     .arg(QString::fromStdString(ec.message())), QMessageBox::Ok);
                             unzipper.close();
-                            return false;
+                            return nullptr;
                         }
                     }
                 }
@@ -212,13 +210,30 @@ bool GkDb::decompress_file(const std::string &fileLoc)
     }
 
     unzipper.close();
-    return true;
+    return temp_dir;
+}
+
+bool GkDb::remove_files(const fs::path &dirLoc)
+{
+    sys::error_code ec;
+    if (fs::is_directory(dirLoc, ec)) {
+        if (!fs::remove_all(dirLoc, ec)) {
+            QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+    return false;
 }
 
 /**
  * @brief GkDb::getCrc32 will calculate the CRC32 hash of any given file when granted the binary data to it.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2017-12-17
+ * @note <http://www.boost.org/doc/libs/1_65_1/libs/crc/crc_example.cpp>
  * @param fileData The actual binary data of the file, for which the hash is to be calculated henceforth.
  * @return The CRC32 hash of the given file.
  */

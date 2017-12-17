@@ -92,11 +92,14 @@ set(SOURCE_FILES
             src/gk_db.hpp
             src/gk_db.cpp
             src/gui/mainwindow.hpp
-            src/gui/mainwindow.cpp)
+            src/gui/mainwindow.cpp
+            src/gui/herpapp.hpp
+            src/gui/herpapp.cpp)
 
 # http://www.executionunit.com/blog/2014/01/22/moving-from-qmake-to-cmake/
 qt5_wrap_ui(UI_HEADERS
-            src/gui/mainwindow.ui)
+            src/gui/mainwindow.ui
+            src/gui/herpapp.ui)
 
 qt5_add_resources(UI_RESOURCES src/assets.qrc)
 
