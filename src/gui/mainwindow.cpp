@@ -116,8 +116,9 @@ void MainWindow::on_button_open_db_clicked()
             }
         }
 
-        QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
-        return;
+        if (ec.value() != sys::errc::errc_t::success) {
+            QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+        }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), tr("A problem was encountered whilst trying to open a database. Error:\n\n%1")
                 .arg(e.what()), QMessageBox::Ok);

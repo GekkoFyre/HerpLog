@@ -441,7 +441,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="button_create_db">
+           <widget class="QCommandLinkButton" name="button_create_db">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
@@ -450,7 +450,7 @@
              </font>
             </property>
             <property name="text">
-             <string>  Create New DB</string>
+             <string>Create New DB</string>
             </property>
             <property name="icon">
              <iconset resource="../assets.qrc">
@@ -462,10 +462,13 @@
               <height>32</height>
              </size>
             </property>
+            <property name="shortcut">
+             <string>Ctrl+N</string>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="button_open_db">
+           <widget class="QCommandLinkButton" name="button_open_db">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
@@ -474,7 +477,7 @@
              </font>
             </property>
             <property name="text">
-             <string>            Open DB</string>
+             <string>Open DB</string>
             </property>
             <property name="icon">
              <iconset resource="../assets.qrc">
@@ -486,10 +489,13 @@
               <height>32</height>
              </size>
             </property>
+            <property name="shortcut">
+             <string>Ctrl+O</string>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="button_exit">
+           <widget class="QCommandLinkButton" name="button_exit">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
@@ -498,17 +504,22 @@
              </font>
             </property>
             <property name="text">
-             <string>                    Exit</string>
+             <string>Exit</string>
             </property>
             <property name="icon">
              <iconset resource="../assets.qrc">
-              <normaloff>:/icons/assets/icons/003-exit.png</normaloff>:/icons/assets/icons/003-exit.png</iconset>
+              <normaloff>:/icons/assets/icons/003-exit.png</normaloff>
+              <activeon>:/icons/assets/icons/001-exit-2.png</activeon>
+              <selectedon>:/icons/assets/icons/001-exit-2.png</selectedon>:/icons/assets/icons/003-exit.png</iconset>
             </property>
             <property name="iconSize">
              <size>
               <width>32</width>
               <height>32</height>
              </size>
+            </property>
+            <property name="shortcut">
+             <string>Esc, Ctrl+X</string>
             </property>
            </widget>
           </item>
