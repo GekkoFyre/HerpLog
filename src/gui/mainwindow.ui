@@ -441,14 +441,16 @@
            </spacer>
           </item>
           <item>
-           <widget class="QCommandLinkButton" name="button_create_new_db">
+           <widget class="QPushButton" name="button_create_db">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
-             <string>Create new DB</string>
+             <string>  Create New DB</string>
             </property>
             <property name="icon">
              <iconset resource="../assets.qrc">
@@ -463,14 +465,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QCommandLinkButton" name="button_open_db">
+           <widget class="QPushButton" name="button_open_db">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
-             <string>Open DB</string>
+             <string>            Open DB</string>
             </property>
             <property name="icon">
              <iconset resource="../assets.qrc">
@@ -485,20 +489,20 @@
            </widget>
           </item>
           <item>
-           <widget class="QCommandLinkButton" name="button_exit">
+           <widget class="QPushButton" name="button_exit">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
-             <string>Exit</string>
+             <string>                    Exit</string>
             </property>
             <property name="icon">
              <iconset resource="../assets.qrc">
-              <normaloff>:/icons/assets/icons/003-exit.png</normaloff>
-              <activeon>:/icons/assets/icons/001-exit-2.png</activeon>
-              <selectedon>:/icons/assets/icons/001-exit-2.png</selectedon>:/icons/assets/icons/003-exit.png</iconset>
+              <normaloff>:/icons/assets/icons/003-exit.png</normaloff>:/icons/assets/icons/003-exit.png</iconset>
             </property>
             <property name="iconSize">
              <size>

@@ -57,7 +57,7 @@ class HerpApp : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit HerpApp(QWidget *parent = 0);
+    explicit HerpApp(const GkFile::FileDb &database, QWidget *parent = 0);
     ~HerpApp();
 
 private slots:

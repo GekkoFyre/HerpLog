@@ -34,51 +34,44 @@
  ********************************************************************************/
 
 /**
- * @file options.h
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-12
- * @brief Contains options, enums, etc. for the entire program.
+ * @file button_align.cpp
+ * @note jpo38 <https://stackoverflow.com/questions/44091339/qpushbutton-icon-aligned-left-with-text-centered>
+ * @date 2017-12-18
+ * @brief A class that specializes QPushButton by overriding paintEvent and sizeHint, and in effect
+ * aligns the icons on the button to the left and the text to the centre.
  */
 
-#ifndef GKOPTIONS_HPP
-#define GKOPTIONS_HPP
+#include "button_align.hpp"
+#include "./../options.hpp"
+#include <QPainter>
 
-#include <boost/filesystem.hpp>
-#include <leveldb/db.h>
-#include <memory>
-#include <string>
+using namespace GekkoFyre;
+BtnAlign::BtnAlign(QWidget *parent) : QPushButton(parent)
+{}
 
-namespace fs = boost::filesystem;
-namespace GekkoFyre {
-    constexpr double HERPLOG_DEFAULT_RESOLUTION_WIDTH = 1920.0;
-    constexpr int HERPLOG_DEFAULT_HORIZONTAL_MARGIN_PUSHBUTTON = 6;
-    constexpr unsigned long LEVELDB_CFG_CACHE_SIZE = 32UL * 1024UL * 1024UL;
+BtnAlign::~BtnAlign()
+{}
 
-    namespace GkFile {
-        struct path_leaf_string {
-            std::string operator()(const fs::directory_entry &entry) const {
-                return entry.path().leaf().string();
-            }
-        };
-
-        struct FileDb {
-            std::shared_ptr<leveldb::DB> db;
-            leveldb::Options options;
-        };
-
-        namespace GkCsv {
-            constexpr char fileName[] = "file_name";
-            constexpr char fileHash[] = "file_hash";
-            constexpr char hashType[] = "hash_type";
-            constexpr char zip_contents_csv[] = "zip_contents.csv";
-
-            constexpr char hashTypeCRC32[] = "CRC32";
-        }
-
-        enum HashTypes {
-            CRC32
-        };
-    }
+void BtnAlign::setPixmap(const QPixmap &pixmap)
+{
+    m_pixmap = pixmap;
 }
 
-#endif // GKOPTIONS_HPP
+QSize BtnAlign::sizeHint() const
+{
+    const auto parentHint = QPushButton::sizeHint();
+
+    // Add margins here if required
+    return QSize((parentHint.width() + m_pixmap.width()), std::max(parentHint.height(), m_pixmap.height()));
+}
+
+void BtnAlign::paintEvent(QPaintEvent *e)
+{
+    QPushButton::paintEvent(e);
+
+    if (!m_pixmap.isNull()) {
+        const int y = ((height() - m_pixmap.height()) / 2); // Add margin if required
+        QPainter painter(this);
+        painter.drawPixmap(GekkoFyre::HERPLOG_DEFAULT_HORIZONTAL_MARGIN_PUSHBUTTON, y, m_pixmap);
+    }
+}

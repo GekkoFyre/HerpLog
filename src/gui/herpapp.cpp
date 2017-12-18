@@ -48,7 +48,7 @@
 
 namespace sys = boost::system;
 namespace fs = boost::filesystem;
-HerpApp::HerpApp(QWidget *parent) : QMainWindow(parent), ui(new Ui::HerpApp)
+HerpApp::HerpApp(const GkFile::FileDb &database, QWidget *parent) : QMainWindow(parent), ui(new Ui::HerpApp)
 {
     ui->setupUi(this);
 }

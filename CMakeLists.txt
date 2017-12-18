@@ -91,6 +91,8 @@ set(SOURCE_FILES
             src/gk_csv.cpp
             src/gk_db.hpp
             src/gk_db.cpp
+            src/gui/button_align.hpp
+            src/gui/button_align.cpp
             src/gui/mainwindow.hpp
             src/gui/mainwindow.cpp
             src/gui/herpapp.hpp

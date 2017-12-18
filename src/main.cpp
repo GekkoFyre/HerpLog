@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     std::unique_ptr<Screen> s = std::make_unique<Screen>();
     s.reset(DefaultScreenOfDisplay(d));
     int width = s->width;
-    double ratio = ((double)width / GekkoFyre::FYREDL_DEFAULT_RESOLUTION_WIDTH);
+    double ratio = ((double)width / GekkoFyre::HERPLOG_DEFAULT_RESOLUTION_WIDTH);
     if (ratio > 1.1) {
         qputenv("QT_SCALE_FACTOR", QString::number(ratio).toLatin1());
     }

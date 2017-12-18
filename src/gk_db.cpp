@@ -169,9 +169,14 @@ std::string GkDb::decompress_file(const std::string &fileLoc)
 
     GkCsvReader csv_reader(3, std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())), GkFile::GkCsv::fileName, GkFile::GkCsv::fileHash, GkFile::GkCsv::hashType);
     std::string csv_file_entry, csv_hash_entry, hashType;
-    std::string fileName = fs::path(fileLoc).filename().string();
-    std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName);
+    fs::path fileName = fs::path(fileLoc).filename();
 
+    // Remove all file-extensions from the filename
+    while(!fileName.extension().empty()) {
+        fileName = fileName.stem();
+    }
+
+    std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName.string());
     unzipper.extract(temp_dir); // Extract the contents of the zip-file into a temporary directory
     while (csv_reader.read_row(csv_file_entry, csv_hash_entry, hashType)) { // Read out the CSV information
         if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) { // Make sure the CSV strings are not empty, otherwise abort
@@ -193,7 +198,7 @@ std::string GkDb::decompress_file(const std::string &fileLoc)
                                 continue;
                             } else {
                                 QMessageBox::warning(nullptr, tr("Error!"), tr("The database, \"%1\", appears to be corrupt. Aborting...")
-                                        .arg(QString::fromStdString(fileName)), QMessageBox::Ok);
+                                        .arg(QString::fromStdString(fileName.string())), QMessageBox::Ok);
                                 unzipper.close();
                                 return nullptr;
                             }

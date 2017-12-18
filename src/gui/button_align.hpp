@@ -34,51 +34,34 @@
  ********************************************************************************/
 
 /**
- * @file options.h
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-12
- * @brief Contains options, enums, etc. for the entire program.
+ * @file button_align.hpp
+ * @note jpo38 <https://stackoverflow.com/questions/44091339/qpushbutton-icon-aligned-left-with-text-centered>
+ * @date 2017-12-18
+ * @brief A class that specializes QPushButton by overriding paintEvent and sizeHint, and in effect
+ * aligns the icons on the button to the left and the text to the centre.
  */
 
-#ifndef GKOPTIONS_HPP
-#define GKOPTIONS_HPP
+#ifndef BTNALIGN_HPP
+#define BTNALIGN_HPP
 
-#include <boost/filesystem.hpp>
-#include <leveldb/db.h>
-#include <memory>
-#include <string>
+#include <QWidget>
+#include <QPushButton>
 
-namespace fs = boost::filesystem;
 namespace GekkoFyre {
-    constexpr double HERPLOG_DEFAULT_RESOLUTION_WIDTH = 1920.0;
-    constexpr int HERPLOG_DEFAULT_HORIZONTAL_MARGIN_PUSHBUTTON = 6;
-    constexpr unsigned long LEVELDB_CFG_CACHE_SIZE = 32UL * 1024UL * 1024UL;
+class BtnAlign : public QPushButton {
+public:
+    explicit BtnAlign(QWidget *parent = 0);
+    virtual ~BtnAlign();
 
-    namespace GkFile {
-        struct path_leaf_string {
-            std::string operator()(const fs::directory_entry &entry) const {
-                return entry.path().leaf().string();
-            }
-        };
+    void setPixmap(const QPixmap &pixmap);
+    virtual QSize sizeHint() const override;
 
-        struct FileDb {
-            std::shared_ptr<leveldb::DB> db;
-            leveldb::Options options;
-        };
+protected:
+    virtual void paintEvent(QPaintEvent *e) override;
 
-        namespace GkCsv {
-            constexpr char fileName[] = "file_name";
-            constexpr char fileHash[] = "file_hash";
-            constexpr char hashType[] = "hash_type";
-            constexpr char zip_contents_csv[] = "zip_contents.csv";
-
-            constexpr char hashTypeCRC32[] = "CRC32";
-        }
-
-        enum HashTypes {
-            CRC32
-        };
-    }
+private:
+    QPixmap m_pixmap;
+};
 }
 
-#endif // GKOPTIONS_HPP
+#endif // BTNALIGN_HPP

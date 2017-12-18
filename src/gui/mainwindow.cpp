@@ -42,7 +42,7 @@
 
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
-#include <boost/filesystem.hpp>
+#include "herpapp.hpp"
 #include <boost/exception/all.hpp>
 #include <QString>
 #include <QFileDialog>
@@ -59,10 +59,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    db_ptr.db.reset();
     delete ui;
 }
 
-void MainWindow::on_button_create_new_db_clicked()
+void MainWindow::on_button_create_db_clicked()
 {
     fs::path home_dir(QDir::homePath().toStdString());
     sys::error_code ec;
@@ -73,12 +74,11 @@ void MainWindow::on_button_create_new_db_clicked()
                 fs::path dirName = fs::path(saveFileName.toStdString()).filename();
                 fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + dirName.string());
                 db_ptr = gkDb->openDatabase(temp_dir.string());
-                db_ptr.db.reset();
 
                 fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
                 fs::path zip_file = std::string(parent_path.string() + fs::path::preferred_separator + dirName.string() + "." + "hdb");
                 gkDb->compress_files(temp_dir.string(), zip_file.string());
-                gkDb->remove_files(temp_dir);
+                tmp_db_loc = temp_dir;
 
                 return;
             }
@@ -88,8 +88,6 @@ void MainWindow::on_button_create_new_db_clicked()
                 .arg(e.what()), QMessageBox::Ok);
         return;
     }
-
-    return;
 }
 
 void MainWindow::on_button_open_db_clicked()
@@ -105,6 +103,14 @@ void MainWindow::on_button_open_db_clicked()
                 std::string tmp_extraction_loc = gkDb->decompress_file(fileName_str);
                 if (!tmp_extraction_loc.empty() && fs::is_directory(tmp_extraction_loc, ec)) {
                     db_ptr = gkDb->openDatabase(tmp_extraction_loc);
+
+                    this->close();
+                    HerpApp *herpAppWin = new HerpApp(db_ptr, this);
+                    herpAppWin->setWindowFlags(Qt::Window);
+                    herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
+                    QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
+                    herpAppWin->show();
+
                     return;
                 }
             }
@@ -122,5 +128,4 @@ void MainWindow::on_button_open_db_clicked()
 void MainWindow::on_button_exit_clicked()
 {
     QApplication::exit(0);
-    return;
 }
