@@ -105,7 +105,7 @@ void MainWindow::on_button_open_db_clicked()
                     db_ptr = gkDb->openDatabase(tmp_extraction_loc);
 
                     this->close();
-                    HerpApp *herpAppWin = new HerpApp(db_ptr, this);
+                    HerpApp *herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, this);
                     herpAppWin->setWindowFlags(Qt::Window);
                     herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
                     QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));

@@ -44,10 +44,12 @@
 #define HERPAPP_HPP
 
 #include "./../options.hpp"
+#include <boost/filesystem.hpp>
 #include <QMainWindow>
 #include <memory>
 
 using namespace GekkoFyre;
+namespace fs = boost::filesystem;
 namespace Ui {
 class HerpApp;
 }
@@ -57,7 +59,7 @@ class HerpApp : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit HerpApp(const GkFile::FileDb &database, QWidget *parent = 0);
+    explicit HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent = 0);
     ~HerpApp();
 
 private slots:
@@ -79,10 +81,16 @@ private slots:
     void on_action_Documentation_triggered();
     void on_action_About_triggered();
 
+    void new_tab();
+
 private:
     Ui::HerpApp *ui;
 
+    bool remove_files(const fs::path &dirLoc);
+
     GkFile::FileDb db_ptr;
+    fs::path global_temp_dir;
+    int tab_count;
 };
 
 #endif // HERPAPP_HPP

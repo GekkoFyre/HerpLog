@@ -218,22 +218,6 @@ std::string GkDb::decompress_file(const std::string &fileLoc)
     return temp_dir;
 }
 
-bool GkDb::remove_files(const fs::path &dirLoc)
-{
-    sys::error_code ec;
-    if (fs::is_directory(dirLoc, ec)) {
-        if (!fs::remove_all(dirLoc, ec)) {
-            QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
-    return false;
-}
-
 /**
  * @brief GkDb::getCrc32 will calculate the CRC32 hash of any given file when granted the binary data to it.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
