@@ -441,14 +441,16 @@
            </spacer>
           </item>
           <item>
-           <widget class="QCommandLinkButton" name="button_create_new_db">
+           <widget class="QCommandLinkButton" name="button_create_db">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
-             <string>Create new DB</string>
+             <string>Create New DB</string>
             </property>
             <property name="icon">
              <iconset resource="../assets.qrc">
@@ -460,6 +462,9 @@
               <height>32</height>
              </size>
             </property>
+            <property name="shortcut">
+             <string>Ctrl+N</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -467,6 +472,8 @@
             <property name="font">
              <font>
               <pointsize>11</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
@@ -482,6 +489,9 @@
               <height>32</height>
              </size>
             </property>
+            <property name="shortcut">
+             <string>Ctrl+O</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -489,6 +499,8 @@
             <property name="font">
              <font>
               <pointsize>11</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
              </font>
             </property>
             <property name="text">
@@ -505,6 +517,9 @@
               <width>32</width>
               <height>32</height>
              </size>
+            </property>
+            <property name="shortcut">
+             <string>Esc, Ctrl+X</string>
             </property>
            </widget>
           </item>

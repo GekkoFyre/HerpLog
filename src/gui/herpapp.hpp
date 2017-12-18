@@ -34,51 +34,63 @@
  ********************************************************************************/
 
 /**
- * @file options.h
+ * @file herpapp.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-12
- * @brief Contains options, enums, etc. for the entire program.
+ * @date 2017-12-18
+ * @brief The primary interface to the HerpLog applications' workings.
  */
 
-#ifndef GKOPTIONS_HPP
-#define GKOPTIONS_HPP
+#ifndef HERPAPP_HPP
+#define HERPAPP_HPP
 
+#include "./../options.hpp"
 #include <boost/filesystem.hpp>
-#include <leveldb/db.h>
+#include <QMainWindow>
 #include <memory>
-#include <string>
 
+using namespace GekkoFyre;
 namespace fs = boost::filesystem;
-namespace GekkoFyre {
-    constexpr double HERPLOG_DEFAULT_RESOLUTION_WIDTH = 1920.0;
-    constexpr int HERPLOG_DEFAULT_HORIZONTAL_MARGIN_PUSHBUTTON = 6;
-    constexpr unsigned long LEVELDB_CFG_CACHE_SIZE = 32UL * 1024UL * 1024UL;
-
-    namespace GkFile {
-        struct path_leaf_string {
-            std::string operator()(const fs::directory_entry &entry) const {
-                return entry.path().leaf().string();
-            }
-        };
-
-        struct FileDb {
-            std::shared_ptr<leveldb::DB> db;
-            leveldb::Options options;
-        };
-
-        namespace GkCsv {
-            constexpr char fileName[] = "file_name";
-            constexpr char fileHash[] = "file_hash";
-            constexpr char hashType[] = "hash_type";
-            constexpr char zip_contents_csv[] = "zip_contents.csv";
-
-            constexpr char hashTypeCRC32[] = "CRC32";
-        }
-
-        enum HashTypes {
-            CRC32
-        };
-    }
+namespace Ui {
+class HerpApp;
 }
 
-#endif // GKOPTIONS_HPP
+class HerpApp : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent = 0);
+    ~HerpApp();
+
+private slots:
+    void on_action_New_Database_triggered();
+    void on_action_Open_Database_triggered();
+    void on_action_Disconnect_triggered();
+    void on_action_Save_triggered();
+    void on_actionSave_As_triggered();
+    void on_actionSave_A_ll_triggered();
+    void on_action_Print_triggered();
+    void on_actionE_xit_triggered();
+    void on_action_Undo_triggered();
+    void on_action_Redo_triggered();
+    void on_actionCu_t_triggered();
+    void on_action_Copy_triggered();
+    void on_action_Paste_triggered();
+    void on_actionF_ind_triggered();
+    void on_action_Settings_triggered();
+    void on_action_Documentation_triggered();
+    void on_action_About_triggered();
+
+    void new_tab();
+
+private:
+    Ui::HerpApp *ui;
+
+    bool remove_files(const fs::path &dirLoc);
+
+    GkFile::FileDb db_ptr;
+    fs::path global_temp_dir;
+    int tab_count;
+};
+
+#endif // HERPAPP_HPP

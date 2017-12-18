@@ -45,7 +45,9 @@
 
 #include "./../options.hpp"
 #include "./../gk_db.hpp"
+#include <boost/filesystem.hpp>
 #include <QMainWindow>
+#include <memory>
 
 using namespace GekkoFyre;
 namespace Ui {
@@ -61,7 +63,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_button_create_new_db_clicked();
+    void on_button_create_db_clicked();
     void on_button_open_db_clicked();
     void on_button_exit_clicked();
 
@@ -70,6 +72,7 @@ private:
 
     std::unique_ptr<GkDb> gkDb;
     GkFile::FileDb db_ptr;
+    fs::path tmp_db_loc;
 };
 
 #endif // MAINWINDOW_HPP

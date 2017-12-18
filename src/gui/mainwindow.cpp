@@ -42,12 +42,11 @@
 
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
-#include <boost/filesystem.hpp>
+#include "herpapp.hpp"
 #include <boost/exception/all.hpp>
 #include <QString>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <memory>
 
 namespace sys = boost::system;
 namespace fs = boost::filesystem;
@@ -60,10 +59,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    db_ptr.db.reset();
     delete ui;
 }
 
-void MainWindow::on_button_create_new_db_clicked()
+void MainWindow::on_button_create_db_clicked()
 {
     fs::path home_dir(QDir::homePath().toStdString());
     sys::error_code ec;
@@ -74,26 +74,20 @@ void MainWindow::on_button_create_new_db_clicked()
                 fs::path dirName = fs::path(saveFileName.toStdString()).filename();
                 fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + dirName.string());
                 db_ptr = gkDb->openDatabase(temp_dir.string());
-                db_ptr.db.reset();
 
                 fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
                 fs::path zip_file = std::string(parent_path.string() + fs::path::preferred_separator + dirName.string() + "." + "hdb");
                 gkDb->compress_files(temp_dir.string(), zip_file.string());
-                if (!fs::remove_all(temp_dir, ec)) {
-                    QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
-                    return;
-                }
+                tmp_db_loc = temp_dir;
 
                 return;
             }
         }
     } catch (const std::exception &e) {
-        QMessageBox::warning(this, tr("Error!"), tr("A problem was encountered whilst trying to open a database. Error:\n\n")
+        QMessageBox::warning(this, tr("Error!"), tr("A problem was encountered whilst trying to open a database. Error:\n\n%1")
                 .arg(e.what()), QMessageBox::Ok);
         return;
     }
-
-    return;
 }
 
 void MainWindow::on_button_open_db_clicked()
@@ -103,27 +97,36 @@ void MainWindow::on_button_open_db_clicked()
     try {
         if (fs::is_directory(home_dir, ec)) {
             QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database"), QString::fromStdString(home_dir.string()), tr("HerpLog Database Files (*.hdb);;Any files (*.*)"));
-            if (!fileName.isEmpty()) {
-                if (fs::exists(fileName.toStdString(), ec)) {
-                    db_ptr = gkDb->openDatabase(fileName.toStdString());
+            std::string fileName_str = fileName.toStdString();
+
+            if (!fileName.isEmpty() && fs::exists(fileName_str, ec)) {
+                std::string tmp_extraction_loc = gkDb->decompress_file(fileName_str);
+                if (!tmp_extraction_loc.empty() && fs::is_directory(tmp_extraction_loc, ec)) {
+                    db_ptr = gkDb->openDatabase(tmp_extraction_loc);
+
+                    this->close();
+                    HerpApp *herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, this);
+                    herpAppWin->setWindowFlags(Qt::Window);
+                    herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
+                    QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
+                    herpAppWin->show();
+
                     return;
                 }
             }
-        } else {
+        }
+
+        if (ec.value() != sys::errc::errc_t::success) {
             QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
-            return;
         }
     } catch (const std::exception &e) {
-        QMessageBox::warning(this, tr("Error!"), tr("A problem was encountered whilst trying to open a database. Error:\n\n")
+        QMessageBox::warning(this, tr("Error!"), tr("A problem was encountered whilst trying to open a database. Error:\n\n%1")
                 .arg(e.what()), QMessageBox::Ok);
         return;
     }
-
-    return;
 }
 
 void MainWindow::on_button_exit_clicked()
 {
     QApplication::exit(0);
-    return;
 }
