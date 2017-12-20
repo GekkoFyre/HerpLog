@@ -46,6 +46,7 @@
 #include "./../options.hpp"
 #include <boost/filesystem.hpp>
 #include <QMainWindow>
+#include <QResizeEvent>
 #include <memory>
 
 using namespace GekkoFyre;
@@ -87,6 +88,8 @@ private:
     Ui::HerpApp *ui;
 
     bool remove_files(const fs::path &dirLoc);
+
+    void resizeEvent(QResizeEvent* event);
 
     GkFile::FileDb db_ptr;
     fs::path global_temp_dir;

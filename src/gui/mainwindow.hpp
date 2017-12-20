@@ -72,7 +72,6 @@ private:
 
     std::unique_ptr<GkDb> gkDb;
     GkFile::FileDb db_ptr;
-    fs::path tmp_db_loc;
 };
 
 #endif // MAINWINDOW_HPP
