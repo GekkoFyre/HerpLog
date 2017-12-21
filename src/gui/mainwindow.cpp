@@ -78,7 +78,13 @@ void MainWindow::on_button_create_db_clicked()
                 fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
                 fs::path zip_file = std::string(parent_path.string() + fs::path::preferred_separator + dirName.string() + "." + "hdb");
                 gkDb->compress_files(temp_dir.string(), zip_file.string());
-                tmp_db_loc = temp_dir;
+
+                this->close();
+                HerpApp *herpAppWin = new HerpApp(db_ptr, temp_dir.string(), this);
+                herpAppWin->setWindowFlags(Qt::Window);
+                herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
+                QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
+                herpAppWin->show();
 
                 return;
             }

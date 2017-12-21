@@ -58,7 +58,7 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir,
     // Create a button to be placed on 'db_tabWidget'
     tab_count = 1;
     QToolButton *tool_btn = new QToolButton(this);
-    ui->db_tabWidget->setCornerWidget(tool_btn, Qt::TopLeftCorner);
+    ui->viewDb_tabWidget->setCornerWidget(tool_btn, Qt::TopLeftCorner);
     tool_btn->setText(tr("+"));
     tool_btn->setCursor(Qt::ArrowCursor);
     tool_btn->setAutoRaise(true);
@@ -141,5 +141,5 @@ void HerpApp::on_action_About_triggered()
 void HerpApp::new_tab()
 {
     ++tab_count;
-    ui->db_tabWidget->addTab(new QWidget(), tr("Record %1").arg(QString::number(tab_count)));
+    ui->viewDb_tabWidget->addTab(new QWidget(), tr("Record %1").arg(QString::number(tab_count)));
 }

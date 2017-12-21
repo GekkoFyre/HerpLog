@@ -46,6 +46,7 @@
 #include "./../options.hpp"
 #include <boost/filesystem.hpp>
 #include <QMainWindow>
+#include <QResizeEvent>
 #include <memory>
 
 using namespace GekkoFyre;
