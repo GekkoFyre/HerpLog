@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -75,7 +75,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>361</width>
-                   <height>447</height>
+                   <height>625</height>
                   </rect>
                  </property>
                  <layout class="QFormLayout" name="formLayout">
@@ -98,10 +98,154 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
+                  <item row="0" column="1">
                    <widget class="QLineEdit" name="lineEdit_dateTime">
                     <property name="readOnly">
                      <bool>true</bool>
+                    </property>
+                    <property name="placeholderText">
+                     <string>&lt;Date/Time&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <spacer name="horizontalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="label_toilet_notes">
+                    <property name="text">
+                     <string>Toilet: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QLineEdit" name="lineEdit_toilet"/>
+                  </item>
+                  <item row="7" column="0">
+                   <widget class="QLabel" name="label_hydration_notes">
+                    <property name="text">
+                     <string>Hydration: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QLineEdit" name="lineEdit_hydration"/>
+                  </item>
+                  <item row="8" column="0">
+                   <widget class="QLabel" name="label_vitamins_notes">
+                    <property name="text">
+                     <string>Vitamins: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="8" column="1">
+                   <widget class="QLineEdit" name="lineEdit_vitamins"/>
+                  </item>
+                  <item row="9" column="0">
+                   <widget class="QLabel" name="label_weight_notes">
+                    <property name="text">
+                     <string>Weight: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="1">
+                   <widget class="QLineEdit" name="lineEdit"/>
+                  </item>
+                  <item row="10" column="1">
+                   <spacer name="horizontalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="11" column="1">
+                   <widget class="QCheckBox" name="checkBox_toilet">
+                    <property name="text">
+                     <string>Went Toilet</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="12" column="1">
+                   <widget class="QCheckBox" name="checkBox_hydration">
+                    <property name="text">
+                     <string>Had Hydration</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="13" column="1">
+                   <widget class="QCheckBox" name="checkBox_vitamins">
+                    <property name="text">
+                     <string>Had Vitamins</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="14" column="0">
+                   <widget class="QLabel" name="label_weight_checkbox">
+                    <property name="text">
+                     <string>Weight: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="14" column="1">
+                   <widget class="QDoubleSpinBox" name="spinBox_weight">
+                    <property name="suffix">
+                     <string> g</string>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="maximum">
+                     <double>5000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QComboBox" name="comboBox_existing_species"/>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_species">
+                    <property name="text">
+                     <string>Species:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="comboBox_existing_id"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_id">
+                    <property name="text">
+                     <string>Name / ID#: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="lineEdit_new_id">
+                    <property name="placeholderText">
+                     <string>Enter new ID# here...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="lineEdit_new_species">
+                    <property name="placeholderText">
+                     <string>Enter new species here...</string>
                     </property>
                    </widget>
                   </item>
@@ -147,7 +291,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>361</width>
-                   <height>447</height>
+                   <height>625</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -159,7 +303,11 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPlainTextEdit" name="plainTextEdit_furtherNotes"/>
+                   <widget class="QPlainTextEdit" name="plainTextEdit_furtherNotes">
+                    <property name="placeholderText">
+                     <string>Any notes of further interest go here...</string>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -223,7 +371,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

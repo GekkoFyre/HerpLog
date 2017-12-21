@@ -89,8 +89,6 @@ private:
 
     bool remove_files(const fs::path &dirLoc);
 
-    void resizeEvent(QResizeEvent* event);
-
     GkFile::FileDb db_ptr;
     fs::path global_temp_dir;
     int tab_count;

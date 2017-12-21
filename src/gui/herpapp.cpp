@@ -143,11 +143,3 @@ void HerpApp::new_tab()
     ++tab_count;
     ui->viewDb_tabWidget->addTab(new QWidget(), tr("Record %1").arg(QString::number(tab_count)));
 }
-
-void HerpApp::resizeEvent(QResizeEvent *event)
-{
-    QMainWindow::resizeEvent(event);
-
-    int appWidth = (this->width() / 3);
-    ui->lineEdit_dateTime->setFixedWidth(appWidth);
-}
