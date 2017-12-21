@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     // https://github.com/notepadqq/notepadqq/issues/323
     #ifdef __linux__
     Display *d = XOpenDisplay(nullptr);
-    std::unique_ptr<Screen> s = std ::make_unique<Screen>();
+    std::unique_ptr<Screen> s = std::make_unique<Screen>();
     s.reset(DefaultScreenOfDisplay(d));
     int width = s->width;
     double ratio = ((double)width / GekkoFyre::HERPLOG_DEFAULT_RESOLUTION_WIDTH);
