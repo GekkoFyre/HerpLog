@@ -45,6 +45,8 @@
 #include <boost/exception/all.hpp>
 #include <QMessageBox>
 #include <QToolButton>
+#include <random>
+#include <chrono>
 
 namespace sys = boost::system;
 HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent) :
@@ -54,6 +56,9 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir,
 
     db_ptr = database;
     global_temp_dir = temp_db_dir;
+
+    gkDb = std::make_unique<GkDb>(this);
+    gkStrOp = std::make_unique<GkStringOp>(this);
 }
 
 HerpApp::~HerpApp()
@@ -140,3 +145,13 @@ void HerpApp::on_pushButton_browse_submit_clicked()
 
 void HerpApp::on_pushButton_add_data_clicked()
 {}
+
+std::string HerpApp::random_hash()
+{
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 mt_rand(seed);
+    std::uniform_int_distribution<int> dist(1, 10);
+    auto result = dist(mt_rand);
+
+    return gkStrOp->getCrc32(std::to_string(result));
+}

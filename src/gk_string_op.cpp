@@ -34,44 +34,36 @@
  ********************************************************************************/
 
 /**
- * @file mainwindow.hpp
+ * @file gk_string_op.cpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-15
- * @brief The main, opening window to the program.
+ * @date 2018-02-21
+ * @brief This file holds any functions related to string processing/modification.
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
-
-#include "./../options.hpp"
-#include "./../gk_db_conn.hpp"
-#include <boost/filesystem.hpp>
-#include <QMainWindow>
-#include <memory>
+#include "gk_string_op.hpp"
+#include <boost/exception/all.hpp>
+#include <boost/crc.hpp>
 
 using namespace GekkoFyre;
-namespace Ui {
-class MainWindow;
-}
+GkStringOp::GkStringOp(QObject *parent) : QObject(parent)
+{}
 
-class MainWindow : public QMainWindow
+GkStringOp::~GkStringOp()
+{}
+
+/**
+ * @brief GkStringOp::getCrc32 will calculate the CRC32 hash of any given string.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-21
+ * @note <http://www.boost.org/doc/libs/1_65_1/libs/crc/crc_example.cpp>
+ * @param input The string in question, for which the hash is to be calculated henceforth.
+ * @return The CRC32 hash of the given input.
+ */
+std::string GkStringOp::getCrc32(const std::string &input)
 {
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private slots:
-    void on_button_create_db_clicked();
-    void on_button_open_db_clicked();
-    void on_button_exit_clicked();
-
-private:
-    Ui::MainWindow *ui;
-
-    std::unique_ptr<GkDbConn> gkDbConn;
-    GkFile::FileDb db_ptr;
-};
-
-#endif // MAINWINDOW_HPP
+    boost::crc_32_type result;
+    result.process_bytes(input.data(), input.length());
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << result.checksum();
+    return oss.str();
+}

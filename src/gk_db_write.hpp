@@ -34,44 +34,28 @@
  ********************************************************************************/
 
 /**
- * @file mainwindow.hpp
+ * @file gk_db_write.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-15
- * @brief The main, opening window to the program.
+ * @date 2018-02-21
+ * @brief Contains any database-related routines, specifically ones related to Google LevelDB
+ * and writing data towards.
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef GKDB_WRITE_HPP
+#define GKDB_WRITE_HPP
 
-#include "./../options.hpp"
-#include "./../gk_db_conn.hpp"
-#include <boost/filesystem.hpp>
-#include <QMainWindow>
-#include <memory>
+#include <QtCore/QObject>
 
-using namespace GekkoFyre;
-namespace Ui {
-class MainWindow;
-}
+namespace GekkoFyre {
+class GkDb;
 
-class MainWindow : public QMainWindow
-{
+class GkDb : public QObject {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private slots:
-    void on_button_create_db_clicked();
-    void on_button_open_db_clicked();
-    void on_button_exit_clicked();
-
-private:
-    Ui::MainWindow *ui;
-
-    std::unique_ptr<GkDbConn> gkDbConn;
-    GkFile::FileDb db_ptr;
+    explicit GkDb(QObject *parent = 0);
+    ~GkDb();
 };
+}
 
-#endif // MAINWINDOW_HPP
+#endif // GKDB_WRITE_HPP
