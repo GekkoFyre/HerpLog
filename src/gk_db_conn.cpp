@@ -34,13 +34,14 @@
  ********************************************************************************/
 
 /**
- * @file gk_db.hpp
+ * @file gk_db_conn.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2017-12-12
- * @brief Contains any database-related routines, specifically ones related to Google LevelDB.
+ * @brief Contains any database-related routines, specifically ones related to Google LevelDB
+ * and making a connection hereto.
  */
 
-#include "gk_db.hpp"
+#include "gk_db_conn.hpp"
 #include "gk_csv.hpp"
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
@@ -64,9 +65,9 @@ using namespace GekkoFyre;
 using namespace zipper;
 namespace sys = boost::system;
 
-GkDb::GkDb(QObject *parent) : QObject(parent) {}
+GkDbConn::GkDbConn(QObject *parent) : QObject(parent) {}
 
-GkDb::~GkDb() {}
+GkDbConn::~GkDbConn() {}
 
 /**
  * @brief GkDb::openDatabase creates a database connection within the applications memory from the database files on
@@ -76,7 +77,7 @@ GkDb::~GkDb() {}
  * @param dbFile The location of the database files on the local storage of the users computer.
  * @return A pointer to the connection opened within memory with regard to the database.
  */
-GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
+GkFile::FileDb GkDbConn::openDatabase(const std::string &dbFile)
 {
     leveldb::Status s;
     GkFile::FileDb db_struct;
@@ -113,7 +114,7 @@ GkFile::FileDb GkDb::openDatabase(const std::string &dbFile)
  * @param saveFileAsLoc The location of where you wish to save the compressed archive as.
  * @return Whether the operation was successful or not.
  */
-bool GkDb::compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc)
+bool GkDbConn::compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc)
 {
     std::stringstream csv_out;
     Zipper zipper(saveFileAsLoc);
@@ -160,7 +161,7 @@ bool GkDb::compress_files(const std::string &folderLoc, const std::string &saveF
  * @param fileLoc The location to the file to be decompressed, on local storage.
  * @return The temporary location of where the files from the archive were decompressed.
  */
-std::string GkDb::decompress_file(const std::string &fileLoc)
+std::string GkDbConn::decompress_file(const std::string &fileLoc)
 {
     Unzipper unzipper(fileLoc);
     std::vector<ZipEntry> entries = unzipper.entries();
@@ -226,7 +227,7 @@ std::string GkDb::decompress_file(const std::string &fileLoc)
  * @param fileData The actual binary data of the file, for which the hash is to be calculated henceforth.
  * @return The CRC32 hash of the given file.
  */
-std::string GkDb::getCrc32(const std::string &fileData)
+std::string GkDbConn::getCrc32(const std::string &fileData)
 {
     boost::crc_32_type result;
     result.process_bytes(fileData.data(), fileData.length());
@@ -241,7 +242,7 @@ std::string GkDb::getCrc32(const std::string &fileData)
  * @param fileLoc The full-path to the file itself, on local storage.
  * @return The binary data of the given file, compartmentalized within a 'std::string()'.
  */
-std::string GkDb::readFileToString(const std::string &fileLoc)
+std::string GkDbConn::readFileToString(const std::string &fileLoc)
 {
     std::ifstream ifs(fileLoc, std::ios::in | std::ios::binary | std::ios::ate);
 
@@ -254,7 +255,7 @@ std::string GkDb::readFileToString(const std::string &fileLoc)
     return std::string(bytes.data(), fileSize);
 }
 
-std::string GkDb::convHashType_toStr(const GkFile::HashTypes &hashType)
+std::string GkDbConn::convHashType_toStr(const GkFile::HashTypes &hashType)
 {
     switch (hashType) {
         case GkFile::HashTypes::CRC32:
@@ -271,7 +272,7 @@ std::string GkDb::convHashType_toStr(const GkFile::HashTypes &hashType)
  * @param dirLoc The location of the directory to be read.
  * @param output The contents of the directory.
  */
-void GkDb::read_directory(const std::string &dirLoc, std::vector<std::string> &output)
+void GkDbConn::read_directory(const std::string &dirLoc, std::vector<std::string> &output)
 {
     fs::path path(dirLoc);
     fs::directory_iterator start(path);

@@ -34,44 +34,43 @@
  ********************************************************************************/
 
 /**
- * @file mainwindow.hpp
+ * @file gk_db_conn.cpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-15
- * @brief The main, opening window to the program.
+ * @date 2017-12-12
+ * @brief Contains any database-related routines, specifically ones related to Google LevelDB
+ * and making a connection hereto.
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef GKDB_CONN_HPP
+#define GKDB_CONN_HPP
 
-#include "./../options.hpp"
-#include "./../gk_db_conn.hpp"
+#include "options.hpp"
 #include <boost/filesystem.hpp>
-#include <QMainWindow>
-#include <memory>
+#include <QtCore/QObject>
+#include <string>
+#include <vector>
 
-using namespace GekkoFyre;
-namespace Ui {
-class MainWindow;
-}
+namespace GekkoFyre {
+class GkDbConn;
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class GkDbConn : public QObject {
+Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit GkDbConn(QObject *parent = 0);
+    ~GkDbConn();
 
-private slots:
-    void on_button_create_db_clicked();
-    void on_button_open_db_clicked();
-    void on_button_exit_clicked();
+public:
+    GkFile::FileDb openDatabase(const std::string &dbFile);
+    bool compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc);
+    std::string decompress_file(const std::string &fileLoc);
 
 private:
-    Ui::MainWindow *ui;
-
-    std::unique_ptr<GkDbConn> gkDbConn;
-    GkFile::FileDb db_ptr;
+    std::string getCrc32(const std::string &fileData);
+    std::string readFileToString(const std::string &fileLoc);
+    std::string convHashType_toStr(const GkFile::HashTypes &hashType);
+    void read_directory(const std::string &dirLoc, std::vector<std::string> &output);
 };
+}
 
-#endif // MAINWINDOW_HPP
+#endif // GKDB_CONN_HPP

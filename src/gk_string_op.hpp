@@ -34,44 +34,30 @@
  ********************************************************************************/
 
 /**
- * @file mainwindow.hpp
+ * @file gk_string_op.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-15
- * @brief The main, opening window to the program.
+ * @date 2018-02-21
+ * @brief This file holds any functions related to string processing/modification.
  */
 
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef GKSTRINGOP_HPP
+#define GKSTRINGOP_HPP
 
-#include "./../options.hpp"
-#include "./../gk_db_conn.hpp"
-#include <boost/filesystem.hpp>
-#include <QMainWindow>
-#include <memory>
+#include <QtCore/QObject>
+#include <string>
 
-using namespace GekkoFyre;
-namespace Ui {
-class MainWindow;
-}
+namespace GekkoFyre {
+class GkStringOp;
 
-class MainWindow : public QMainWindow
-{
+class GkStringOp : public QObject {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit GkStringOp(QObject *parent = 0);
+    ~GkStringOp();
 
-private slots:
-    void on_button_create_db_clicked();
-    void on_button_open_db_clicked();
-    void on_button_exit_clicked();
-
-private:
-    Ui::MainWindow *ui;
-
-    std::unique_ptr<GkDbConn> gkDbConn;
-    GkFile::FileDb db_ptr;
+    std::string getCrc32(const std::string &input);
 };
+}
 
-#endif // MAINWINDOW_HPP
+#endif // GKSTRINGOP_HPP

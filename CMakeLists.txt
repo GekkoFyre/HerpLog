@@ -89,8 +89,12 @@ set(SOURCE_FILES
             src/options.hpp
             src/gk_csv.hpp
             src/gk_csv.cpp
-            src/gk_db.hpp
-            src/gk_db.cpp
+            src/gk_db_conn.hpp
+            src/gk_db_conn.cpp
+            src/gk_db_write.hpp
+            src/gk_db_write.cpp
+            src/gk_string_op.hpp
+            src/gk_string_op.cpp
             src/gui/mainwindow.hpp
             src/gui/mainwindow.cpp
             src/gui/herpapp.hpp

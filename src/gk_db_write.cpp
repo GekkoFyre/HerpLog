@@ -34,42 +34,18 @@
  ********************************************************************************/
 
 /**
- * @file gk_db.cpp
+ * @file gk_db_write.cpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2017-12-12
- * @brief Contains any database-related routines, specifically ones related to Google LevelDB.
+ * @date 2018-02-21
+ * @brief Contains any database-related routines, specifically ones related to Google LevelDB
+ * and writing data towards.
  */
 
-#ifndef GKDB_HPP
-#define GKDB_HPP
+#include "gk_db_write.hpp"
 
-#include "options.hpp"
-#include <boost/filesystem.hpp>
-#include <QtCore/QObject>
-#include <string>
-#include <vector>
+using namespace GekkoFyre;
+GkDb::GkDb(QObject *parent) : QObject(parent)
+{}
 
-namespace GekkoFyre {
-class GkDb;
-
-class GkDb : public QObject {
-Q_OBJECT
-
-public:
-    explicit GkDb(QObject *parent = 0);
-    ~GkDb();
-
-public:
-    GkFile::FileDb openDatabase(const std::string &dbFile);
-    bool compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc);
-    std::string decompress_file(const std::string &fileLoc);
-
-private:
-    std::string getCrc32(const std::string &fileData);
-    std::string readFileToString(const std::string &fileLoc);
-    std::string convHashType_toStr(const GkFile::HashTypes &hashType);
-    void read_directory(const std::string &dirLoc, std::vector<std::string> &output);
-};
-}
-
-#endif // GKDB_HPP
+GkDb::~GkDb()
+{}

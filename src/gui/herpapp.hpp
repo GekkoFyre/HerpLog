@@ -44,6 +44,8 @@
 #define HERPAPP_HPP
 
 #include "./../options.hpp"
+#include "./../gk_db_write.hpp"
+#include "./../gk_string_op.hpp"
 #include <boost/filesystem.hpp>
 #include <QMainWindow>
 #include <QResizeEvent>
@@ -81,17 +83,22 @@ private slots:
     void on_action_Settings_triggered();
     void on_action_Documentation_triggered();
     void on_action_About_triggered();
-
-    void new_tab();
+    void on_pushButton_archive_next_clicked();
+    void on_pushButton_archive_prev_clicked();
+    void on_pushButton_browse_submit_clicked();
+    void on_pushButton_add_data_clicked();
 
 private:
     Ui::HerpApp *ui;
 
     bool remove_files(const fs::path &dirLoc);
+    std::string random_hash();
 
     GkFile::FileDb db_ptr;
+    std::unique_ptr<GkDb> gkDb;
+    std::unique_ptr<GkStringOp> gkStrOp;
+
     fs::path global_temp_dir;
-    int tab_count;
 };
 
 #endif // HERPAPP_HPP

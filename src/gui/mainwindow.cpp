@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
-    gkDb = std::make_unique<GkDb>(this);
+    gkDbConn = std::make_unique<GkDbConn>(this);
 }
 
 MainWindow::~MainWindow()
@@ -73,11 +73,11 @@ void MainWindow::on_button_create_db_clicked()
             if (!saveFileName.isEmpty()) {
                 fs::path dirName = fs::path(saveFileName.toStdString()).filename();
                 fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + dirName.string());
-                db_ptr = gkDb->openDatabase(temp_dir.string());
+                db_ptr = gkDbConn->openDatabase(temp_dir.string());
 
                 fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
                 fs::path zip_file = std::string(parent_path.string() + fs::path::preferred_separator + dirName.string() + "." + "hdb");
-                gkDb->compress_files(temp_dir.string(), zip_file.string());
+                gkDbConn->compress_files(temp_dir.string(), zip_file.string());
 
                 this->close();
                 HerpApp *herpAppWin = new HerpApp(db_ptr, temp_dir.string(), this);
@@ -106,9 +106,9 @@ void MainWindow::on_button_open_db_clicked()
             std::string fileName_str = fileName.toStdString();
 
             if (!fileName.isEmpty() && fs::exists(fileName_str, ec)) {
-                std::string tmp_extraction_loc = gkDb->decompress_file(fileName_str);
+                std::string tmp_extraction_loc = gkDbConn->decompress_file(fileName_str);
                 if (!tmp_extraction_loc.empty() && fs::is_directory(tmp_extraction_loc, ec)) {
-                    db_ptr = gkDb->openDatabase(tmp_extraction_loc);
+                    db_ptr = gkDbConn->openDatabase(tmp_extraction_loc);
 
                     this->close();
                     HerpApp *herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, this);

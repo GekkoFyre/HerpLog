@@ -45,6 +45,8 @@
 #include <boost/exception/all.hpp>
 #include <QMessageBox>
 #include <QToolButton>
+#include <random>
+#include <chrono>
 
 namespace sys = boost::system;
 HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent) :
@@ -55,14 +57,8 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir,
     db_ptr = database;
     global_temp_dir = temp_db_dir;
 
-    // Create a button to be placed on 'db_tabWidget'
-    tab_count = 1;
-    QToolButton *tool_btn = new QToolButton(this);
-    ui->viewDb_tabWidget->setCornerWidget(tool_btn, Qt::TopLeftCorner);
-    tool_btn->setText(tr("+"));
-    tool_btn->setCursor(Qt::ArrowCursor);
-    tool_btn->setAutoRaise(true);
-    QObject::connect(tool_btn, SIGNAL(clicked()), this, SLOT(new_tab()));
+    gkDb = std::make_unique<GkDb>(this);
+    gkStrOp = std::make_unique<GkStringOp>(this);
 }
 
 HerpApp::~HerpApp()
@@ -138,8 +134,24 @@ void HerpApp::on_action_Documentation_triggered()
 void HerpApp::on_action_About_triggered()
 {}
 
-void HerpApp::new_tab()
+void HerpApp::on_pushButton_archive_next_clicked()
+{}
+
+void HerpApp::on_pushButton_archive_prev_clicked()
+{}
+
+void HerpApp::on_pushButton_browse_submit_clicked()
+{}
+
+void HerpApp::on_pushButton_add_data_clicked()
+{}
+
+std::string HerpApp::random_hash()
 {
-    ++tab_count;
-    ui->viewDb_tabWidget->addTab(new QWidget(), tr("Record %1").arg(QString::number(tab_count)));
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 mt_rand(seed);
+    std::uniform_int_distribution<int> dist(1, 10);
+    auto result = dist(mt_rand);
+
+    return gkStrOp->getCrc32(std::to_string(result));
 }
