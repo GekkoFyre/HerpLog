@@ -24,7 +24,7 @@
     <item>
      <widget class="QTabWidget" name="interface_tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -75,7 +75,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>361</width>
-                   <height>647</height>
+                   <height>625</height>
                   </rect>
                  </property>
                  <layout class="QFormLayout" name="formLayout">
@@ -108,7 +108,41 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="5" column="1">
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_species">
+                    <property name="text">
+                     <string>Species:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="comboBox_existing_species"/>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="lineEdit_new_species">
+                    <property name="placeholderText">
+                     <string>Enter new species here...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_id">
+                    <property name="text">
+                     <string>Name / ID#: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QComboBox" name="comboBox_existing_id"/>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="lineEdit_new_id">
+                    <property name="placeholderText">
+                     <string>Enter new ID# here...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="1">
                    <spacer name="horizontalSpacer_notes">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -121,63 +155,63 @@
                     </property>
                    </spacer>
                   </item>
-                  <item row="6" column="0">
+                  <item row="8" column="0">
                    <widget class="QLabel" name="label_toilet_notes">
                     <property name="text">
                      <string>Toilet: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="6" column="1">
+                  <item row="8" column="1">
                    <widget class="QLineEdit" name="lineEdit_toilet_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="0">
+                  <item row="9" column="0">
                    <widget class="QLabel" name="label_hydration_notes">
                     <property name="text">
                      <string>Hydration: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="1">
+                  <item row="9" column="1">
                    <widget class="QLineEdit" name="lineEdit_hydration_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="0">
+                  <item row="10" column="0">
                    <widget class="QLabel" name="label_vitamins_notes">
                     <property name="text">
                      <string>Vitamins: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="1">
+                  <item row="10" column="1">
                    <widget class="QLineEdit" name="lineEdit_vitamins_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="0">
+                  <item row="11" column="0">
                    <widget class="QLabel" name="label_weight_notes">
                     <property name="text">
                      <string>Weight: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="1">
+                  <item row="11" column="1">
                    <widget class="QLineEdit" name="lineEdit_weight_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="1">
+                  <item row="12" column="1">
                    <spacer name="horizontalSpacer_checkBox">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -190,28 +224,28 @@
                     </property>
                    </spacer>
                   </item>
-                  <item row="11" column="1">
+                  <item row="13" column="1">
                    <widget class="QCheckBox" name="checkBox_toilet">
                     <property name="text">
                      <string>Went Toilet</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="12" column="1">
+                  <item row="14" column="1">
                    <widget class="QCheckBox" name="checkBox_hydration">
                     <property name="text">
                      <string>Had Hydration</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="13" column="1">
+                  <item row="15" column="1">
                    <widget class="QCheckBox" name="checkBox_vitamins">
                     <property name="text">
                      <string>Had Vitamins</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="14" column="1">
+                  <item row="16" column="1">
                    <widget class="QDoubleSpinBox" name="spinBox_weight">
                     <property name="suffix">
                      <string> g</string>
@@ -224,37 +258,36 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
-                   <widget class="QComboBox" name="comboBox_existing_species"/>
+                  <item row="17" column="1">
+                   <spacer name="horizontalSpacer_14">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
-                  <item row="3" column="0">
-                   <widget class="QLabel" name="label_species">
+                  <item row="18" column="1">
+                   <spacer name="horizontalSpacer_15">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="19" column="1">
+                   <widget class="QPushButton" name="pushButton_add_data">
                     <property name="text">
-                     <string>Species:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QComboBox" name="comboBox_existing_id"/>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_id">
-                    <property name="text">
-                     <string>Name / ID#: </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QLineEdit" name="lineEdit_new_id">
-                    <property name="placeholderText">
-                     <string>Enter new ID# here...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QLineEdit" name="lineEdit_new_species">
-                    <property name="placeholderText">
-                     <string>Enter new species here...</string>
+                     <string>Submit</string>
                     </property>
                    </widget>
                   </item>
@@ -300,7 +333,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>361</width>
-                   <height>647</height>
+                   <height>625</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -371,7 +404,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>740</width>
-                    <height>653</height>
+                    <height>631</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -515,7 +548,7 @@
       </widget>
       <widget class="QWidget" name="searchRecords">
        <attribute name="title">
-        <string>Search</string>
+        <string>Archive</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
@@ -537,80 +570,18 @@
             <item>
              <widget class="QGroupBox" name="groupBox_searchRecords">
               <property name="title">
-               <string>Search Records</string>
+               <string>Record Archive</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_13">
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
-                <widget class="QScrollArea" name="scrollArea_searchRecords">
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="widgetResizable">
-                  <bool>true</bool>
-                 </property>
-                 <widget class="QWidget" name="scrollAreaWidgetContents_searchRecords">
-                  <property name="geometry">
-                   <rect>
-                    <x>0</x>
-                    <y>0</y>
-                    <width>740</width>
-                    <height>653</height>
-                   </rect>
-                  </property>
-                 </widget>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="viewRecords">
-       <attribute name="title">
-        <string>View</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QTabWidget" name="viewDb_tabWidget">
-          <property name="tabShape">
-           <enum>QTabWidget::Triangular</enum>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <property name="documentMode">
-           <bool>true</bool>
-          </property>
-          <property name="tabsClosable">
-           <bool>true</bool>
-          </property>
-          <property name="movable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="records">
-           <attribute name="title">
-            <string>Record 1</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QGroupBox" name="date_groupBox">
-              <property name="title">
-               <string>[ Date ]</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <item>
-                <widget class="QFrame" name="frame_view_records_left">
+                <widget class="QFrame" name="frame_view_records_left_2">
                  <property name="frameShape">
                   <enum>QFrame::NoFrame</enum>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_15">
+                 <layout class="QVBoxLayout" name="verticalLayout_18">
                   <property name="leftMargin">
                    <number>3</number>
                   </property>
@@ -624,32 +595,32 @@
                    <number>3</number>
                   </property>
                   <item>
-                   <widget class="QScrollArea" name="scrollArea_view_records_left">
+                   <widget class="QScrollArea" name="scrollArea_view_records_left_2">
                     <property name="frameShape">
                      <enum>QFrame::NoFrame</enum>
                     </property>
                     <property name="widgetResizable">
                      <bool>true</bool>
                     </property>
-                    <widget class="QWidget" name="scrollAreaWidgetContents_records_left">
+                    <widget class="QWidget" name="scrollAreaWidgetContents_records_left_4">
                      <property name="geometry">
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>352</width>
-                       <height>597</height>
+                       <width>361</width>
+                       <height>625</height>
                       </rect>
                      </property>
-                     <layout class="QFormLayout" name="formLayout_2">
+                     <layout class="QFormLayout" name="formLayout_5">
                       <item row="0" column="0">
-                       <widget class="QLabel" name="label_records_dateTime_notes">
+                       <widget class="QLabel" name="label_records_dateTime_notes_4">
                         <property name="text">
                          <string>Date &amp; Time: </string>
                         </property>
                        </widget>
                       </item>
                       <item row="0" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_dateTime_notes">
+                       <widget class="QLineEdit" name="lineEdit_records_dateTime_notes_4">
                         <property name="readOnly">
                          <bool>true</bool>
                         </property>
@@ -658,15 +629,15 @@
                         </property>
                        </widget>
                       </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="label_records_id_notes">
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="label_records_id_notes_4">
                         <property name="text">
                          <string>Name / ID#: </string>
                         </property>
                        </widget>
                       </item>
-                      <item row="1" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_id_notes">
+                      <item row="2" column="1">
+                       <widget class="QLineEdit" name="lineEdit_records_id_notes_4">
                         <property name="readOnly">
                          <bool>true</bool>
                         </property>
@@ -675,25 +646,8 @@
                         </property>
                        </widget>
                       </item>
-                      <item row="2" column="0">
-                       <widget class="QLabel" name="label_records_species_notes">
-                        <property name="text">
-                         <string>Species: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_species_notes">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>&lt;Species&gt;</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="1">
-                       <spacer name="horizontalSpacer_5">
+                      <item row="4" column="1">
+                       <spacer name="horizontalSpacer_11">
                         <property name="orientation">
                          <enum>Qt::Horizontal</enum>
                         </property>
@@ -705,32 +659,15 @@
                         </property>
                        </spacer>
                       </item>
-                      <item row="4" column="0">
-                       <widget class="QLabel" name="label_records_toilet_notes">
+                      <item row="5" column="0">
+                       <widget class="QLabel" name="label_records_toilet_notes_4">
                         <property name="text">
                          <string>Toilet: </string>
                         </property>
                        </widget>
                       </item>
-                      <item row="4" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_toilet_notes">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>Notes...</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="5" column="0">
-                       <widget class="QLabel" name="label_records_hydration_notes">
-                        <property name="text">
-                         <string>Hydration: </string>
-                        </property>
-                       </widget>
-                      </item>
                       <item row="5" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_hydration_notes">
+                       <widget class="QLineEdit" name="lineEdit_records_toilet_notes_4">
                         <property name="readOnly">
                          <bool>true</bool>
                         </property>
@@ -740,14 +677,14 @@
                        </widget>
                       </item>
                       <item row="6" column="0">
-                       <widget class="QLabel" name="label_records_vitamins_notes">
+                       <widget class="QLabel" name="label_records_hydration_notes_4">
                         <property name="text">
-                         <string>Vitamins: </string>
+                         <string>Hydration: </string>
                         </property>
                        </widget>
                       </item>
                       <item row="6" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_vitamins_notes">
+                       <widget class="QLineEdit" name="lineEdit_records_hydration_notes_4">
                         <property name="readOnly">
                          <bool>true</bool>
                         </property>
@@ -757,14 +694,14 @@
                        </widget>
                       </item>
                       <item row="7" column="0">
-                       <widget class="QLabel" name="label_records_weight_notes">
+                       <widget class="QLabel" name="label_records_vitamins_notes_4">
                         <property name="text">
-                         <string>Weight: </string>
+                         <string>Vitamins: </string>
                         </property>
                        </widget>
                       </item>
                       <item row="7" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_weight_notes">
+                       <widget class="QLineEdit" name="lineEdit_records_vitamins_notes_4">
                         <property name="readOnly">
                          <bool>true</bool>
                         </property>
@@ -773,8 +710,25 @@
                         </property>
                        </widget>
                       </item>
+                      <item row="8" column="0">
+                       <widget class="QLabel" name="label_records_weight_notes_4">
+                        <property name="text">
+                         <string>Weight: </string>
+                        </property>
+                       </widget>
+                      </item>
                       <item row="8" column="1">
-                       <spacer name="horizontalSpacer_6">
+                       <widget class="QLineEdit" name="lineEdit_records_weight_notes_4">
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                        <property name="placeholderText">
+                         <string>Notes...</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="9" column="1">
+                       <spacer name="horizontalSpacer_12">
                         <property name="orientation">
                          <enum>Qt::Horizontal</enum>
                         </property>
@@ -786,29 +740,29 @@
                         </property>
                        </spacer>
                       </item>
-                      <item row="9" column="1">
-                       <widget class="QCheckBox" name="checkBox_records_went_toilet">
+                      <item row="10" column="1">
+                       <widget class="QCheckBox" name="checkBox_records_went_toilet_4">
                         <property name="text">
                          <string>Went Toilet</string>
                         </property>
                        </widget>
                       </item>
-                      <item row="10" column="1">
-                       <widget class="QCheckBox" name="checkBox_records_had_hydration">
+                      <item row="11" column="1">
+                       <widget class="QCheckBox" name="checkBox_records_had_hydration_4">
                         <property name="text">
                          <string>Had Hydration</string>
                         </property>
                        </widget>
                       </item>
-                      <item row="11" column="1">
-                       <widget class="QCheckBox" name="checkBox_records_had_vitamins">
+                      <item row="12" column="1">
+                       <widget class="QCheckBox" name="checkBox_records_had_vitamins_4">
                         <property name="text">
                          <string>Had Vitamins</string>
                         </property>
                        </widget>
                       </item>
-                      <item row="12" column="1">
-                       <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                      <item row="13" column="1">
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
                         <property name="readOnly">
                          <bool>true</bool>
                         </property>
@@ -823,6 +777,76 @@
                         </property>
                        </widget>
                       </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_records_species_notes_4">
+                        <property name="text">
+                         <string>Species: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QLineEdit" name="lineEdit_records_species_notes_4">
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                        <property name="placeholderText">
+                         <string>&lt;Species&gt;</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="14" column="1">
+                       <spacer name="horizontalSpacer_5">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item row="15" column="1">
+                       <spacer name="horizontalSpacer_6">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item row="16" column="1">
+                       <spacer name="horizontalSpacer_13">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item row="17" column="1">
+                       <widget class="QPushButton" name="pushButton_archive_next">
+                        <property name="text">
+                         <string>Next Record &gt;&gt;</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="18" column="1">
+                       <widget class="QPushButton" name="pushButton_archive_prev">
+                        <property name="text">
+                         <string>&lt;&lt; Prev. Record</string>
+                        </property>
+                       </widget>
+                      </item>
                      </layout>
                     </widget>
                    </widget>
@@ -831,14 +855,14 @@
                 </widget>
                </item>
                <item>
-                <widget class="QFrame" name="frame_view_records_right">
+                <widget class="QFrame" name="frame_view_records_right_2">
                  <property name="frameShape">
                   <enum>QFrame::NoFrame</enum>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_16">
+                 <layout class="QVBoxLayout" name="verticalLayout_19">
                   <property name="leftMargin">
                    <number>3</number>
                   </property>
@@ -852,32 +876,32 @@
                    <number>3</number>
                   </property>
                   <item>
-                   <widget class="QScrollArea" name="scrollArea_view_records_right">
+                   <widget class="QScrollArea" name="scrollArea_view_records_right_2">
                     <property name="frameShape">
                      <enum>QFrame::NoFrame</enum>
                     </property>
                     <property name="widgetResizable">
                      <bool>true</bool>
                     </property>
-                    <widget class="QWidget" name="scrollAreaWidgetContents_records_right">
+                    <widget class="QWidget" name="scrollAreaWidgetContents_records_right_2">
                      <property name="geometry">
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>352</width>
-                       <height>597</height>
+                       <width>361</width>
+                       <height>625</height>
                       </rect>
                      </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_17">
+                     <layout class="QVBoxLayout" name="verticalLayout_20">
                       <item>
-                       <widget class="QLabel" name="label_records_further_notes">
+                       <widget class="QLabel" name="label_records_further_notes_2">
                         <property name="text">
                          <string>Further Notes: </string>
                         </property>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QPlainTextEdit" name="plainTextEdit_records_further_notes">
+                       <widget class="QPlainTextEdit" name="plainTextEdit_records_further_notes_2">
                         <property name="readOnly">
                          <bool>true</bool>
                         </property>
@@ -912,7 +936,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

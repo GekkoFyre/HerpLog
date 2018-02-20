@@ -81,8 +81,10 @@ private slots:
     void on_action_Settings_triggered();
     void on_action_Documentation_triggered();
     void on_action_About_triggered();
-
-    void new_tab();
+    void on_pushButton_archive_next_clicked();
+    void on_pushButton_archive_prev_clicked();
+    void on_pushButton_browse_submit_clicked();
+    void on_pushButton_add_data_clicked();
 
 private:
     Ui::HerpApp *ui;
@@ -91,7 +93,6 @@ private:
 
     GkFile::FileDb db_ptr;
     fs::path global_temp_dir;
-    int tab_count;
 };
 
 #endif // HERPAPP_HPP
