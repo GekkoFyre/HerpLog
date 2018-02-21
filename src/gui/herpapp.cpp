@@ -57,8 +57,8 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir,
     db_ptr = database;
     global_temp_dir = temp_db_dir;
 
-    gkDb = std::make_unique<GkDb>(this);
-    gkStrOp = std::make_unique<GkStringOp>(this);
+    gkStrOp = std::make_shared<GkStringOp>(this);
+    gkDb = std::make_unique<GkDb>(db_ptr, gkStrOp, this);
 
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
 }

@@ -42,10 +42,100 @@
  */
 
 #include "gk_db_write.hpp"
+#include <leveldb/db.h>
+#include <leveldb/write_batch.h>
+#include <leveldb/cache.h>
+#include <exception>
 
 using namespace GekkoFyre;
-GkDb::GkDb(QObject *parent) : QObject(parent)
-{}
+GkDb::GkDb(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent) : QObject(parent)
+{
+    db_conn = database;
+    gkStrOp = gk_str_op;
+}
 
 GkDb::~GkDb()
 {}
+
+/**
+ *@brief GkDb::add_item_db
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-21
+ * @param record_id The Unique ID that identifies the record being written/deleted/read.
+ * @param key The type of record that is being written/deleted/read, usually stated as unique string of characters.
+ * @param value The information that you wish to store in the database.
+ */
+void GkDb::add_item_db(const std::string record_id, const std::string &key, std::string value)
+{
+    if (value.empty()) {
+        value = "";
+    }
+
+    leveldb::WriteOptions write_options;
+    write_options.sync = true;
+    leveldb::WriteBatch batch;
+    std::lock_guard<std::mutex> locker(db_mutex);
+    std::string key_joined = gkStrOp->multipart_key({record_id, key});
+    batch.Delete(key_joined);
+    batch.Put(key_joined, value);
+    leveldb::Status s;
+    s = db_conn.db->Write(write_options, &batch);
+    if (!s.ok()) {
+        throw std::runtime_error(s.ToString());
+    }
+
+    return;
+}
+
+/**
+ * @brief GkDb::del_item_db
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-21
+ * @param record_id The Unique ID that identifies the record being written/deleted/read.
+ * @param key The type of record that is being written/deleted/read, usually stated as unique string of characters.
+ */
+void GkDb::del_item_db(const std::string record_id, const std::string &key)
+{
+    leveldb::WriteOptions write_options;
+    write_options.sync = true;
+    leveldb::WriteBatch batch;
+    std::lock_guard<std::mutex> locker(db_mutex);
+    std::string key_joined = gkStrOp->multipart_key({record_id, key});
+    batch.Delete(key_joined);
+    leveldb::Status s;
+    s = db_conn.db->Write(write_options, &batch);
+    if (!s.ok()) {
+        throw std::runtime_error(s.ToString());
+    }
+
+    return;
+}
+
+/**
+ * @brief GkDb::read_item_db
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-21
+ * @param record_id The Unique ID that identifies the record being written/deleted/read.
+ * @param key The type of record that is being written/deleted/read, usually stated as unique string of characters.
+ * @return The information that was retrieved from the database, given the Unique ID and Key.
+ */
+std::string GkDb::read_item_db(const std::string record_id, const std::string &key)
+{
+    std::string read_data;
+    leveldb::ReadOptions read_opt;
+    leveldb::Status s;
+    read_opt.verify_checksums = true;
+    std::string key_joined = gkStrOp->multipart_key({record_id, key});
+
+    std::lock_guard<std::mutex> locker(db_mutex);
+    s = db_conn.db->Get(read_opt, key_joined, &read_data);
+    if (!s.ok()) {
+        throw std::runtime_error(s.ToString());
+    }
+
+    if (!read_data.empty()) {
+        return read_data;
+    } else {
+        return "";
+    }
+}

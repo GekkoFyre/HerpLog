@@ -57,7 +57,7 @@ class GkDbConn : public QObject {
 Q_OBJECT
 
 public:
-    explicit GkDbConn(QObject *parent = 0);
+    explicit GkDbConn(QObject *parent = nullptr);
     ~GkDbConn();
 
 public:

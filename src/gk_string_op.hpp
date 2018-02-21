@@ -44,6 +44,7 @@
 #define GKSTRINGOP_HPP
 
 #include <QtCore/QObject>
+#include <initializer_list>
 #include <string>
 
 namespace GekkoFyre {
@@ -53,11 +54,13 @@ class GkStringOp : public QObject {
     Q_OBJECT
 
 public:
-    explicit GkStringOp(QObject *parent = 0);
+    explicit GkStringOp(QObject *parent = nullptr);
     ~GkStringOp();
 
     std::string getCrc32(const std::string &input);
     std::string random_hash();
+
+    std::string multipart_key(const std::initializer_list<std::string> &args);
 };
 }
 

@@ -62,7 +62,7 @@ class HerpApp : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent = 0);
+    explicit HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent = nullptr);
     ~HerpApp();
 
 private slots:
@@ -97,7 +97,7 @@ private:
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDb> gkDb;
-    std::unique_ptr<GkStringOp> gkStrOp;
+    std::shared_ptr<GkStringOp> gkStrOp;
 
     fs::path global_temp_dir;
 };

@@ -48,6 +48,7 @@
 #include <boost/crc.hpp>
 #include <random>
 #include <chrono>
+#include <sstream>
 
 using namespace GekkoFyre;
 GkStringOp::GkStringOp(QObject *parent) : QObject(parent)
@@ -85,4 +86,29 @@ std::string GkStringOp::random_hash()
     std::string substr = result.substr(0, 8); // Extract just the first few characters from the UUID
     for (auto & c: substr) c = std::toupper(c); // Convert to uppercase
     return substr;
+}
+
+/**
+ * @brief GkStringOp::multipart_key combines and creates a unique key that is suitable for lookup of individual records
+ * in a Google LevelDB database.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-21
+ * @param args The multipart arguments to be provided, whether one, a dozen, or even more. But usually only two in this case.
+ * @return The combined key, outputted as a std::string.
+ */
+std::string GkStringOp::multipart_key(const std::initializer_list<std::string> &args)
+{
+    std::ostringstream ret_val;
+    static int counter;
+    counter = 0;
+    for (const auto &arg: args) {
+        ++counter;
+        if (counter == 1) {
+            ret_val << arg;
+        } else {
+            ret_val << "_" << arg;
+        }
+    }
+
+    return ret_val.str();
 }

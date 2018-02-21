@@ -44,7 +44,11 @@
 #ifndef GKDB_WRITE_HPP
 #define GKDB_WRITE_HPP
 
+#include "options.hpp"
+#include "gk_string_op.hpp"
 #include <QtCore/QObject>
+#include <string>
+#include <mutex>
 
 namespace GekkoFyre {
 class GkDb;
@@ -53,8 +57,18 @@ class GkDb : public QObject {
     Q_OBJECT
 
 public:
-    explicit GkDb(QObject *parent = 0);
+    explicit GkDb(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
     ~GkDb();
+
+    void add_item_db(const std::string record_id, const std::string &key, std::string value);
+    void del_item_db(const std::string record_id, const std::string &key);
+    std::string read_item_db(const std::string record_id, const std::string &key);
+
+private:
+    std::shared_ptr<GkStringOp> gkStrOp;
+    GkFile::FileDb db_conn;
+
+    std::mutex db_mutex;
 };
 }
 
