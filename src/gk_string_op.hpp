@@ -57,6 +57,7 @@ public:
     ~GkStringOp();
 
     std::string getCrc32(const std::string &input);
+    std::string random_hash();
 };
 }
 

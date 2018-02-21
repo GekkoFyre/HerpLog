@@ -135,14 +135,7 @@
                   <item row="3" column="1">
                    <widget class="QComboBox" name="comboBox_existing_id"/>
                   </item>
-                  <item row="4" column="1">
-                   <widget class="QLineEdit" name="lineEdit_new_id">
-                    <property name="placeholderText">
-                     <string>Enter new ID# here...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="7" column="1">
+                  <item row="6" column="1">
                    <spacer name="horizontalSpacer_notes">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -155,63 +148,63 @@
                     </property>
                    </spacer>
                   </item>
-                  <item row="8" column="0">
+                  <item row="7" column="0">
                    <widget class="QLabel" name="label_toilet_notes">
                     <property name="text">
                      <string>Toilet: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="1">
+                  <item row="7" column="1">
                    <widget class="QLineEdit" name="lineEdit_toilet_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="0">
+                  <item row="8" column="0">
                    <widget class="QLabel" name="label_hydration_notes">
                     <property name="text">
                      <string>Hydration: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="1">
+                  <item row="8" column="1">
                    <widget class="QLineEdit" name="lineEdit_hydration_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="0">
+                  <item row="9" column="0">
                    <widget class="QLabel" name="label_vitamins_notes">
                     <property name="text">
                      <string>Vitamins: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="1">
+                  <item row="9" column="1">
                    <widget class="QLineEdit" name="lineEdit_vitamins_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="11" column="0">
+                  <item row="10" column="0">
                    <widget class="QLabel" name="label_weight_notes">
                     <property name="text">
                      <string>Weight: </string>
                     </property>
                    </widget>
                   </item>
-                  <item row="11" column="1">
+                  <item row="10" column="1">
                    <widget class="QLineEdit" name="lineEdit_weight_notes">
                     <property name="placeholderText">
                      <string>Notes...</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="12" column="1">
+                  <item row="11" column="1">
                    <spacer name="horizontalSpacer_checkBox">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -224,28 +217,28 @@
                     </property>
                    </spacer>
                   </item>
-                  <item row="13" column="1">
+                  <item row="12" column="1">
                    <widget class="QCheckBox" name="checkBox_toilet">
                     <property name="text">
                      <string>Went Toilet</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="14" column="1">
+                  <item row="13" column="1">
                    <widget class="QCheckBox" name="checkBox_hydration">
                     <property name="text">
                      <string>Had Hydration</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="15" column="1">
+                  <item row="14" column="1">
                    <widget class="QCheckBox" name="checkBox_vitamins">
                     <property name="text">
                      <string>Had Vitamins</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="16" column="1">
+                  <item row="15" column="1">
                    <widget class="QDoubleSpinBox" name="spinBox_weight">
                     <property name="suffix">
                      <string> g</string>
@@ -258,7 +251,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="17" column="1">
+                  <item row="16" column="1">
                    <spacer name="horizontalSpacer_14">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -271,7 +264,7 @@
                     </property>
                    </spacer>
                   </item>
-                  <item row="18" column="1">
+                  <item row="17" column="1">
                    <spacer name="horizontalSpacer_15">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -284,11 +277,55 @@
                     </property>
                    </spacer>
                   </item>
-                  <item row="19" column="1">
+                  <item row="18" column="1">
                    <widget class="QPushButton" name="pushButton_add_data">
                     <property name="text">
                      <string>Submit</string>
                     </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QFrame" name="frame_3">
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_6">
+                     <property name="spacing">
+                      <number>6</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QLineEdit" name="lineEdit_new_id">
+                       <property name="placeholderText">
+                        <string>New Name / ID#</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QToolButton" name="toolButton_new_hash">
+                       <property name="toolTip">
+                        <string>Create a new, random ID#.</string>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>

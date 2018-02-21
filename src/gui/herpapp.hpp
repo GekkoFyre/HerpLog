@@ -88,11 +88,12 @@ private slots:
     void on_pushButton_browse_submit_clicked();
     void on_pushButton_add_data_clicked();
 
+    void on_toolButton_new_hash_clicked();
+
 private:
     Ui::HerpApp *ui;
 
     bool remove_files(const fs::path &dirLoc);
-    std::string random_hash();
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDb> gkDb;
