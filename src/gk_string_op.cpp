@@ -42,7 +42,12 @@
 
 #include "gk_string_op.hpp"
 #include <boost/exception/all.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/random.hpp>
 #include <boost/crc.hpp>
+#include <random>
+#include <chrono>
 
 using namespace GekkoFyre;
 GkStringOp::GkStringOp(QObject *parent) : QObject(parent)
@@ -61,9 +66,23 @@ GkStringOp::~GkStringOp()
  */
 std::string GkStringOp::getCrc32(const std::string &input)
 {
-    boost::crc_32_type result;
-    result.process_bytes(input.data(), input.length());
+    boost::crc_32_type hash;
+    hash.process_bytes(input.data(), input.length());
     std::ostringstream oss;
-    oss << std::hex << std::uppercase << result.checksum();
+    oss << std::hex << std::uppercase << hash.checksum();
+
     return oss.str();
+}
+
+std::string GkStringOp::random_hash()
+{
+    boost::mt19937 ran;
+    std::random_device rd;
+    ran.seed(rd());
+    boost::uuids::basic_random_generator<boost::mt19937> gen(&ran);
+    boost::uuids::uuid u = gen();
+    std::string result = boost::uuids::to_string(u); // Convert the Boost UUID to a std::string
+    std::string substr = result.substr(0, 8); // Extract just the first few characters from the UUID
+    for (auto & c: substr) c = std::toupper(c); // Convert to uppercase
+    return substr;
 }

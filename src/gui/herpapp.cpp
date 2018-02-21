@@ -59,6 +59,8 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir,
 
     gkDb = std::make_unique<GkDb>(this);
     gkStrOp = std::make_unique<GkStringOp>(this);
+
+    ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
 }
 
 HerpApp::~HerpApp()
@@ -146,12 +148,8 @@ void HerpApp::on_pushButton_browse_submit_clicked()
 void HerpApp::on_pushButton_add_data_clicked()
 {}
 
-std::string HerpApp::random_hash()
+void HerpApp::on_toolButton_new_hash_clicked()
 {
-    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    std::mt19937 mt_rand(seed);
-    std::uniform_int_distribution<int> dist(1, 10);
-    auto result = dist(mt_rand);
-
-    return gkStrOp->getCrc32(std::to_string(result));
+    ui->lineEdit_new_id->clear();
+    ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
 }
