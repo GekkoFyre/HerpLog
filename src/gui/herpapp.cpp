@@ -45,6 +45,7 @@
 #include <boost/exception/all.hpp>
 #include <QMessageBox>
 #include <QToolButton>
+#include <exception>
 #include <random>
 #include <chrono>
 
@@ -152,4 +153,39 @@ void HerpApp::on_toolButton_new_hash_clicked()
 {
     ui->lineEdit_new_id->clear();
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
+}
+
+void HerpApp::submit_record()
+{
+    try {
+        if (!ui->lineEdit_new_species->text().isEmpty() && !ui->lineEdit_new_id->text().isEmpty()) {
+            using namespace GkRecords;
+            std::lock_guard<std::mutex> locker(w_record_mtx);
+
+            GkSpecies species;
+            species.species_name = ui->lineEdit_new_species->text().toStdString();
+
+            GkId identifier;
+            identifier.identifier_str = ui->lineEdit_new_id->text().toStdString();
+
+            GkSubmit submit;
+            submit.date_time = std::time(nullptr);
+            submit.species = species;
+            submit.identifier = identifier;
+            submit.further_notes = ui->plainTextEdit_furtherNotes->toPlainText().toStdString();
+            submit.vitamin_notes = ui->lineEdit_vitamins_notes->text().toStdString();
+            submit.toilet_notes = ui->lineEdit_toilet_notes->text().toStdString();
+            submit.weight_notes = ui->lineEdit_weight_notes->text().toStdString();
+            submit.hydration_notes = ui->lineEdit_hydration_notes->text().toStdString();
+            submit.went_toilet = ui->checkBox_toilet->isChecked();
+            submit.had_hydration = ui->checkBox_hydration->isChecked();
+            submit.had_vitamins = ui->checkBox_vitamins->isChecked();
+            submit.weight = ui->spinBox_weight->value();
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+        return;
+    }
+
+    return;
 }

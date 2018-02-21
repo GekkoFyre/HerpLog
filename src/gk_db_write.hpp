@@ -48,6 +48,7 @@
 #include "gk_string_op.hpp"
 #include <QtCore/QObject>
 #include <string>
+#include <vector>
 #include <mutex>
 
 namespace GekkoFyre {
@@ -60,9 +61,13 @@ public:
     explicit GkDb(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
     ~GkDb();
 
-    void add_item_db(const std::string record_id, const std::string &key, std::string value);
-    void del_item_db(const std::string record_id, const std::string &key);
-    std::string read_item_db(const std::string record_id, const std::string &key);
+    void add_item_db(const std::string &record_id, const std::string &key, std::string value);
+    void del_item_db(const std::string &record_id, const std::string &key);
+    std::string read_item_db(const std::string &record_id, const std::string &key);
+
+    auto get_misc_key_vals(const GkRecords::StrucType &struc_type);
+    auto get_record_ids();
+    int incr_id(const std::string &record_id, const std::string &key);
 
 private:
     std::shared_ptr<GkStringOp> gkStrOp;

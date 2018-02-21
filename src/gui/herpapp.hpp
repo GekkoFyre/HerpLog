@@ -50,6 +50,7 @@
 #include <QMainWindow>
 #include <QResizeEvent>
 #include <memory>
+#include <mutex>
 
 using namespace GekkoFyre;
 namespace fs = boost::filesystem;
@@ -94,12 +95,14 @@ private:
     Ui::HerpApp *ui;
 
     bool remove_files(const fs::path &dirLoc);
+    void submit_record();
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDb> gkDb;
     std::shared_ptr<GkStringOp> gkStrOp;
 
     fs::path global_temp_dir;
+    std::mutex w_record_mtx;
 };
 
 #endif // HERPAPP_HPP
