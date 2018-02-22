@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -67,13 +67,16 @@ public:
 
     auto get_misc_key_vals(const GkRecords::StrucType &struc_type);
     auto get_record_ids();
-    int incr_id(const std::string &record_id, const std::string &key);
+    void add_misc_key_val(const GkRecords::StrucType &struc_type, const std::string &unique_id, const std::string &value);
+    bool add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id);
+    std::string create_unique_id();
 
 private:
     std::shared_ptr<GkStringOp> gkStrOp;
     GkFile::FileDb db_conn;
 
     std::mutex db_mutex;
+    std::mutex create_key_mutex;
 };
 }
 

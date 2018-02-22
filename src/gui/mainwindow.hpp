@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -45,6 +45,7 @@
 
 #include "./../options.hpp"
 #include "./../gk_db_conn.hpp"
+#include "./../gk_file_io.hpp"
 #include <boost/filesystem.hpp>
 #include <QMainWindow>
 #include <memory>
@@ -71,6 +72,7 @@ private:
     Ui::MainWindow *ui;
 
     std::unique_ptr<GkDbConn> gkDbConn;
+    std::shared_ptr<GkFileIo> gkFileIo;
     GkFile::FileDb db_ptr;
 };
 

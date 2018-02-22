@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -108,20 +108,24 @@ namespace GekkoFyre {
         constexpr char csvNameId[] = "csv_name_id";
         constexpr char csvIdentifyStr[] = "csv_identifier_str";
 
+        constexpr char LEVELDB_STORE_RECORD_ID[] = "store_unique_id";
+        constexpr char LEVELDB_STORE_SPECIES_ID[] = "store_species_id";
+        constexpr char LEVELDB_STORE_NAME_ID[] = "store_name_id";
+
         struct GkSpecies {
-            int record_id;                  // The Unique Identifier for the entire record in question
-            int species_id;                 // The species Unique ID
+            std::string record_id;          // The Unique Identifier for the entire record in question
+            std::string species_id;         // The species Unique ID
             std::string species_name;       // The species of the animal/lizard in question
         };
 
         struct GkId {
-            int record_id;                  // The Unique Identifier for the entire record in question
-            int name_id;                    // Self-explanatory
+            std::string record_id;          // The Unique Identifier for the entire record in question
+            std::string name_id;            // Self-explanatory
             std::string identifier_str;     // The identifier as a string, for the animal/lizard in question
         };
 
         struct GkSubmit {
-            int record_id;                  // The Unique Identifier for the entire record in question
+            std::string record_id;          // The Unique Identifier for the entire record in question
             std::time_t date_time;          // The epoch at the time of submitting/modifying this record
             GkSpecies species;              // The species of the animal/lizard in question
             GkId identifier;                // The identifier as a string, for the animal/lizard in question

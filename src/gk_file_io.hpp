@@ -34,34 +34,37 @@
  ********************************************************************************/
 
 /**
- * @file gk_string_op.hpp
+ * @file gk_db_write.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @brief This file holds any functions related to string processing/modification.
+ * @brief Contains any routines relating to file input/output operations.
  */
 
-#ifndef GKSTRINGOP_HPP
-#define GKSTRINGOP_HPP
+#ifndef GK_FILE_IO_HPP
+#define GK_FILE_IO_HPP
 
-#include <QtCore/QObject>
-#include <initializer_list>
-#include <string>
+#include "options.hpp"
+#include <QObject>
+#include <boost/filesystem.hpp>
 
 namespace GekkoFyre {
-class GkStringOp;
+class GkFileIo;
 
-class GkStringOp : public QObject {
+class GkFileIo : public QObject {
     Q_OBJECT
 
 public:
-    explicit GkStringOp(QObject *parent = nullptr);
-    ~GkStringOp();
+    explicit GkFileIo(QObject *parent = nullptr);
+    ~GkFileIo();
 
-    std::string getCrc32(const std::string &input);
-    std::string random_hash();
+    bool compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc);
+    std::string decompress_file(const std::string &fileLoc);
 
-    std::string multipart_key(const std::initializer_list<std::string> &args);
+private:
+    std::string readFileToString(const std::string &fileLoc);
+    std::string getCrc32(const std::string &fileData);
+    void read_directory(const std::string &dirLoc, std::vector<std::string> &output);
 };
 }
 
-#endif // GKSTRINGOP_HPP
+#endif // GK_FILE_IO_HPP

@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -46,6 +46,7 @@
 #include "./../options.hpp"
 #include "./../gk_db_write.hpp"
 #include "./../gk_string_op.hpp"
+#include "./../gk_file_io.hpp"
 #include <boost/filesystem.hpp>
 #include <QMainWindow>
 #include <QResizeEvent>
@@ -63,7 +64,8 @@ class HerpApp : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent = nullptr);
+    explicit HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_path, const std::string &db_file_path,
+                     const std::shared_ptr<GkFileIo> &file_io_ptr, QWidget *parent = nullptr);
     ~HerpApp();
 
 private slots:
@@ -94,14 +96,16 @@ private slots:
 private:
     Ui::HerpApp *ui;
 
-    bool remove_files(const fs::path &dirLoc);
-    void submit_record();
+    bool remove_files(const fs::path &tmpDirLoc);
+    bool submit_record();
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDb> gkDb;
     std::shared_ptr<GkStringOp> gkStrOp;
+    std::shared_ptr<GkFileIo> gkFileIo;
 
-    fs::path global_temp_dir;
+    fs::path global_db_temp_dir;
+    std::string global_db_file_path;
     std::mutex w_record_mtx;
 };
 

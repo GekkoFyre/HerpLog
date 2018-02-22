@@ -93,6 +93,8 @@ set(SOURCE_FILES
             src/gk_db_conn.cpp
             src/gk_db_write.hpp
             src/gk_db_write.cpp
+            src/gk_file_io.hpp
+            src/gk_file_io.cpp
             src/gk_string_op.hpp
             src/gk_string_op.cpp
             src/gui/mainwindow.hpp
