@@ -51,11 +51,11 @@
 #include <leveldb/write_batch.h>
 #include <leveldb/cache.h>
 #include <QMessageBox>
-#include <unordered_map>
 #include <random>
 #include <exception>
 #include <sstream>
 #include <utility>
+#include <algorithm>
 
 using namespace GekkoFyre;
 GkDb::GkDb(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent) : QObject(parent)
@@ -215,14 +215,14 @@ auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
  * @date 2018-02-21
  * @return The information that was retrieved from the database.
  */
-auto GkDb::get_record_ids()
+std::unordered_map<std::string, std::pair<std::string, std::string>> GkDb::get_record_ids()
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
 
     std::string csv_read_data;
     std::lock_guard<std::mutex> locker(db_mutex);
-    db_conn.db->Get(read_opt, GkRecords::recordId, &csv_read_data);
+    db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_RECORD_ID, &csv_read_data);
 
     std::unordered_map<std::string, std::pair<std::string, std::string>> cache;
     std::stringstream csv_out;
@@ -266,8 +266,13 @@ void GkDb::add_misc_key_val(const GkRecords::StrucType &struc_type, const std::s
         case StrucType::gkSpecies:
         {
             auto species_cache = get_misc_key_vals(StrucType::gkSpecies);
-            for (const auto &species: species_cache) {
-                oss << species.first << "," << species.second << std::endl;
+
+            if (species_cache.empty()) {
+                oss << GkRecords::csvSpeciesId << "," << GkRecords::csvSpeciesName << std::endl;
+            } else {
+                for (const auto &species: species_cache) {
+                    oss << species.first << "," << species.second << std::endl;
+                }
             }
 
             // Now we insert the new UUID alongside with its value
@@ -281,8 +286,13 @@ void GkDb::add_misc_key_val(const GkRecords::StrucType &struc_type, const std::s
         case StrucType::gkId:
         {
             auto id_cache = get_misc_key_vals(StrucType::gkId);
-            for (const auto &id: id_cache) {
-                oss << id.first << "," << id.second << std::endl;
+
+            if (id_cache.empty()) {
+                oss << GkRecords::csvNameId << "," << GkRecords::csvIdentifyStr << std::endl;
+            } else {
+                for (const auto &id: id_cache) {
+                    oss << id.first << "," << id.second << std::endl;
+                }
             }
 
             // Now we insert the new UUID alongside with its value
@@ -319,8 +329,13 @@ bool GkDb::add_record_id(const std::string &unique_id, const GkRecords::GkSpecie
     try {
         std::ostringstream oss;
         auto record_cache = get_record_ids();
-        for (const auto &record: record_cache) {
-            oss << record.first << "," << record.second.first << "," << record.second.second << std::endl;
+
+        if (record_cache.empty()) {
+            oss << GkRecords::csvRecordId << "," << GkRecords::csvSpeciesId << "," << GkRecords::csvNameId << std::endl;
+        } else {
+            for (const auto &record: record_cache) {
+                oss << record.first << "," << record.second.first << "," << record.second.second << std::endl;
+            }
         }
 
         // Now we insert the new UUID alongside with its value
@@ -368,4 +383,42 @@ std::string GkDb::create_unique_id()
     std::string result = boost::uuids::to_string(u); // Convert the Boost UUID to a std::string
     for (auto & c: result) c = std::toupper(c); // Convert to uppercase
     return result;
+}
+
+int GkDb::determineMinimumDate(const std::vector<std::string> &record_id)
+{
+    if (!record_id.empty()) {
+        std::vector<std::string> dates_str_vec;
+        for (const auto &id: record_id) {
+            dates_str_vec.push_back(read_item_db(id, GkRecords::dateTime));
+        }
+
+        std::vector<int> dates_vec;
+        for (const auto &date: dates_str_vec) {
+            dates_vec.push_back(std::stoi(date));
+        }
+
+        return *std::min_element(dates_vec.begin(), dates_vec.end());
+    }
+
+    return 0;
+}
+
+int GkDb::determineMaximumDate(const std::vector<std::string> &record_id)
+{
+    if (!record_id.empty()) {
+        std::vector<std::string> dates_str_vec;
+        for (const auto &id: record_id) {
+            dates_str_vec.push_back(read_item_db(id, GkRecords::dateTime));
+        }
+
+        std::vector<int> dates_vec;
+        for (const auto &date: dates_str_vec) {
+            dates_vec.push_back(std::stoi(date));
+        }
+
+        return *std::max_element(dates_vec.begin(), dates_vec.end());
+    }
+
+    return 0;
 }
