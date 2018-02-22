@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -47,11 +47,13 @@
 #include <leveldb/db.h>
 #include <memory>
 #include <string>
+#include <chrono>
 
 namespace fs = boost::filesystem;
 namespace GekkoFyre {
     constexpr double HERPLOG_DEFAULT_RESOLUTION_WIDTH = 1920.0;
     constexpr int HERPLOG_DEFAULT_HORIZONTAL_MARGIN_PUSHBUTTON = 6;
+    constexpr int CFG_CSV_MIN_PARSE_SIZE = 12;
     constexpr unsigned long LEVELDB_CFG_CACHE_SIZE = 32UL * 1024UL * 1024UL;
 
     namespace GkFile {
@@ -77,6 +79,71 @@ namespace GekkoFyre {
 
         enum HashTypes {
             CRC32
+        };
+    }
+
+    namespace GkRecords {
+        constexpr char recordId[] = "record_id";
+
+        constexpr char speciesId[] = "species_id";
+        constexpr char speciesName[] = "species_name";
+
+        constexpr char nameId[] = "name_id";
+        constexpr char identifierStr[] = "identifier_str";
+
+        constexpr char dateTime[] = "date_time";
+        constexpr char furtherNotes[] = "further_notes";
+        constexpr char vitaminNotes[] = "vitamin_notes";
+        constexpr char toiletNotes[] = "toilet_notes";
+        constexpr char weightNotes[] = "weight_notes";
+        constexpr char hydrationNotes[] = "hydration_notes";
+        constexpr char boolWentToilet[] = "bool_went_toilet";
+        constexpr char boolHadHydration[] = "bool_had_hydration";
+        constexpr char boolHadVitamins[] = "bool_had_vitamins";
+        constexpr char weightMeasure[] = "weight_measurement";
+
+        constexpr char csvRecordId[] = "csv_record_id";
+        constexpr char csvSpeciesId[] = "csv_species_id";
+        constexpr char csvSpeciesName[] = "csv_species_name";
+        constexpr char csvNameId[] = "csv_name_id";
+        constexpr char csvIdentifyStr[] = "csv_identifier_str";
+
+        constexpr char LEVELDB_STORE_RECORD_ID[] = "store_unique_id";
+        constexpr char LEVELDB_STORE_SPECIES_ID[] = "store_species_id";
+        constexpr char LEVELDB_STORE_NAME_ID[] = "store_name_id";
+
+        struct GkSpecies {
+            std::string record_id;          // The Unique Identifier for the entire record in question
+            std::string species_id;         // The species Unique ID
+            std::string species_name;       // The species of the animal/lizard in question
+        };
+
+        struct GkId {
+            std::string record_id;          // The Unique Identifier for the entire record in question
+            std::string name_id;            // Self-explanatory
+            std::string identifier_str;     // The identifier as a string, for the animal/lizard in question
+        };
+
+        struct GkSubmit {
+            std::string record_id;          // The Unique Identifier for the entire record in question
+            std::time_t date_time;          // The epoch at the time of submitting/modifying this record
+            GkSpecies species;              // The species of the animal/lizard in question
+            GkId identifier;                // The identifier as a string, for the animal/lizard in question
+            std::string further_notes;      // Any further notes, usually as one, long std::string
+            std::string vitamin_notes;      // Any extra notes about the lizard's vitamin intake
+            std::string toilet_notes;       // Any extra notes about the lizard's bathroom habits
+            std::string weight_notes;       // Any extra notes about the lizard's weight
+            std::string hydration_notes;    // Any extra notes about the lizard's hydration intake
+            bool went_toilet;               // Whether the lizard went to the bathroom or not
+            bool had_hydration;             // Whether the lizard had any hydration or not
+            bool had_vitamins;              // Whether the lizard had any vitamins or not
+            double weight;                  // The weight of the lizard in question
+        };
+
+        enum StrucType {
+            gkSpecies,
+            gkId,
+            gkSubmit
         };
     }
 }

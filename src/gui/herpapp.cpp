@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -45,43 +45,45 @@
 #include <boost/exception/all.hpp>
 #include <QMessageBox>
 #include <QToolButton>
+#include <exception>
 #include <random>
 #include <chrono>
 
 namespace sys = boost::system;
-HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_db_dir, QWidget *parent) :
-        QMainWindow(parent), ui(new Ui::HerpApp)
+HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_path, const std::string &db_file_path,
+                 const std::shared_ptr<GkFileIo> &file_io_ptr, QWidget *parent) : QMainWindow(parent), ui(new Ui::HerpApp)
 {
     ui->setupUi(this);
 
     db_ptr = database;
-    global_temp_dir = temp_db_dir;
+    global_db_temp_dir = temp_dir_path;
+    global_db_file_path = db_file_path;
+    gkFileIo = file_io_ptr;
 
-    gkDb = std::make_unique<GkDb>(this);
-    gkStrOp = std::make_unique<GkStringOp>(this);
+    gkStrOp = std::make_shared<GkStringOp>(this);
+    gkDb = std::make_unique<GkDb>(db_ptr, gkStrOp, this);
 
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
 }
 
 HerpApp::~HerpApp()
 {
-    remove_files(global_temp_dir);
+    remove_files(global_db_temp_dir);
     delete ui;
 }
 
-bool HerpApp::remove_files(const fs::path &dirLoc)
+bool HerpApp::remove_files(const fs::path &tmpDirLoc)
 {
     sys::error_code ec;
-    if (fs::is_directory(dirLoc, ec)) {
-        if (!fs::remove_all(dirLoc, ec)) {
-            QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+    if (fs::is_directory(tmpDirLoc, ec)) {
+        if (!fs::remove_all(tmpDirLoc, ec)) {
+            QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
             return false;
         } else {
             return true;
         }
     }
 
-    QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
     return false;
 }
 
@@ -95,7 +97,19 @@ void HerpApp::on_action_Disconnect_triggered()
 {}
 
 void HerpApp::on_action_Save_triggered()
-{}
+{
+    sys::error_code ec;
+    if (fs::exists(global_db_file_path, ec)) {
+        if (!fs::remove(global_db_file_path, ec)) {
+            QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+            return;
+        } else {
+            gkFileIo->compress_files(global_db_temp_dir.string(), global_db_file_path);
+        }
+    }
+
+    return;
+}
 
 void HerpApp::on_actionSave_As_triggered()
 {}
@@ -146,10 +160,77 @@ void HerpApp::on_pushButton_browse_submit_clicked()
 {}
 
 void HerpApp::on_pushButton_add_data_clicked()
-{}
+{
+    submit_record();
+}
 
 void HerpApp::on_toolButton_new_hash_clicked()
 {
     ui->lineEdit_new_id->clear();
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
+}
+
+bool HerpApp::submit_record()
+{
+    try {
+        if (!ui->lineEdit_new_species->text().isEmpty() && !ui->lineEdit_new_id->text().isEmpty()) {
+            using namespace GkRecords;
+            std::lock_guard<std::mutex> locker(w_record_mtx);
+
+            GkSpecies species;
+            species.species_name = ui->lineEdit_new_species->text().toStdString();
+
+            GkId identifier;
+            identifier.identifier_str = ui->lineEdit_new_id->text().toStdString();
+
+            GkSubmit submit;
+            submit.date_time = std::time(nullptr);
+            submit.species = species;
+            submit.identifier = identifier;
+            submit.further_notes = ui->plainTextEdit_furtherNotes->toPlainText().toStdString();
+            submit.vitamin_notes = ui->lineEdit_vitamins_notes->text().toStdString();
+            submit.toilet_notes = ui->lineEdit_toilet_notes->text().toStdString();
+            submit.weight_notes = ui->lineEdit_weight_notes->text().toStdString();
+            submit.hydration_notes = ui->lineEdit_hydration_notes->text().toStdString();
+            submit.went_toilet = ui->checkBox_toilet->isChecked();
+            submit.had_hydration = ui->checkBox_hydration->isChecked();
+            submit.had_vitamins = ui->checkBox_vitamins->isChecked();
+            submit.weight = ui->spinBox_weight->value();
+
+            std::string unique_id = gkDb->create_unique_id();
+            if (!submit.species.species_name.empty()) {
+                submit.species.species_id = gkDb->create_unique_id();
+            } else {
+                submit.species.species_id = "";
+            }
+
+            if (!submit.identifier.identifier_str.empty()) {
+                submit.identifier.name_id = gkDb->create_unique_id();
+            } else {
+                submit.identifier.name_id = "";
+            }
+
+            gkDb->add_record_id(unique_id, submit.species, submit.identifier);
+            gkDb->add_item_db(unique_id, dateTime, std::to_string(submit.date_time));
+            gkDb->add_item_db(unique_id, speciesId, submit.species.species_id);
+            gkDb->add_item_db(unique_id, speciesName, submit.species.species_name);
+            gkDb->add_item_db(unique_id, nameId, submit.identifier.name_id);
+            gkDb->add_item_db(unique_id, identifierStr, submit.identifier.identifier_str);
+            gkDb->add_item_db(unique_id, furtherNotes, submit.further_notes);
+            gkDb->add_item_db(unique_id, vitaminNotes, submit.vitamin_notes);
+            gkDb->add_item_db(unique_id, toiletNotes, submit.toilet_notes);
+            gkDb->add_item_db(unique_id, weightNotes, submit.weight_notes);
+            gkDb->add_item_db(unique_id, hydrationNotes, submit.hydration_notes);
+            gkDb->add_item_db(unique_id, boolWentToilet, std::to_string(submit.went_toilet));
+            gkDb->add_item_db(unique_id, boolHadHydration, std::to_string(submit.had_hydration));
+            gkDb->add_item_db(unique_id, boolHadVitamins, std::to_string(submit.had_vitamins));
+            gkDb->add_item_db(unique_id, weightMeasure, std::to_string(submit.weight));
+            return true;
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+        return false;
+    }
+
+    return false;
 }

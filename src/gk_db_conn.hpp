@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -57,19 +57,11 @@ class GkDbConn : public QObject {
 Q_OBJECT
 
 public:
-    explicit GkDbConn(QObject *parent = 0);
+    explicit GkDbConn(QObject *parent = nullptr);
     ~GkDbConn();
 
 public:
     GkFile::FileDb openDatabase(const std::string &dbFile);
-    bool compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc);
-    std::string decompress_file(const std::string &fileLoc);
-
-private:
-    std::string getCrc32(const std::string &fileData);
-    std::string readFileToString(const std::string &fileLoc);
-    std::string convHashType_toStr(const GkFile::HashTypes &hashType);
-    void read_directory(const std::string &dirLoc, std::vector<std::string> &output);
 };
 }
 

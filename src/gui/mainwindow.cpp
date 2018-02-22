@@ -9,7 +9,7 @@
  **                 |_|                |___/
  **
  **   Thank you for using "HerpLog" for your herpetology management requirements!
- **   Copyright (C) 2017. GekkoFyre.
+ **   Copyright (C) 2017-2018. GekkoFyre.
  **
  **
  **   HerpLog is free software: you can redistribute it and/or modify
@@ -55,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     gkDbConn = std::make_unique<GkDbConn>(this);
+    gkFileIo = std::make_shared<GkFileIo>(this);
 }
 
 MainWindow::~MainWindow()
@@ -77,10 +78,10 @@ void MainWindow::on_button_create_db_clicked()
 
                 fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
                 fs::path zip_file = std::string(parent_path.string() + fs::path::preferred_separator + dirName.string() + "." + "hdb");
-                gkDbConn->compress_files(temp_dir.string(), zip_file.string());
+                gkFileIo->compress_files(temp_dir.string(), zip_file.string());
 
                 this->close();
-                HerpApp *herpAppWin = new HerpApp(db_ptr, temp_dir.string(), this);
+                HerpApp *herpAppWin = new HerpApp(db_ptr, temp_dir.string(), zip_file.string(), gkFileIo, this);
                 herpAppWin->setWindowFlags(Qt::Window);
                 herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
                 QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
@@ -106,12 +107,12 @@ void MainWindow::on_button_open_db_clicked()
             std::string fileName_str = fileName.toStdString();
 
             if (!fileName.isEmpty() && fs::exists(fileName_str, ec)) {
-                std::string tmp_extraction_loc = gkDbConn->decompress_file(fileName_str);
+                std::string tmp_extraction_loc = gkFileIo->decompress_file(fileName_str);
                 if (!tmp_extraction_loc.empty() && fs::is_directory(tmp_extraction_loc, ec)) {
                     db_ptr = gkDbConn->openDatabase(tmp_extraction_loc);
 
                     this->close();
-                    HerpApp *herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, this);
+                    HerpApp *herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, fileName_str, gkFileIo, this);
                     herpAppWin->setWindowFlags(Qt::Window);
                     herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
                     QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
