@@ -47,6 +47,7 @@
 #include "options.hpp"
 #include "gk_string_op.hpp"
 #include <QtCore/QObject>
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <mutex>
@@ -66,10 +67,13 @@ public:
     std::string read_item_db(const std::string &record_id, const std::string &key);
 
     auto get_misc_key_vals(const GkRecords::StrucType &struc_type);
-    auto get_record_ids();
+    std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
     void add_misc_key_val(const GkRecords::StrucType &struc_type, const std::string &unique_id, const std::string &value);
     bool add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id);
     std::string create_unique_id();
+
+    int determineMinimumDate(const std::vector<std::string> &record_id);
+    int determineMaximumDate(const std::vector<std::string> &record_id);
 
 private:
     std::shared_ptr<GkStringOp> gkStrOp;

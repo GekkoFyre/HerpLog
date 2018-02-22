@@ -44,10 +44,12 @@
 #include "ui_herpapp.h"
 #include <boost/exception/all.hpp>
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QToolButton>
+#include <QDateTime>
+#include <QString>
 #include <exception>
 #include <random>
-#include <chrono>
 
 namespace sys = boost::system;
 HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_path, const std::string &db_file_path,
@@ -63,7 +65,29 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     gkStrOp = std::make_shared<GkStringOp>(this);
     gkDb = std::make_unique<GkDb>(db_ptr, gkStrOp, this);
 
+    record_id_cache = gkDb->get_record_ids();
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
+    ui->dateTime_add_record->setDate(QDate::currentDate());
+    ui->dateTime_add_record->setTime(QTime::currentTime());
+
+    if (!record_id_cache.empty()) {
+        std::vector<std::string> record_ids;
+        for (const auto &ids: record_id_cache) {
+            record_ids.push_back(ids.first);
+        }
+
+        int minTimestamp = gkDb->determineMinimumDate(record_ids);
+        int maxTimestamp = gkDb->determineMaximumDate(record_ids);
+        QDate qt_min_date;
+        QDate qt_max_date;
+        qt_min_date.fromJulianDay(minTimestamp);
+        qt_max_date.fromJulianDay(maxTimestamp);
+
+        ui->dateTimeEdit_browse_start->setMinimumDate(qt_min_date);
+        ui->dateTimeEdit_browse_end->setMinimumDate(qt_min_date);
+        ui->dateTimeEdit_browse_start->setMaximumDate(qt_max_date);
+        ui->dateTimeEdit_browse_end->setMaximumDate(qt_max_date);
+    }
 }
 
 HerpApp::~HerpApp()
@@ -88,13 +112,22 @@ bool HerpApp::remove_files(const fs::path &tmpDirLoc)
 }
 
 void HerpApp::on_action_New_Database_triggered()
-{}
+{
+    QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
 
 void HerpApp::on_action_Open_Database_triggered()
-{}
+{
+    QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
 
 void HerpApp::on_action_Disconnect_triggered()
-{}
+{
+    QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
 
 void HerpApp::on_action_Save_triggered()
 {
@@ -106,22 +139,43 @@ void HerpApp::on_action_Save_triggered()
         } else {
             gkFileIo->compress_files(global_db_temp_dir.string(), global_db_file_path);
         }
+    } else {
+        QMessageBox::warning(this, tr("Error!"), tr("There was an error saving to:\n\n%1").arg(QString::fromStdString(global_db_file_path)), QMessageBox::Ok);
+        return;
     }
 
     return;
 }
 
 void HerpApp::on_actionSave_As_triggered()
-{}
+{
+    QString save_dest = QFileDialog::getSaveFileName(this, tr("Save As"), QString::fromStdString(global_db_file_path), tr("HerpLog Database Files (*.hdb)"));
+
+    sys::error_code ec;
+    std::string save_dest_str = save_dest.toStdString();
+    if (fs::exists(save_dest_str, ec)) {
+        if (!fs::remove(save_dest_str, ec)) {
+            QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+            return;
+        } else {
+            gkFileIo->compress_files(global_db_temp_dir.string(), save_dest_str);
+        }
+    }
+}
 
 void HerpApp::on_actionSave_A_ll_triggered()
-{}
+{
+    QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
 
 void HerpApp::on_action_Print_triggered()
 {}
 
 void HerpApp::on_actionE_xit_triggered()
-{}
+{
+    QApplication::quit();
+}
 
 void HerpApp::on_action_Undo_triggered()
 {}
@@ -156,6 +210,9 @@ void HerpApp::on_pushButton_archive_next_clicked()
 void HerpApp::on_pushButton_archive_prev_clicked()
 {}
 
+void HerpApp::on_pushButton_archive_delete_clicked()
+{}
+
 void HerpApp::on_pushButton_browse_submit_clicked()
 {}
 
@@ -184,7 +241,7 @@ bool HerpApp::submit_record()
             identifier.identifier_str = ui->lineEdit_new_id->text().toStdString();
 
             GkSubmit submit;
-            submit.date_time = std::time(nullptr);
+            submit.date_time = QDateTime::currentSecsSinceEpoch();
             submit.species = species;
             submit.identifier = identifier;
             submit.further_notes = ui->plainTextEdit_furtherNotes->toPlainText().toStdString();

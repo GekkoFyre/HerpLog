@@ -83,8 +83,6 @@ namespace GekkoFyre {
     }
 
     namespace GkRecords {
-        constexpr char recordId[] = "record_id";
-
         constexpr char speciesId[] = "species_id";
         constexpr char speciesName[] = "species_name";
 

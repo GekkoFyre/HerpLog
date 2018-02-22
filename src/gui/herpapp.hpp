@@ -52,6 +52,7 @@
 #include <QResizeEvent>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 
 using namespace GekkoFyre;
 namespace fs = boost::filesystem;
@@ -88,9 +89,9 @@ private slots:
     void on_action_About_triggered();
     void on_pushButton_archive_next_clicked();
     void on_pushButton_archive_prev_clicked();
+    void on_pushButton_archive_delete_clicked();
     void on_pushButton_browse_submit_clicked();
     void on_pushButton_add_data_clicked();
-
     void on_toolButton_new_hash_clicked();
 
 private:
@@ -107,6 +108,8 @@ private:
     fs::path global_db_temp_dir;
     std::string global_db_file_path;
     std::mutex w_record_mtx;
+
+    std::unordered_map<std::string, std::pair<std::string, std::string>> record_id_cache;
 };
 
 #endif // HERPAPP_HPP
