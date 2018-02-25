@@ -59,6 +59,7 @@ public:
 
     bool compress_files(const std::string &folderLoc, const std::string &saveFileAsLoc);
     std::string decompress_file(const std::string &fileLoc);
+    bool checkExistingTempDir(const fs::path &tempDir, const bool &askAboutLockFile = false, const bool &deleteDir = true);
 
 private:
     std::string readFileToString(const std::string &fileLoc);

@@ -267,7 +267,12 @@ bool HerpApp::submit_record()
                 submit.identifier.name_id = "";
             }
 
-            gkDb->add_record_id(unique_id, submit.species, submit.identifier);
+            if (!unique_id.empty() && !submit.species.species_id.empty() && !submit.identifier.name_id.empty()) {
+                gkDb->add_record_id(unique_id, submit.species, submit.identifier);
+            } else {
+                throw std::invalid_argument(tr("Invalid ID provided!").toStdString());
+            }
+
             gkDb->add_item_db(unique_id, dateTime, std::to_string(submit.date_time));
             gkDb->add_item_db(unique_id, speciesId, submit.species.species_id);
             gkDb->add_item_db(unique_id, speciesName, submit.species.species_name);
