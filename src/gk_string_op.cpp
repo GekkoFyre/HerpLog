@@ -44,6 +44,7 @@
 #include <boost/exception/all.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/random.hpp>
 #include <boost/crc.hpp>
 #include <random>
@@ -84,7 +85,7 @@ std::string GkStringOp::random_hash()
     boost::uuids::uuid u = gen();
     std::string result = boost::uuids::to_string(u); // Convert the Boost UUID to a std::string
     std::string substr = result.substr(0, 8); // Extract just the first few characters from the UUID
-    for (auto & c: substr) c = std::toupper(c); // Convert to uppercase
+    boost::to_upper(substr); // Convert to uppercase
     return substr;
 }
 

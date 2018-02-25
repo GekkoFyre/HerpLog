@@ -46,6 +46,7 @@
 #include <boost/exception/all.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/random.hpp>
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
@@ -166,7 +167,6 @@ auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
     std::lock_guard<std::mutex> locker(db_mutex);
 
     std::unordered_map<std::string, std::string> cache;
-    std::stringstream csv_out;
 
     switch (struc_type) {
         case GkRecords::StrucType::gkSpecies:
@@ -174,7 +174,7 @@ auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
 
             if (!csv_read_data.empty() && csv_read_data.size() > CFG_CSV_MIN_PARSE_SIZE) {
                 try {
-                    GkCsvReader csv_in(3, csv_read_data, GkRecords::csvSpeciesId, GkRecords::csvSpeciesName);
+                    GkCsvReader csv_in(2, csv_read_data, GkRecords::csvSpeciesId, GkRecords::csvSpeciesName);
                     std::string species_id, species_name;
 
                     while (csv_in.read_row(species_id, species_name)) {
@@ -191,7 +191,7 @@ auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
 
             if (!csv_read_data.empty() && csv_read_data.size() > CFG_CSV_MIN_PARSE_SIZE) {
                 try {
-                    GkCsvReader csv_in(3, csv_read_data, GkRecords::csvNameId, GkRecords::csvIdentifyStr);
+                    GkCsvReader csv_in(2, csv_read_data, GkRecords::csvNameId, GkRecords::csvIdentifyStr);
                     std::string name_id, identity_str;
                     while (csv_in.read_row(name_id, identity_str)) {
                         cache.insert(std::make_pair(name_id, identity_str));
@@ -225,8 +225,6 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDb::get_r
     db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_RECORD_ID, &csv_read_data);
 
     std::unordered_map<std::string, std::pair<std::string, std::string>> cache;
-    std::stringstream csv_out;
-
     if (!csv_read_data.empty() && csv_read_data.size() > CFG_CSV_MIN_PARSE_SIZE) {
         try {
             GkCsvReader csv_in(3, csv_read_data, GkRecords::csvRecordId, GkRecords::csvSpeciesId, GkRecords::csvNameId);
@@ -252,7 +250,8 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDb::get_r
  * @param value The value to be stored alongside the UUID.
  * @return Whether the process was a success or not.
  */
-void GkDb::add_misc_key_val(const GkRecords::StrucType &struc_type, const std::string &unique_id, const std::string &value)
+void GkDb::add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
+                             const std::string &value)
 {
     std::ostringstream oss;
     using namespace GkRecords;
@@ -343,12 +342,12 @@ bool GkDb::add_record_id(const std::string &unique_id, const GkRecords::GkSpecie
 
         if (!species.species_name.empty() && !species.species_id.empty()) {
             // We have a new entry for the Species sub-record!
-            add_misc_key_val(StrucType::gkSpecies, species.species_name, species.species_id);
+            add_misc_key_vals(StrucType::gkSpecies, species.species_id, species.species_name);
         }
 
         if (!id.identifier_str.empty()) {
             // We have a new entry for the Name/ID# sub-record!
-            add_misc_key_val(StrucType::gkId, id.identifier_str, id.name_id);
+            add_misc_key_vals(StrucType::gkId, id.name_id, id.identifier_str);
         }
 
         leveldb::WriteOptions write_options;
@@ -381,7 +380,7 @@ std::string GkDb::create_unique_id()
     boost::uuids::basic_random_generator<boost::mt19937> gen(&ran);
     boost::uuids::uuid u = gen();
     std::string result = boost::uuids::to_string(u); // Convert the Boost UUID to a std::string
-    for (auto & c: result) c = std::toupper(c); // Convert to uppercase
+    boost::to_upper(result); // Convert to uppercase
     return result;
 }
 

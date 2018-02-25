@@ -139,6 +139,8 @@ std::string GkFileIo::decompress_file(const std::string &fileLoc)
     }
 
     std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName.string());
+    checkExistingTempDir(temp_dir, true, true);
+
     unzipper.extract(temp_dir); // Extract the contents of the zip-file into a temporary directory
     while (csv_reader.read_row(csv_file_entry, csv_hash_entry, hashType)) { // Read out the CSV information
         if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) { // Make sure the CSV strings are not empty, otherwise abort
@@ -227,4 +229,23 @@ void GkFileIo::read_directory(const std::string &dirLoc, std::vector<std::string
     fs::directory_iterator start(path);
     fs::directory_iterator end;
     std::transform(start, end, std::back_inserter(output), GkFile::path_leaf_string());
+}
+
+bool GkFileIo::checkExistingTempDir(const fs::path &tempDir, const bool &askAboutLockFile, const bool &deleteDir)
+{
+    Q_UNUSED(askAboutLockFile);
+    // TODO: Check for the existance of a `LOCK` file and provide options as a result
+
+    sys::error_code ec;
+    if (fs::exists(tempDir, ec)) {
+        if (deleteDir) {
+            if (!fs::remove_all(tempDir, ec)) {
+                throw ec.message();
+            }
+        }
+
+        return true;
+    }
+
+    return false;
 }

@@ -68,7 +68,8 @@ public:
 
     auto get_misc_key_vals(const GkRecords::StrucType &struc_type);
     std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
-    void add_misc_key_val(const GkRecords::StrucType &struc_type, const std::string &unique_id, const std::string &value);
+    void add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
+                           const std::string &value);
     bool add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id);
     std::string create_unique_id();
 

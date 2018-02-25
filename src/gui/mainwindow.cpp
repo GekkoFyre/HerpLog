@@ -74,6 +74,7 @@ void MainWindow::on_button_create_db_clicked()
             if (!saveFileName.isEmpty()) {
                 fs::path dirName = fs::path(saveFileName.toStdString()).filename();
                 fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + dirName.string());
+                gkFileIo->checkExistingTempDir(temp_dir, false, true);
                 db_ptr = gkDbConn->openDatabase(temp_dir.string());
 
                 fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
@@ -109,6 +110,7 @@ void MainWindow::on_button_open_db_clicked()
             if (!fileName.isEmpty() && fs::exists(fileName_str, ec)) {
                 std::string tmp_extraction_loc = gkFileIo->decompress_file(fileName_str);
                 if (!tmp_extraction_loc.empty() && fs::is_directory(tmp_extraction_loc, ec)) {
+                    gkFileIo->checkExistingTempDir(tmp_extraction_loc, false, true);
                     db_ptr = gkDbConn->openDatabase(tmp_extraction_loc);
 
                     this->close();
