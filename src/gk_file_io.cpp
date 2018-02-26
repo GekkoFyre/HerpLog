@@ -41,7 +41,7 @@
  */
 
 #include "gk_file_io.hpp"
-#include "gk_csv.hpp"
+#include "3rd_party/minicsv/minicsv.h"
 #include <boost/exception/all.hpp>
 #include <boost/crc.hpp>
 #include <zipper.h>
@@ -58,6 +58,7 @@
 
 using namespace GekkoFyre;
 using namespace zipper;
+using namespace mini;
 namespace sys = boost::system;
 GkFileIo::GkFileIo(QObject *parent) : QObject(parent)
 {}
@@ -129,7 +130,7 @@ std::string GkFileIo::decompress_file(const std::string &fileLoc)
     std::vector<unsigned char> unzipped_data_csv;
     unzipper.extractEntryToMemory(GkFile::GkCsv::zip_contents_csv, unzipped_data_csv);
 
-    GkCsvReader csv_reader(3, std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())), GkFile::GkCsv::fileName, GkFile::GkCsv::fileHash, GkFile::GkCsv::hashType);
+    csv::istringstream iss(std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())));
     std::string csv_file_entry, csv_hash_entry, hashType;
     fs::path fileName = fs::path(fileLoc).filename();
 
@@ -138,18 +139,21 @@ std::string GkFileIo::decompress_file(const std::string &fileLoc)
         fileName = fileName.stem();
     }
 
-    std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName.string());
+    const std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName.string());
     checkExistingTempDir(temp_dir, true, true);
 
     unzipper.extract(temp_dir); // Extract the contents of the zip-file into a temporary directory
-    while (csv_reader.read_row(csv_file_entry, csv_hash_entry, hashType)) { // Read out the CSV information
+    while (iss.read_line()) { // Read out the CSV information
+        iss >> csv_file_entry >> csv_hash_entry >> hashType;
         if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) { // Make sure the CSV strings are not empty, otherwise abort
             for (const auto &entry: entries) { // Read out the information contained within the zip-file datastream itself
                 if (!entry.name.empty()) { // Make sure the filename is valid
                     const std::string cur_file = entry.name;
                     if (cur_file == csv_file_entry) {
                         // The full-path to the currently addressed, unzipped file
-                        fs::path cur_file_full_path = std::string(temp_dir += fs::path::preferred_separator + cur_file);
+                        std::ostringstream cur_file_full_path_oss;
+                        cur_file_full_path_oss << temp_dir << fs::path::preferred_separator << cur_file;
+                        fs::path cur_file_full_path = cur_file_full_path_oss.str();
 
                         sys::error_code ec;
                         if (fs::exists(cur_file_full_path, ec)) {
