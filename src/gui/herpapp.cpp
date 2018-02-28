@@ -63,9 +63,10 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     gkFileIo = file_io_ptr;
 
     gkStrOp = std::make_shared<GkStringOp>(this);
-    gkDb = std::make_unique<GkDb>(db_ptr, gkStrOp, this);
+    gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkStrOp, this);
+    gkDbRead = std::make_unique<GkDbRead>(db_ptr, gkStrOp, this);
 
-    record_id_cache = gkDb->get_record_ids();
+    record_id_cache = gkDbWrite->get_record_ids();
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
     ui->dateTime_add_record->setDate(QDate::currentDate());
     ui->dateTime_add_record->setTime(QTime::currentTime());
@@ -73,8 +74,19 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     if (!record_id_cache.empty()) {
         std::vector<std::string> record_ids;
         for (const auto &ids: record_id_cache) {
-            record_ids.push_back(ids.first);
+            if (std::strcmp(ids.first.c_str(), GkRecords::csvRecordId) != 0) { // An ugly hack, I know...
+                record_ids.push_back(ids.first);
+            }
         }
+
+        int minDateTime = gkDbRead->determineMinimumDate(record_ids);
+        int maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+
+        ui->dateTimeEdit_browse_start->setMinimumDateTime(QDateTime::fromTime_t(minDateTime));
+        ui->dateTimeEdit_browse_start->setMaximumDateTime(QDateTime::fromTime_t(maxDateTime));
+        ui->dateTimeEdit_browse_end->setMinimumDateTime(QDateTime::fromTime_t(minDateTime));
+        ui->dateTimeEdit_browse_end->setMaximumDateTime(QDateTime::fromTime_t(maxDateTime));
+        ui->dateTimeEdit_browse_end->setDateTime(QDateTime::fromTime_t(maxDateTime));
     }
 }
 
@@ -228,6 +240,12 @@ void HerpApp::on_toolButton_new_hash_clicked()
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
 }
 
+void HerpApp::on_toolButton_add_record_update_datetime_clicked()
+{
+    ui->dateTime_add_record->setDate(QDate::currentDate());
+    ui->dateTime_add_record->setTime(QTime::currentTime());
+}
+
 bool HerpApp::submit_record()
 {
     try {
@@ -255,39 +273,55 @@ bool HerpApp::submit_record()
             submit.had_vitamins = ui->checkBox_vitamins->isChecked();
             submit.weight = ui->spinBox_weight->value();
 
-            std::string unique_id = gkDb->create_unique_id();
+            std::string unique_id = gkDbWrite->create_unique_id();
             if (!submit.species.species_name.empty()) {
-                submit.species.species_id = gkDb->create_unique_id();
+                submit.species.species_id = gkDbWrite->create_unique_id();
             } else {
                 submit.species.species_id = "";
             }
 
             if (!submit.identifier.identifier_str.empty()) {
-                submit.identifier.name_id = gkDb->create_unique_id();
+                submit.identifier.name_id = gkDbWrite->create_unique_id();
             } else {
                 submit.identifier.name_id = "";
             }
 
             if (!unique_id.empty() && !submit.species.species_id.empty() && !submit.identifier.name_id.empty()) {
-                gkDb->add_record_id(unique_id, submit.species, submit.identifier);
+                gkDbWrite->add_record_id(unique_id, submit.species, submit.identifier);
             } else {
                 throw std::invalid_argument(tr("Invalid ID provided!").toStdString());
             }
 
-            gkDb->add_item_db(unique_id, dateTime, std::to_string(submit.date_time));
-            gkDb->add_item_db(unique_id, speciesId, submit.species.species_id);
-            gkDb->add_item_db(unique_id, speciesName, submit.species.species_name);
-            gkDb->add_item_db(unique_id, nameId, submit.identifier.name_id);
-            gkDb->add_item_db(unique_id, identifierStr, submit.identifier.identifier_str);
-            gkDb->add_item_db(unique_id, furtherNotes, submit.further_notes);
-            gkDb->add_item_db(unique_id, vitaminNotes, submit.vitamin_notes);
-            gkDb->add_item_db(unique_id, toiletNotes, submit.toilet_notes);
-            gkDb->add_item_db(unique_id, weightNotes, submit.weight_notes);
-            gkDb->add_item_db(unique_id, hydrationNotes, submit.hydration_notes);
-            gkDb->add_item_db(unique_id, boolWentToilet, std::to_string(submit.went_toilet));
-            gkDb->add_item_db(unique_id, boolHadHydration, std::to_string(submit.had_hydration));
-            gkDb->add_item_db(unique_id, boolHadVitamins, std::to_string(submit.had_vitamins));
-            gkDb->add_item_db(unique_id, weightMeasure, std::to_string(submit.weight));
+            gkDbWrite->add_item_db(unique_id, dateTime, std::to_string(submit.date_time));
+            gkDbWrite->add_item_db(unique_id, speciesId, submit.species.species_id);
+            gkDbWrite->add_item_db(unique_id, speciesName, submit.species.species_name);
+            gkDbWrite->add_item_db(unique_id, nameId, submit.identifier.name_id);
+            gkDbWrite->add_item_db(unique_id, identifierStr, submit.identifier.identifier_str);
+            gkDbWrite->add_item_db(unique_id, furtherNotes, submit.further_notes);
+            gkDbWrite->add_item_db(unique_id, vitaminNotes, submit.vitamin_notes);
+            gkDbWrite->add_item_db(unique_id, toiletNotes, submit.toilet_notes);
+            gkDbWrite->add_item_db(unique_id, weightNotes, submit.weight_notes);
+            gkDbWrite->add_item_db(unique_id, hydrationNotes, submit.hydration_notes);
+            gkDbWrite->add_item_db(unique_id, boolWentToilet, std::to_string(submit.went_toilet));
+            gkDbWrite->add_item_db(unique_id, boolHadHydration, std::to_string(submit.had_hydration));
+            gkDbWrite->add_item_db(unique_id, boolHadVitamins, std::to_string(submit.had_vitamins));
+            gkDbWrite->add_item_db(unique_id, weightMeasure, std::to_string(submit.weight));
+
+            // Reset all the input fields
+            ui->dateTime_add_record->setDate(QDate::currentDate());
+            ui->dateTime_add_record->setTime(QTime::currentTime());
+            ui->lineEdit_new_species->clear();
+            ui->lineEdit_new_id->clear();
+            ui->lineEdit_toilet_notes->clear();
+            ui->lineEdit_hydration_notes->clear();
+            ui->lineEdit_vitamins_notes->clear();
+            ui->lineEdit_weight_notes->clear();
+            ui->checkBox_toilet->setChecked(false);
+            ui->checkBox_hydration->setChecked(false);
+            ui->checkBox_vitamins->setChecked(false);
+            ui->spinBox_weight->setValue(0.000);
+            ui->plainTextEdit_furtherNotes->clear();
+
             return true;
         }
     } catch (const std::exception &e) {

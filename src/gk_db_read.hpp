@@ -34,52 +34,43 @@
  ********************************************************************************/
 
 /**
- * @file gk_db_write.hpp
+ * @file gk_db_read.hpp
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-02-21
+ * @date 2018-02-28
  * @brief Contains any database-related routines, specifically ones related to Google LevelDB
- * and writing data towards.
+ * and reading data from within.
  */
 
-#ifndef GKDB_WRITE_HPP
-#define GKDB_WRITE_HPP
+#ifndef GKDB_READ_HPP
+#define GKDB_READ_HPP
 
 #include "options.hpp"
 #include "gk_string_op.hpp"
 #include <QtCore/QObject>
-#include <unordered_map>
 #include <string>
 #include <vector>
 #include <mutex>
 #include <memory>
 
 namespace GekkoFyre {
-class GkDbWrite;
+class GkDbRead;
 
-class GkDbWrite : public QObject {
+class GkDbRead : public QObject {
     Q_OBJECT
-
 public:
-    explicit GkDbWrite(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
-    ~GkDbWrite();
+    explicit GkDbRead(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
+    ~GkDbRead();
 
-    void add_item_db(const std::string &record_id, const std::string &key, std::string value);
-    void del_item_db(const std::string &record_id, const std::string &key);
-
-    auto get_misc_key_vals(const GkRecords::StrucType &struc_type);
-    std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
-    void add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
-                           const std::string &value);
-    bool add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id);
-    std::string create_unique_id();
+    std::string read_item_db(const std::string &record_id, const std::string &key);
+    int determineMinimumDate(const std::vector<std::string> &record_id);
+    int determineMaximumDate(const std::vector<std::string> &record_id);
 
 private:
     std::shared_ptr<GkStringOp> gkStrOp;
     GkFile::FileDb db_conn;
 
     std::mutex db_mutex;
-    std::mutex create_key_mutex;
 };
 }
 
-#endif // GKDB_WRITE_HPP
+#endif // GKDB_READ_HPP
