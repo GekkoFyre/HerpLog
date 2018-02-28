@@ -58,8 +58,8 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     ui->setupUi(this);
 
     db_ptr = database;
-    global_db_temp_dir = temp_dir_path;
-    global_db_file_path = db_file_path;
+    global_db_temp_dir = temp_dir_path; // The (base) temporary directory where the database has been extracted to
+    global_db_file_path = db_file_path; // The file-path to the (currently opened/newly created) database
     gkFileIo = file_io_ptr;
 
     gkStrOp = std::make_shared<GkStringOp>(this);
@@ -75,18 +75,6 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
         for (const auto &ids: record_id_cache) {
             record_ids.push_back(ids.first);
         }
-
-        int minTimestamp = gkDb->determineMinimumDate(record_ids);
-        int maxTimestamp = gkDb->determineMaximumDate(record_ids);
-        QDate qt_min_date;
-        QDate qt_max_date;
-        qt_min_date.fromJulianDay(minTimestamp);
-        qt_max_date.fromJulianDay(maxTimestamp);
-
-        ui->dateTimeEdit_browse_start->setMinimumDate(qt_min_date);
-        ui->dateTimeEdit_browse_end->setMinimumDate(qt_min_date);
-        ui->dateTimeEdit_browse_start->setMaximumDate(qt_max_date);
-        ui->dateTimeEdit_browse_end->setMaximumDate(qt_max_date);
     }
 }
 
@@ -96,6 +84,14 @@ HerpApp::~HerpApp()
     delete ui;
 }
 
+/**
+ * @brief HerpApp::remove_files Attempts to remove the temporary directory that is created after extraction of the database (upon
+ * opening), when making an exit from the application.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02
+ * @param tmpDirLoc The location of the temporary directory itself.
+ * @return Whether the operation was successful or not.
+ */
 bool HerpApp::remove_files(const fs::path &tmpDirLoc)
 {
     sys::error_code ec;
@@ -132,16 +128,21 @@ void HerpApp::on_action_Disconnect_triggered()
 void HerpApp::on_action_Save_triggered()
 {
     sys::error_code ec;
-    if (fs::exists(global_db_file_path, ec)) {
-        if (!fs::remove(global_db_file_path, ec)) {
+    if (fs::exists(global_db_file_path, ec)) { // Check that the database does exist, otherwise perform a "Save As"
+        std::string temp_file_name = std::string(global_db_file_path + "." + gkStrOp->random_hash()); // Give the new, temporary file a random extension
+        gkFileIo->compress_files(global_db_temp_dir.string(), temp_file_name); // Compress it
+        if (!fs::remove(global_db_file_path, ec)) { // Remove the old database file
             QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
             return;
         } else {
-            gkFileIo->compress_files(global_db_temp_dir.string(), global_db_file_path);
+            fs::rename(temp_file_name, global_db_file_path, ec); // Rename the temporary database back so it's as if nothing changed, except for the contents of course :)
+            if (ec.value() > 0) {
+                QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+                return;
+            }
         }
     } else {
-        QMessageBox::warning(this, tr("Error!"), tr("There was an error saving to:\n\n%1").arg(QString::fromStdString(global_db_file_path)), QMessageBox::Ok);
-        return;
+        on_actionSave_As_triggered();
     }
 
     return;

@@ -87,8 +87,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 set(SOURCE_FILES
             src/main.cpp
             src/options.hpp
-            src/gk_csv.hpp
-            src/gk_csv.cpp
             src/gk_db_conn.hpp
             src/gk_db_conn.cpp
             src/gk_db_write.hpp
@@ -100,7 +98,8 @@ set(SOURCE_FILES
             src/gui/mainwindow.hpp
             src/gui/mainwindow.cpp
             src/gui/herpapp.hpp
-            src/gui/herpapp.cpp)
+            src/gui/herpapp.cpp
+            3rd_party/minicsv/minicsv.h)
 
 # http://www.executionunit.com/blog/2014/01/22/moving-from-qmake-to-cmake/
 qt5_wrap_ui(UI_HEADERS

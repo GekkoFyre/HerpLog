@@ -42,7 +42,7 @@
  */
 
 #include "gk_db_write.hpp"
-#include "gk_csv.hpp"
+#include "3rd_party/minicsv/minicsv.h"
 #include <boost/exception/all.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -59,6 +59,7 @@
 #include <algorithm>
 
 using namespace GekkoFyre;
+using namespace mini;
 GkDb::GkDb(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent) : QObject(parent)
 {
     db_conn = database;
@@ -172,12 +173,14 @@ auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
         case GkRecords::StrucType::gkSpecies:
             db_conn.db->Get(read_opt, GkRecords::speciesId, &csv_read_data);
 
-            if (!csv_read_data.empty() && csv_read_data.size() > CFG_CSV_MIN_PARSE_SIZE) {
+            if (!csv_read_data.empty()) {
                 try {
-                    GkCsvReader csv_in(2, csv_read_data, GkRecords::csvSpeciesId, GkRecords::csvSpeciesName);
+                    csv::istringstream iss(csv_read_data);
+                    iss.set_delimiter(',', "$$");
                     std::string species_id, species_name;
 
-                    while (csv_in.read_row(species_id, species_name)) {
+                    while (iss.read_line()) {
+                        iss >> species_id >> species_name;
                         cache.insert(std::make_pair(species_id, species_name));
                     }
                 } catch (const std::exception &e) {
@@ -189,11 +192,13 @@ auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
         case GkRecords::StrucType::gkId:
             db_conn.db->Get(read_opt, GkRecords::nameId, &csv_read_data);
 
-            if (!csv_read_data.empty() && csv_read_data.size() > CFG_CSV_MIN_PARSE_SIZE) {
+            if (!csv_read_data.empty()) {
                 try {
-                    GkCsvReader csv_in(2, csv_read_data, GkRecords::csvNameId, GkRecords::csvIdentifyStr);
+                    csv::istringstream iss(csv_read_data);
+                    iss.set_delimiter(',', "$$");
                     std::string name_id, identity_str;
-                    while (csv_in.read_row(name_id, identity_str)) {
+                    while (iss.read_line()) {
+                        iss >> name_id >> identity_str;
                         cache.insert(std::make_pair(name_id, identity_str));
                     }
                 } catch (const std::exception &e) {
@@ -225,11 +230,13 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDb::get_r
     db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_RECORD_ID, &csv_read_data);
 
     std::unordered_map<std::string, std::pair<std::string, std::string>> cache;
-    if (!csv_read_data.empty() && csv_read_data.size() > CFG_CSV_MIN_PARSE_SIZE) {
+    if (!csv_read_data.empty()) {
         try {
-            GkCsvReader csv_in(3, csv_read_data, GkRecords::csvRecordId, GkRecords::csvSpeciesId, GkRecords::csvNameId);
+            csv::istringstream iss(csv_read_data);
+            iss.set_delimiter(',', "$$");
             std::string record_id, species_id, name_id;
-            while (csv_in.read_row(record_id, species_id, name_id)) {
+            while (iss.read_line()) {
+                iss >> record_id >> species_id >> name_id;
                 cache.insert(std::make_pair(record_id, std::make_pair(species_id, name_id)));
             }
         } catch (const std::exception &e) {

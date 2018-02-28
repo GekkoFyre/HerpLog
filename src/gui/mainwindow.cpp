@@ -110,7 +110,6 @@ void MainWindow::on_button_open_db_clicked()
             if (!fileName.isEmpty() && fs::exists(fileName_str, ec)) {
                 std::string tmp_extraction_loc = gkFileIo->decompress_file(fileName_str);
                 if (!tmp_extraction_loc.empty() && fs::is_directory(tmp_extraction_loc, ec)) {
-                    gkFileIo->checkExistingTempDir(tmp_extraction_loc, false, true);
                     db_ptr = gkDbConn->openDatabase(tmp_extraction_loc);
 
                     this->close();
