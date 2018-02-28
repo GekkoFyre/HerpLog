@@ -63,10 +63,10 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     gkFileIo = file_io_ptr;
 
     gkStrOp = std::make_shared<GkStringOp>(this);
-    gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkStrOp, this);
-    gkDbRead = std::make_unique<GkDbRead>(db_ptr, gkStrOp, this);
+    gkDbRead = std::make_shared<GkDbRead>(db_ptr, gkStrOp, this);
+    gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkDbRead, gkStrOp, this);
 
-    record_id_cache = gkDbWrite->get_record_ids();
+    record_id_cache = gkDbRead->get_record_ids();
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
     ui->dateTime_add_record->setDate(QDate::currentDate());
     ui->dateTime_add_record->setTime(QTime::currentTime());

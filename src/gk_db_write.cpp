@@ -60,9 +60,11 @@
 
 using namespace GekkoFyre;
 using namespace mini;
-GkDbWrite::GkDbWrite(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent) : QObject(parent)
+GkDbWrite::GkDbWrite(const GkFile::FileDb &gk_db_conn, const std::shared_ptr<GkDbRead> &gk_db_read,
+                     const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent) : QObject(parent)
 {
-    db_conn = database;
+    db_conn = gk_db_conn;
+    gkDbRead = gk_db_read;
     gkStrOp = gk_str_op;
 }
 
@@ -186,39 +188,6 @@ auto GkDbWrite::get_misc_key_vals(const GkRecords::StrucType &struc_type)
 }
 
 /**
- * @brief GkDbWrite::get_record_ids will obtain all the Unique Identifiers for each record that's in the database.
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-02-21
- * @return The information that was retrieved from the database.
- */
-std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbWrite::get_record_ids()
-{
-    leveldb::ReadOptions read_opt;
-    read_opt.verify_checksums = true;
-
-    std::string csv_read_data;
-    std::lock_guard<std::mutex> locker(db_mutex);
-    db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_RECORD_ID, &csv_read_data);
-
-    std::unordered_map<std::string, std::pair<std::string, std::string>> cache;
-    if (!csv_read_data.empty()) {
-        try {
-            csv::istringstream iss(csv_read_data);
-            iss.set_delimiter(',', "$$");
-            std::string record_id, species_id, name_id;
-            while (iss.read_line()) {
-                iss >> record_id >> species_id >> name_id;
-                cache.insert(std::make_pair(record_id, std::make_pair(species_id, name_id)));
-            }
-        } catch (const std::exception &e) {
-            QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
-        }
-    }
-
-    return cache;
-}
-
-/**
  * @brief GkDbWrite::add_misc_key_val Adds a Unique Identifier for either a new Species or Name/ID sub-record to the Google LevelDB
  * database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
@@ -305,7 +274,7 @@ bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkS
 
     try {
         std::ostringstream oss;
-        auto record_cache = get_record_ids();
+        auto record_cache = gkDbRead->get_record_ids();
 
         if (record_cache.empty()) {
             oss << GkRecords::csvRecordId << "," << GkRecords::csvSpeciesId << "," << GkRecords::csvNameId << std::endl;

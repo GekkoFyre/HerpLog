@@ -104,7 +104,7 @@ private:
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;
-    std::unique_ptr<GkDbRead> gkDbRead;
+    std::shared_ptr<GkDbRead> gkDbRead;
     std::shared_ptr<GkStringOp> gkStrOp;
     std::shared_ptr<GkFileIo> gkFileIo;
 

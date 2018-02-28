@@ -42,12 +42,15 @@
  */
 
 #include "gk_db_read.hpp"
+#include "3rd_party/minicsv/minicsv.h"
+#include <QMessageBox>
 
 using namespace GekkoFyre;
-GkDbRead::GkDbRead(const GekkoFyre::GkFile::FileDb &database, const std::shared_ptr<GekkoFyre::GkStringOp> &gk_str_op,
+using namespace mini;
+GkDbRead::GkDbRead(const GekkoFyre::GkFile::FileDb &gk_db_conn, const std::shared_ptr<GekkoFyre::GkStringOp> &gk_str_op,
                               QObject *parent)
 {
-    db_conn = database;
+    db_conn = gk_db_conn;
     gkStrOp = gk_str_op;
 }
 
@@ -119,4 +122,51 @@ int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_id)
     }
 
     return 0;
+}
+
+/**
+ * @brief GkDbRead::get_record_ids will obtain all the Unique Identifiers for each record that's in the database.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-21
+ * @return The information that was retrieved from the database.
+ */
+std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::get_record_ids()
+{
+    leveldb::ReadOptions read_opt;
+    read_opt.verify_checksums = true;
+
+    std::string csv_read_data;
+    std::lock_guard<std::mutex> locker(db_mutex);
+    db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_RECORD_ID, &csv_read_data);
+
+    std::unordered_map<std::string, std::pair<std::string, std::string>> cache;
+    if (!csv_read_data.empty()) {
+        try {
+            csv::istringstream iss(csv_read_data);
+            iss.set_delimiter(',', "$$");
+            std::string record_id, species_id, name_id;
+            while (iss.read_line()) {
+                iss >> record_id >> species_id >> name_id;
+                cache.insert(std::make_pair(record_id, std::make_pair(species_id, name_id)));
+            }
+        } catch (const std::exception &e) {
+            QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
+        }
+    }
+
+    return cache;
+}
+
+/**
+ * @brief GkDbRead::extractRecords will extract whatever Record IDs that lay within a given date range, depending on when
+ * they were `submitted`.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-28
+ * @param dateStart The beginning of the date range, as UNIX Epoch Time.
+ * @param dateEnd The end of the date range, as UNIX Epoch Time.
+ * @return The extracted Record IDs that lay within the given date range.
+ */
+std::vector<std::string> GkDbRead::extractRecords(const int &dateStart, const int &dateEnd)
+{
+    auto record_id_cache = get_record_ids();
 }
