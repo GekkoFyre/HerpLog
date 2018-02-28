@@ -83,28 +83,39 @@ bool GkFileIo::compress_files(const std::string &folderLoc, const std::string &s
     sys::error_code ec;
 
     try {
-        const std::string dir_name = fs::path(saveFileAsLoc).filename().string();
         std::vector<std::string> dir_contents;
         read_directory(folderLoc, dir_contents);
-        zipper.open();
-        for (const auto &file: dir_contents) {
-            fs::path file_path = std::string(folderLoc + fs::path::preferred_separator + file);
-            if (fs::exists(file_path, ec)) { // Check that the file(s) to be compressed do exist still
-                std::string fileData = readFileToString(file_path.string());
-                csv_out << file << "," << getCrc32(fileData) << "," << "CRC32" << std::endl; // Create the CSV strings
-                zipper.add(file_path.string());
-            } else {
-                QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
-                return false;
+
+        // If the checksum file already exists, due to being present from a previous 'save operation', then delete it before
+        // creating a new one.
+        sys::error_code ec;
+        const std::string csv_file = fs::path(folderLoc + fs::path::preferred_separator + GkFile::GkCsv::zip_contents_csv).string();
+        if (fs::exists(csv_file)) {
+            if (!fs::remove(csv_file, ec)) {
+                throw ec.message();
             }
         }
 
-        const std::string csv_file = fs::path(folderLoc + fs::path::preferred_separator + GkFile::GkCsv::zip_contents_csv).string();
+        zipper.open();
+        for (const auto &file: dir_contents) {
+            fs::path file_path = std::string(folderLoc + fs::path::preferred_separator + file);
+            if (std::strcmp(file.c_str(), GkFile::GkCsv::zip_contents_csv) != 0) { // Skip the addition of the checksum file, that'll be added on its own later
+                if (fs::exists(file_path, ec)) { // Check that the file(s) to be compressed do exist still
+                    std::string fileData = readFileToString(file_path.string());
+                    csv_out << file << "," << getCrc32(fileData) << "," << "CRC32" << std::endl; // Create the CSV strings
+                    zipper.add(file_path.string());
+                } else {
+                    QMessageBox::warning(nullptr, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+                    return false;
+                }
+            }
+        }
+
         std::ofstream output;
         output.open(csv_file, std::ios::out | std::ios::app);
         output << csv_out.str();
         output.close();
-        zipper.add(csv_file);
+        zipper.add(csv_file); // Add the checksum file to the compressed archive (i.e. database file)
         zipper.close();
     } catch (const std::exception &e) {
         QMessageBox::warning(nullptr, tr("Error!"), tr("An error has occurred during the saving of your database file.\n\n%1").arg(e.what()),
@@ -235,6 +246,16 @@ void GkFileIo::read_directory(const std::string &dirLoc, std::vector<std::string
     std::transform(start, end, std::back_inserter(output), GkFile::path_leaf_string());
 }
 
+/**
+ * @brief GkFileIo::checkExistingTempDir Checks for the existance of a temporary directory and if needed, performs a
+ * number of actions on/about it.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-02-25
+ * @param tempDir The temporary directory to be checked.
+ * @param askAboutLockFile To pose a QMessageBox about any (possible) `LOCK` file or not.
+ * @param deleteDir Delete the temporary directory in question, IF DETECTED.
+ * @return Returns a boolean true value if the temporary directory does exist.
+ */
 bool GkFileIo::checkExistingTempDir(const fs::path &tempDir, const bool &askAboutLockFile, const bool &deleteDir)
 {
     Q_UNUSED(askAboutLockFile);

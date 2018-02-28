@@ -93,7 +93,7 @@ namespace mini
 		public:
 			sep(const char delimiter_, const std::string& escape_) : delimiter(delimiter_), escape(escape_) {}
 
-			const char get_delimiter() const { return delimiter; }
+            char get_delimiter() const { return delimiter; }
 			const std::string& get_escape() const { return escape; }
 		private:
 			const char delimiter;
