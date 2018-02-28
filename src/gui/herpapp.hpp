@@ -45,6 +45,7 @@
 
 #include "./../options.hpp"
 #include "./../gk_db_write.hpp"
+#include "./../gk_db_read.hpp"
 #include "./../gk_string_op.hpp"
 #include "./../gk_file_io.hpp"
 #include <boost/filesystem.hpp>
@@ -93,6 +94,7 @@ private slots:
     void on_pushButton_browse_submit_clicked();
     void on_pushButton_add_data_clicked();
     void on_toolButton_new_hash_clicked();
+    void on_toolButton_add_record_update_datetime_clicked();
 
 private:
     Ui::HerpApp *ui;
@@ -101,7 +103,8 @@ private:
     bool submit_record();
 
     GkFile::FileDb db_ptr;
-    std::unique_ptr<GkDb> gkDb;
+    std::unique_ptr<GkDbWrite> gkDbWrite;
+    std::unique_ptr<GkDbRead> gkDbRead;
     std::shared_ptr<GkStringOp> gkStrOp;
     std::shared_ptr<GkFileIo> gkFileIo;
 

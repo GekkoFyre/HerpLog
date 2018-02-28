@@ -60,24 +60,24 @@
 
 using namespace GekkoFyre;
 using namespace mini;
-GkDb::GkDb(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent) : QObject(parent)
+GkDbWrite::GkDbWrite(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent) : QObject(parent)
 {
     db_conn = database;
     gkStrOp = gk_str_op;
 }
 
-GkDb::~GkDb()
+GkDbWrite::~GkDbWrite()
 {}
 
 /**
- *@brief GkDb::add_item_db
+ *@brief GkDbWrite::add_item_db
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
  * @param record_id The Unique ID that identifies the record being written/deleted/read.
  * @param key The type of record that is being written/deleted/read, usually stated as unique string of characters.
  * @param value The information that you wish to store in the database.
  */
-void GkDb::add_item_db(const std::string &record_id, const std::string &key, std::string value)
+void GkDbWrite::add_item_db(const std::string &record_id, const std::string &key, std::string value)
 {
     if (value.empty()) {
         value = "";
@@ -100,13 +100,13 @@ void GkDb::add_item_db(const std::string &record_id, const std::string &key, std
 }
 
 /**
- * @brief GkDb::del_item_db
+ * @brief GkDbWrite::del_item_db
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
  * @param record_id The Unique ID that identifies the record being written/deleted/read.
  * @param key The type of record that is being written/deleted/read, usually stated as unique string of characters.
  */
-void GkDb::del_item_db(const std::string &record_id, const std::string &key)
+void GkDbWrite::del_item_db(const std::string &record_id, const std::string &key)
 {
     leveldb::WriteOptions write_options;
     write_options.sync = true;
@@ -124,42 +124,13 @@ void GkDb::del_item_db(const std::string &record_id, const std::string &key)
 }
 
 /**
- * @brief GkDb::read_item_db
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-02-21
- * @param record_id The Unique ID that identifies the record being written/deleted/read.
- * @param key The type of record that is being written/deleted/read, usually stated as unique string of characters.
- * @return The information that was retrieved from the database, given the Unique ID and Key.
- */
-std::string GkDb::read_item_db(const std::string &record_id, const std::string &key)
-{
-    std::string read_data;
-    leveldb::ReadOptions read_opt;
-    leveldb::Status s;
-    read_opt.verify_checksums = true;
-    std::string key_joined = gkStrOp->multipart_key({record_id, key});
-
-    std::lock_guard<std::mutex> locker(db_mutex);
-    s = db_conn.db->Get(read_opt, key_joined, &read_data);
-    if (!s.ok()) {
-        throw std::runtime_error(s.ToString());
-    }
-
-    if (!read_data.empty()) {
-        return read_data;
-    } else {
-        return "";
-    }
-}
-
-/**
- * @brief GkDb::get_misc_key_vals will obtain all the Unique Identifiers from the database for the given key, IF it's related
+ * @brief GkDbWrite::get_misc_key_vals will obtain all the Unique Identifiers from the database for the given key, IF it's related
  * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
  * @return The information that was retrieved from the database.
  */
-auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
+auto GkDbWrite::get_misc_key_vals(const GkRecords::StrucType &struc_type)
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -215,12 +186,12 @@ auto GkDb::get_misc_key_vals(const GkRecords::StrucType &struc_type)
 }
 
 /**
- * @brief GkDb::get_record_ids will obtain all the Unique Identifiers for each record that's in the database.
+ * @brief GkDbWrite::get_record_ids will obtain all the Unique Identifiers for each record that's in the database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
  * @return The information that was retrieved from the database.
  */
-std::unordered_map<std::string, std::pair<std::string, std::string>> GkDb::get_record_ids()
+std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbWrite::get_record_ids()
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -248,7 +219,7 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDb::get_r
 }
 
 /**
- * @brief GkDb::add_misc_key_val Adds a Unique Identifier for either a new Species or Name/ID sub-record to the Google LevelDB
+ * @brief GkDbWrite::add_misc_key_val Adds a Unique Identifier for either a new Species or Name/ID sub-record to the Google LevelDB
  * database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
@@ -257,7 +228,7 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDb::get_r
  * @param value The value to be stored alongside the UUID.
  * @return Whether the process was a success or not.
  */
-void GkDb::add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
+void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
                              const std::string &value)
 {
     std::ostringstream oss;
@@ -323,12 +294,12 @@ void GkDb::add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::
 }
 
 /**
- * @brief GkDb::add_record_id Adds a new Unique Identifier for the record in question to the Google LevelDB database.
+ * @brief GkDbWrite::add_record_id Adds a new Unique Identifier for the record in question to the Google LevelDB database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
  * @return Whether the process was a success or not.
  */
-bool GkDb::add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id)
+bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id)
 {
     using namespace GkRecords;
 
@@ -378,7 +349,7 @@ bool GkDb::add_record_id(const std::string &unique_id, const GkRecords::GkSpecie
     }
 }
 
-std::string GkDb::create_unique_id()
+std::string GkDbWrite::create_unique_id()
 {
     std::lock_guard<std::mutex> locker(db_mutex);
     boost::mt19937 ran;
@@ -389,42 +360,4 @@ std::string GkDb::create_unique_id()
     std::string result = boost::uuids::to_string(u); // Convert the Boost UUID to a std::string
     boost::to_upper(result); // Convert to uppercase
     return result;
-}
-
-int GkDb::determineMinimumDate(const std::vector<std::string> &record_id)
-{
-    if (!record_id.empty()) {
-        std::vector<std::string> dates_str_vec;
-        for (const auto &id: record_id) {
-            dates_str_vec.push_back(read_item_db(id, GkRecords::dateTime));
-        }
-
-        std::vector<int> dates_vec;
-        for (const auto &date: dates_str_vec) {
-            dates_vec.push_back(std::stoi(date));
-        }
-
-        return *std::min_element(dates_vec.begin(), dates_vec.end());
-    }
-
-    return 0;
-}
-
-int GkDb::determineMaximumDate(const std::vector<std::string> &record_id)
-{
-    if (!record_id.empty()) {
-        std::vector<std::string> dates_str_vec;
-        for (const auto &id: record_id) {
-            dates_str_vec.push_back(read_item_db(id, GkRecords::dateTime));
-        }
-
-        std::vector<int> dates_vec;
-        for (const auto &date: dates_str_vec) {
-            dates_vec.push_back(std::stoi(date));
-        }
-
-        return *std::max_element(dates_vec.begin(), dates_vec.end());
-    }
-
-    return 0;
 }
