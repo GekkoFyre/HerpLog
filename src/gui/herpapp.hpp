@@ -49,11 +49,15 @@
 #include "./../gk_string_op.hpp"
 #include "./../gk_file_io.hpp"
 #include <boost/filesystem.hpp>
+#include <QObject>
 #include <QMainWindow>
 #include <QResizeEvent>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include <list>
 
 using namespace GekkoFyre;
 namespace fs = boost::filesystem;
@@ -101,6 +105,8 @@ private:
 
     bool remove_files(const fs::path &tmpDirLoc);
     bool submit_record();
+    void refresh_caches();
+    void find_date_ranges();
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;
@@ -113,6 +119,7 @@ private:
     std::mutex w_record_mtx;
 
     std::unordered_map<std::string, std::pair<std::string, std::string>> record_id_cache;
+    std::list<std::string> archive_records;
 };
 
 #endif // HERPAPP_HPP

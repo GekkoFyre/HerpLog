@@ -212,13 +212,8 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
         case StrucType::gkSpecies:
         {
             auto species_cache = get_misc_key_vals(StrucType::gkSpecies);
-
-            if (species_cache.empty()) {
-                oss << GkRecords::csvSpeciesId << "," << GkRecords::csvSpeciesName << std::endl;
-            } else {
-                for (const auto &species: species_cache) {
-                    oss << species.first << "," << species.second << std::endl;
-                }
+            for (const auto &species: species_cache) {
+                oss << species.first << "," << species.second << std::endl;
             }
 
             // Now we insert the new UUID alongside with its value
@@ -232,13 +227,8 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
         case StrucType::gkId:
         {
             auto id_cache = get_misc_key_vals(StrucType::gkId);
-
-            if (id_cache.empty()) {
-                oss << GkRecords::csvNameId << "," << GkRecords::csvIdentifyStr << std::endl;
-            } else {
-                for (const auto &id: id_cache) {
-                    oss << id.first << "," << id.second << std::endl;
-                }
+            for (const auto &id: id_cache) {
+                oss << id.first << "," << id.second << std::endl;
             }
 
             // Now we insert the new UUID alongside with its value
@@ -275,13 +265,8 @@ bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkS
     try {
         std::ostringstream oss;
         auto record_cache = gkDbRead->get_record_ids();
-
-        if (record_cache.empty()) {
-            oss << GkRecords::csvRecordId << "," << GkRecords::csvSpeciesId << "," << GkRecords::csvNameId << std::endl;
-        } else {
-            for (const auto &record: record_cache) {
-                oss << record.first << "," << record.second.first << "," << record.second.second << std::endl;
-            }
+        for (const auto &record: record_cache) {
+            oss << record.first << "," << record.second.first << "," << record.second.second << std::endl;
         }
 
         // Now we insert the new UUID alongside with its value

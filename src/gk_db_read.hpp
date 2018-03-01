@@ -53,6 +53,7 @@
 #include <memory>
 #include <utility>
 #include <unordered_map>
+#include <list>
 
 namespace GekkoFyre {
 class GkDbRead;
@@ -68,7 +69,7 @@ public:
     int determineMinimumDate(const std::vector<std::string> &record_id);
     int determineMaximumDate(const std::vector<std::string> &record_id);
     std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
-    std::vector<std::string> extractRecords(const int &dateStart, const int &dateEnd);
+    std::list<std::string> extractRecords(const int &dateStart, const int &dateEnd);
 
 private:
     std::shared_ptr<GkStringOp> gkStrOp;

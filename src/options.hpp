@@ -52,8 +52,6 @@
 namespace fs = boost::filesystem;
 namespace GekkoFyre {
     constexpr double HERPLOG_DEFAULT_RESOLUTION_WIDTH = 1920.0;
-    constexpr int HERPLOG_DEFAULT_HORIZONTAL_MARGIN_PUSHBUTTON = 6;
-    constexpr int CFG_CSV_MIN_PARSE_SIZE = 12;
     constexpr unsigned long LEVELDB_CFG_CACHE_SIZE = 32UL * 1024UL * 1024UL;
 
     namespace GkFile {
@@ -99,12 +97,6 @@ namespace GekkoFyre {
         constexpr char boolHadHydration[] = "bool_had_hydration";
         constexpr char boolHadVitamins[] = "bool_had_vitamins";
         constexpr char weightMeasure[] = "weight_measurement";
-
-        constexpr char csvRecordId[] = "csv_record_id";
-        constexpr char csvSpeciesId[] = "csv_species_id";
-        constexpr char csvSpeciesName[] = "csv_species_name";
-        constexpr char csvNameId[] = "csv_name_id";
-        constexpr char csvIdentifyStr[] = "csv_identifier_str";
 
         constexpr char LEVELDB_STORE_RECORD_ID[] = "store_unique_id";
         constexpr char LEVELDB_STORE_SPECIES_ID[] = "store_species_id";

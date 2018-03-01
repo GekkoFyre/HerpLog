@@ -91,15 +91,20 @@ int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_id)
     if (!record_id.empty()) {
         std::vector<std::string> dates_str_vec;
         for (const auto &id: record_id) {
-            dates_str_vec.push_back(read_item_db(id, GkRecords::dateTime));
+            std::string db_val = read_item_db(id, GkRecords::dateTime);
+            if (!db_val.empty()) {
+                dates_str_vec.push_back(db_val);
+            }
         }
 
-        std::vector<int> dates_vec;
-        for (const auto &date: dates_str_vec) {
-            dates_vec.push_back(std::stoi(date));
-        }
+        if (!dates_str_vec.empty()) {
+            std::vector<int> dates_vec;
+            for (const auto &date: dates_str_vec) {
+                dates_vec.push_back(std::stoi(date));
+            }
 
-        return *std::min_element(dates_vec.begin(), dates_vec.end());
+            return *std::min_element(dates_vec.begin(), dates_vec.end());
+        }
     }
 
     return 0;
@@ -110,15 +115,20 @@ int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_id)
     if (!record_id.empty()) {
         std::vector<std::string> dates_str_vec;
         for (const auto &id: record_id) {
-            dates_str_vec.push_back(read_item_db(id, GkRecords::dateTime));
+            std::string db_val = read_item_db(id, GkRecords::dateTime);
+            if (!db_val.empty()) {
+                dates_str_vec.push_back(db_val);
+            }
         }
 
-        std::vector<int> dates_vec;
-        for (const auto &date: dates_str_vec) {
-            dates_vec.push_back(std::stoi(date));
-        }
+        if (!dates_str_vec.empty()) {
+            std::vector<int> dates_vec;
+            for (const auto &date: dates_str_vec) {
+                dates_vec.push_back(std::stoi(date));
+            }
 
-        return *std::max_element(dates_vec.begin(), dates_vec.end());
+            return *std::max_element(dates_vec.begin(), dates_vec.end());
+        }
     }
 
     return 0;
@@ -166,7 +176,42 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::g
  * @param dateEnd The end of the date range, as UNIX Epoch Time.
  * @return The extracted Record IDs that lay within the given date range.
  */
-std::vector<std::string> GkDbRead::extractRecords(const int &dateStart, const int &dateEnd)
+std::list<std::string> GkDbRead::extractRecords(const int &dateStart, const int &dateEnd)
 {
+    // Extract all the possible Record IDs from the database
     auto record_id_cache = get_record_ids();
+    if (!record_id_cache.empty()) {
+        std::vector<std::string> record_ids;
+        for (const auto &ids: record_id_cache) {
+            if (!ids.first.empty()) {
+                record_ids.push_back(ids.first); // Put just the Record IDs ONLY into a std::vector<>()
+            }
+        }
+
+        std::list<int> collected_dates;
+        std::unordered_map<std::string, int> date_cache; // Key: Record IDs, Value: Dates
+
+        // Filter out the dates that match our criteria within the database
+        for (const auto &record: record_ids) {
+            int possible_date = std::stoi(read_item_db(record, GkRecords::dateTime)); // Extract the dates one-by-one from the database
+            if (possible_date >= dateStart && possible_date <= dateEnd) { // Filter the dates through our criteria
+                collected_dates.push_back(possible_date); // Add the dates that meet our criteria to an std::list
+                date_cache.insert(std::make_pair(record, possible_date));
+            }
+        }
+
+        collected_dates.sort(); // Sort the dates into ascending order
+        std::list<std::string> output;
+        for (const auto &date: collected_dates) {
+            for (const auto &cache: date_cache) {
+                if (date == cache.second) {
+                    output.push_back(cache.first);
+                }
+            }
+        }
+
+        return output;
+    }
+
+    return std::list<std::string>();
 }
