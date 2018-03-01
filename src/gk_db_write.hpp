@@ -46,11 +46,13 @@
 
 #include "options.hpp"
 #include "gk_string_op.hpp"
+#include "gk_db_read.hpp"
 #include <QtCore/QObject>
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include <mutex>
+#include <utility>
 #include <memory>
 
 namespace GekkoFyre {
@@ -60,14 +62,13 @@ class GkDbWrite : public QObject {
     Q_OBJECT
 
 public:
-    explicit GkDbWrite(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
+    explicit GkDbWrite(const GkFile::FileDb &gk_db_conn, const std::shared_ptr<GkDbRead> &gk_db_read, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
     ~GkDbWrite();
 
     void add_item_db(const std::string &record_id, const std::string &key, std::string value);
     void del_item_db(const std::string &record_id, const std::string &key);
 
     auto get_misc_key_vals(const GkRecords::StrucType &struc_type);
-    std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
     void add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
                            const std::string &value);
     bool add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id);
@@ -76,6 +77,7 @@ public:
 private:
     std::shared_ptr<GkStringOp> gkStrOp;
     GkFile::FileDb db_conn;
+    std::shared_ptr<GkDbRead> gkDbRead;
 
     std::mutex db_mutex;
     std::mutex create_key_mutex;

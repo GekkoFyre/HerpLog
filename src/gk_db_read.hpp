@@ -51,6 +51,9 @@
 #include <vector>
 #include <mutex>
 #include <memory>
+#include <utility>
+#include <unordered_map>
+#include <list>
 
 namespace GekkoFyre {
 class GkDbRead;
@@ -58,12 +61,15 @@ class GkDbRead;
 class GkDbRead : public QObject {
     Q_OBJECT
 public:
-    explicit GkDbRead(const GkFile::FileDb &database, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
+    explicit GkDbRead(const GkFile::FileDb &gk_db_conn, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
     ~GkDbRead();
 
     std::string read_item_db(const std::string &record_id, const std::string &key);
+
     int determineMinimumDate(const std::vector<std::string> &record_id);
     int determineMaximumDate(const std::vector<std::string> &record_id);
+    std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
+    std::list<std::string> extractRecords(const int &dateStart, const int &dateEnd);
 
 private:
     std::shared_ptr<GkStringOp> gkStrOp;

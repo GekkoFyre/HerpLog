@@ -63,31 +63,18 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     gkFileIo = file_io_ptr;
 
     gkStrOp = std::make_shared<GkStringOp>(this);
-    gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkStrOp, this);
-    gkDbRead = std::make_unique<GkDbRead>(db_ptr, gkStrOp, this);
+    gkDbRead = std::make_shared<GkDbRead>(db_ptr, gkStrOp, this);
+    gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkDbRead, gkStrOp, this);
 
-    record_id_cache = gkDbWrite->get_record_ids();
+    ui->interface_tabWidget->setTabEnabled(2, false);
+    ui->interface_tabWidget->setTabEnabled(3, false);
+
+    refresh_caches();
     ui->lineEdit_new_id->setText(QString::fromStdString(gkStrOp->random_hash()));
     ui->dateTime_add_record->setDate(QDate::currentDate());
     ui->dateTime_add_record->setTime(QTime::currentTime());
 
-    if (!record_id_cache.empty()) {
-        std::vector<std::string> record_ids;
-        for (const auto &ids: record_id_cache) {
-            if (std::strcmp(ids.first.c_str(), GkRecords::csvRecordId) != 0) { // An ugly hack, I know...
-                record_ids.push_back(ids.first);
-            }
-        }
-
-        int minDateTime = gkDbRead->determineMinimumDate(record_ids);
-        int maxDateTime = gkDbRead->determineMaximumDate(record_ids);
-
-        ui->dateTimeEdit_browse_start->setMinimumDateTime(QDateTime::fromTime_t(minDateTime));
-        ui->dateTimeEdit_browse_start->setMaximumDateTime(QDateTime::fromTime_t(maxDateTime));
-        ui->dateTimeEdit_browse_end->setMinimumDateTime(QDateTime::fromTime_t(minDateTime));
-        ui->dateTimeEdit_browse_end->setMaximumDateTime(QDateTime::fromTime_t(maxDateTime));
-        ui->dateTimeEdit_browse_end->setDateTime(QDateTime::fromTime_t(maxDateTime));
-    }
+    find_date_ranges();
 }
 
 HerpApp::~HerpApp()
@@ -227,7 +214,20 @@ void HerpApp::on_pushButton_archive_delete_clicked()
 {}
 
 void HerpApp::on_pushButton_browse_submit_clicked()
-{}
+{
+    int dateTimeStart = ui->dateTimeEdit_browse_start->dateTime().toTime_t();
+    int dateTimeEnd = ui->dateTimeEdit_browse_end->dateTime().toTime_t();
+    archive_records = gkDbRead->extractRecords(dateTimeStart, dateTimeEnd);
+
+    if (!archive_records.empty()) {
+        ui->interface_tabWidget->setTabEnabled(2, true);
+        ui->interface_tabWidget->setCurrentIndex(2);
+        return;
+    } else {
+        QMessageBox::information(this, tr("Info"), tr("There is no data to display!"), QMessageBox::Ok);
+        return;
+    }
+}
 
 void HerpApp::on_pushButton_add_data_clicked()
 {
@@ -322,6 +322,9 @@ bool HerpApp::submit_record()
             ui->spinBox_weight->setValue(0.000);
             ui->plainTextEdit_furtherNotes->clear();
 
+            on_toolButton_new_hash_clicked();
+            find_date_ranges();
+
             return true;
         }
     } catch (const std::exception &e) {
@@ -330,4 +333,46 @@ bool HerpApp::submit_record()
     }
 
     return false;
+}
+
+void HerpApp::refresh_caches()
+{
+    record_id_cache.clear();
+    record_id_cache = gkDbRead->get_record_ids();
+}
+
+void HerpApp::find_date_ranges()
+{
+    refresh_caches();
+    if (!record_id_cache.empty()) {
+        std::vector<std::string> record_ids;
+        for (const auto &ids: record_id_cache) {
+            if (!ids.first.empty()) {
+                record_ids.push_back(ids.first);
+            }
+        }
+
+        int minDateTime = gkDbRead->determineMinimumDate(record_ids);
+        int maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+
+        if ((minDateTime > 0) && (maxDateTime > 0)) {
+            if (!ui->dateTimeEdit_browse_start->isEnabled() && !ui->dateTimeEdit_browse_end->isEnabled()) {
+                ui->dateTimeEdit_browse_start->setEnabled(true);
+                ui->dateTimeEdit_browse_end->setEnabled(true);
+            }
+
+            ui->dateTimeEdit_browse_start->setMinimumDateTime(QDateTime::fromTime_t(minDateTime));
+            ui->dateTimeEdit_browse_start->setMaximumDateTime(QDateTime::fromTime_t(maxDateTime));
+            ui->dateTimeEdit_browse_end->setMinimumDateTime(QDateTime::fromTime_t(minDateTime));
+            ui->dateTimeEdit_browse_end->setMaximumDateTime(QDateTime::fromTime_t(maxDateTime));
+            ui->dateTimeEdit_browse_end->setDateTime(QDateTime::fromTime_t(maxDateTime));
+            return;
+        }
+    } else {
+        ui->dateTimeEdit_browse_start->setEnabled(false);
+        ui->dateTimeEdit_browse_end->setEnabled(false);
+        return;
+    }
+
+    return;
 }
