@@ -126,68 +126,6 @@ void GkDbWrite::del_item_db(const std::string &record_id, const std::string &key
 }
 
 /**
- * @brief GkDbWrite::get_misc_key_vals will obtain all the Unique Identifiers from the database for the given key, IF it's related
- * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-02-21
- * @return The information that was retrieved from the database.
- */
-auto GkDbWrite::get_misc_key_vals(const GkRecords::StrucType &struc_type)
-{
-    leveldb::ReadOptions read_opt;
-    read_opt.verify_checksums = true;
-
-    std::string csv_read_data;
-    std::lock_guard<std::mutex> locker(db_mutex);
-
-    std::unordered_map<std::string, std::string> cache;
-
-    switch (struc_type) {
-        case GkRecords::StrucType::gkSpecies:
-            db_conn.db->Get(read_opt, GkRecords::speciesId, &csv_read_data);
-
-            if (!csv_read_data.empty()) {
-                try {
-                    csv::istringstream iss(csv_read_data);
-                    iss.set_delimiter(',', "$$");
-                    std::string species_id, species_name;
-
-                    while (iss.read_line()) {
-                        iss >> species_id >> species_name;
-                        cache.insert(std::make_pair(species_id, species_name));
-                    }
-                } catch (const std::exception &e) {
-                    QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
-                }
-            }
-
-            break;
-        case GkRecords::StrucType::gkId:
-            db_conn.db->Get(read_opt, GkRecords::nameId, &csv_read_data);
-
-            if (!csv_read_data.empty()) {
-                try {
-                    csv::istringstream iss(csv_read_data);
-                    iss.set_delimiter(',', "$$");
-                    std::string name_id, identity_str;
-                    while (iss.read_line()) {
-                        iss >> name_id >> identity_str;
-                        cache.insert(std::make_pair(name_id, identity_str));
-                    }
-                } catch (const std::exception &e) {
-                    QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
-                }
-            }
-
-            break;
-        default:
-            throw std::invalid_argument(tr("Unable to read Unique Identifier from database! This should not happen!").toStdString());
-    }
-
-    return cache;
-}
-
-/**
  * @brief GkDbWrite::add_misc_key_val Adds a Unique Identifier for either a new Species or Name/ID sub-record to the Google LevelDB
  * database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
@@ -211,7 +149,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
     switch (struc_type) {
         case StrucType::gkSpecies:
         {
-            auto species_cache = get_misc_key_vals(StrucType::gkSpecies);
+            auto species_cache = gkDbRead->get_misc_key_vals(StrucType::gkSpecies);
             for (const auto &species: species_cache) {
                 oss << species.first << "," << species.second << std::endl;
             }
@@ -226,7 +164,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
             break;
         case StrucType::gkId:
         {
-            auto id_cache = get_misc_key_vals(StrucType::gkId);
+            auto id_cache = gkDbRead->get_misc_key_vals(StrucType::gkId);
             for (const auto &id: id_cache) {
                 oss << id.first << "," << id.second << std::endl;
             }

@@ -99,6 +99,7 @@ private slots:
     void on_pushButton_add_data_clicked();
     void on_toolButton_new_hash_clicked();
     void on_toolButton_add_record_update_datetime_clicked();
+    void on_toolButton_records_calendar_popup_clicked();
 
 private:
     Ui::HerpApp *ui;
@@ -107,6 +108,9 @@ private:
     bool submit_record();
     void refresh_caches();
     void find_date_ranges();
+    std::string browse_records(const std::list<std::string> &records, const bool &forward);
+    void archive_clear_forms();
+    void archive_fill_form_data(const std::string &record_id);
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;
@@ -120,6 +124,7 @@ private:
 
     std::unordered_map<std::string, std::pair<std::string, std::string>> record_id_cache;
     std::list<std::string> archive_records;
+    std::list<std::string> viewed_records;
 };
 
 #endif // HERPAPP_HPP
