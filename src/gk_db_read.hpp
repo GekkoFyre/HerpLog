@@ -69,6 +69,7 @@ public:
     int determineMinimumDate(const std::vector<std::string> &record_id);
     int determineMaximumDate(const std::vector<std::string> &record_id);
     std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
+    std::unordered_map<std::string, std::string> get_misc_key_vals(const GkRecords::StrucType &struc_type);
     std::list<std::string> extractRecords(const int &dateStart, const int &dateEnd);
 
 private:

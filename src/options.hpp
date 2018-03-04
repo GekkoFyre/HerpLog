@@ -67,12 +67,7 @@ namespace GekkoFyre {
         };
 
         namespace GkCsv {
-            constexpr char fileName[] = "file_name";
-            constexpr char fileHash[] = "file_hash";
-            constexpr char hashType[] = "hash_type";
             constexpr char zip_contents_csv[] = "zip_contents.csv";
-
-            constexpr char hashTypeCRC32[] = "CRC32";
         }
 
         enum HashTypes {
@@ -81,12 +76,6 @@ namespace GekkoFyre {
     }
 
     namespace GkRecords {
-        constexpr char speciesId[] = "species_id";
-        constexpr char speciesName[] = "species_name";
-
-        constexpr char nameId[] = "name_id";
-        constexpr char identifierStr[] = "identifier_str";
-
         constexpr char dateTime[] = "date_time";
         constexpr char furtherNotes[] = "further_notes";
         constexpr char vitaminNotes[] = "vitamin_notes";
@@ -103,13 +92,11 @@ namespace GekkoFyre {
         constexpr char LEVELDB_STORE_NAME_ID[] = "store_name_id";
 
         struct GkSpecies {
-            std::string record_id;          // The Unique Identifier for the entire record in question
             std::string species_id;         // The species Unique ID
             std::string species_name;       // The species of the animal/lizard in question
         };
 
         struct GkId {
-            std::string record_id;          // The Unique Identifier for the entire record in question
             std::string name_id;            // Self-explanatory
             std::string identifier_str;     // The identifier as a string, for the animal/lizard in question
         };
