@@ -122,6 +122,15 @@ namespace GekkoFyre {
             gkId,
             gkSubmit
         };
+
+        namespace GkGraph {
+            struct WeightVsTime {
+                std::string record_id;
+                GkSpecies species;
+                GkId identifier;
+                double weight;
+            };
+        }
     }
 }
 

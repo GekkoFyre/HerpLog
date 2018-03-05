@@ -52,12 +52,15 @@
 #include <QObject>
 #include <QMainWindow>
 #include <QResizeEvent>
+#include <QPointer>
+#include <QtCharts>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <list>
+#include <map>
 
 using namespace GekkoFyre;
 namespace fs = boost::filesystem;
@@ -111,6 +114,8 @@ private:
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
+    void insert_charts();
+    void update_charts();
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;
@@ -122,9 +127,19 @@ private:
     std::string global_db_file_path;
     std::mutex w_record_mtx;
 
+    long int minDateTime;
+    long int maxDateTime;
+
     std::unordered_map<std::string, std::pair<std::string, std::string>> record_id_cache;
     std::list<std::string> archive_records;
+    // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
+    // the `Previous Record` button is pressed.
     std::list<std::string> viewed_records;
+
+    std::map<long int, GkRecords::GkGraph::WeightVsTime> weight_measurements; // The key is QDateTime
+    QPointer<QLineSeries> line_series_weight;
+    QPointer<QChart> chart_weight;
+    bool charts_tab_enabled;
 };
 
 #endif // HERPAPP_HPP

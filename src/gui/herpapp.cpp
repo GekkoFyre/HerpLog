@@ -67,6 +67,7 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     gkDbRead = std::make_shared<GkDbRead>(db_ptr, gkStrOp, this);
     gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkDbRead, gkStrOp, this);
 
+    ui->interface_tabWidget->setCurrentIndex(0);
     ui->interface_tabWidget->setTabEnabled(2, false);
     ui->interface_tabWidget->setTabEnabled(3, false);
 
@@ -76,7 +77,9 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     ui->dateTime_add_record->setDate(QDate::currentDate());
     ui->dateTime_add_record->setTime(QTime::currentTime());
 
+    charts_tab_enabled = false;
     find_date_ranges();
+    insert_charts();
 }
 
 HerpApp::~HerpApp()
@@ -346,6 +349,7 @@ bool HerpApp::submit_record()
 
             on_toolButton_new_hash_clicked();
             find_date_ranges();
+            update_charts();
 
             return true;
         }
@@ -361,11 +365,6 @@ void HerpApp::refresh_caches()
 {
     record_id_cache.clear();
     record_id_cache = gkDbRead->get_record_ids();
-}
-
-void HerpApp::find_date_ranges()
-{
-    refresh_caches();
     if (!record_id_cache.empty()) {
         std::vector<std::string> record_ids;
         for (const auto &ids: record_id_cache) {
@@ -374,9 +373,18 @@ void HerpApp::find_date_ranges()
             }
         }
 
-        int minDateTime = gkDbRead->determineMinimumDate(record_ids);
-        int maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+        minDateTime = gkDbRead->determineMinimumDate(record_ids);
+        maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+        return;
+    }
 
+    return;
+}
+
+void HerpApp::find_date_ranges()
+{
+    refresh_caches();
+    if (!record_id_cache.empty()) {
         if ((minDateTime > 0) && (maxDateTime > 0)) {
             if (!ui->dateTimeEdit_browse_start->isEnabled() && !ui->dateTimeEdit_browse_end->isEnabled()) {
                 ui->dateTimeEdit_browse_start->setEnabled(true);
@@ -409,9 +417,9 @@ void HerpApp::find_date_ranges()
  */
 std::string HerpApp::browse_records(const std::list<std::string> &records, const bool &forward)
 {
-    // Records are added to this std::list<std::string>() as the `Next Record` button is pressed, and removed as
-    // the `Previous Record` button is pressed.
     if (!records.empty()) {
+        // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
+        // the `Previous Record` button is pressed.
         for (const auto &record: records) {
             if (forward) { // `Next Record` has been pressed
                 if (std::find(viewed_records.begin(), viewed_records.end(), record) == viewed_records.end()) { // Check that the cached record does not already exist within `viewed_records`.
@@ -543,4 +551,105 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
         return;
     }
+}
+
+/**
+ * @brief HerpApp::insert_charts will insert the QChart widgets into the GUI, in their respective places.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-04
+ */
+void HerpApp::insert_charts()
+{
+    update_charts();
+
+    chart_weight = new QChart();
+    chart_weight->legend()->show();
+    chart_weight->addSeries(line_series_weight);
+    chart_weight->createDefaultAxes();
+    chart_weight->setTitle(tr("Weight vs. Time"));
+    chart_weight->setAnimationOptions(QChart::AllAnimations);
+
+    QPointer<QChartView> chart_view_weight = new QChartView(chart_weight);
+    chart_view_weight->setRenderHint(QPainter::Antialiasing);
+
+    ui->vertLayout_chart_1->addWidget(chart_view_weight);
+}
+
+/**
+ * @brief HerpApp::update_charts refreshes the QCharts with any new and previously available data.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-04
+ */
+void HerpApp::update_charts()
+{
+    try {
+        line_series_weight = new QLineSeries();
+        refresh_caches();
+        if (!record_id_cache.empty()) {
+            auto dated_record_ids = gkDbRead->extractRecords(minDateTime, maxDateTime);
+            auto species_record_cache = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkSpecies);
+            auto ident_record_cache = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            long int date_time;
+            double weight_in_loop;
+            GkRecords::GkSpecies species_struct;
+            GkRecords::GkId ident_struct;
+
+            if ((!dated_record_ids.empty()) && (!species_record_cache.empty()) && (!ident_record_cache.empty())) {
+                for (const auto &dated_id: dated_record_ids) {
+                    date_time = std::stol(gkDbRead->read_item_db(dated_id, GkRecords::dateTime));
+                    if (weight_measurements.count(date_time) < 1) { // Check that the key does not already exist in the cache!
+                        for (const auto &cached_id: record_id_cache) {
+                            if (dated_id == cached_id.first) {
+                                weight_in_loop = std::stod(gkDbRead->read_item_db(dated_id, GkRecords::weightMeasure));
+                                species_struct.species_id = cached_id.second.first;
+                                ident_struct.name_id = cached_id.second.second;
+
+                                for (const auto &species: species_record_cache) {
+                                    if (species_struct.species_id == species.first) {
+                                        species_struct.species_name = species.second;
+                                    }
+                                }
+
+                                for (const auto &ident: ident_record_cache) {
+                                    if (ident_struct.name_id == ident.first) {
+                                        ident_struct.identifier_str = ident.second;
+                                    }
+                                }
+
+                                GkRecords::GkGraph::WeightVsTime weight_struct;
+                                weight_struct.record_id = dated_id;
+                                weight_struct.species = species_struct;
+                                weight_struct.identifier = ident_struct;
+                                weight_struct.weight = weight_in_loop;
+
+                                weight_measurements.insert(std::make_pair(date_time, weight_struct));
+
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (dated_record_ids.size() > 1) { // Therefore there are two plot points for the graph(s)
+                    if (!charts_tab_enabled) {
+                        ui->interface_tabWidget->setTabEnabled(3, true);
+                        charts_tab_enabled = true;
+                    }
+
+                    if (!weight_measurements.empty()) {
+                        for (const auto &weight: weight_measurements) {
+                            Q_UNUSED(weight);
+                            // TODO: Finish this!
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+        return;
+    }
+
+    return;
 }
