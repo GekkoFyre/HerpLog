@@ -105,6 +105,7 @@ private slots:
     void on_toolButton_records_calendar_popup_clicked();
     void on_comboBox_view_charts_select_species_currentIndexChanged(int index);
     void on_comboBox_view_charts_select_id_currentIndexChanged(int index);
+    void on_comboBox_existing_species_currentIndexChanged(int index);
 
 private:
     Ui::HerpApp *ui;
@@ -135,7 +136,7 @@ private:
     std::unordered_map<std::string, std::pair<std::string, std::string>> record_id_cache;
     std::list<std::string> archive_records;
     QMultiMap<std::string, std::pair<std::string, int>> species_cache; // <Key: Species ID, Value: <Species Name, Index No.>>
-    QMultiMap<std::string, std::pair<std::string, int>> animal_cache; // <Key: Animal ID, Value <Species ID, Index No.>>
+    QMultiMap<std::string, std::pair<std::string, int>> animal_cache; // <Key: Species ID, Value <Animal ID, Index No.>>
     // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
     // the `Previous Record` button is pressed.
     std::list<std::string> viewed_records;
@@ -144,6 +145,7 @@ private:
     QPointer<QLineSeries> line_series_weight;
     QPointer<QChart> chart_weight;
     bool charts_tab_enabled;
+    bool caches_enabled;
 };
 
 #endif // HERPAPP_HPP
