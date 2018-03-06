@@ -150,8 +150,8 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
         case StrucType::gkSpecies:
         {
             auto species_cache = gkDbRead->get_misc_key_vals(StrucType::gkSpecies);
-            for (const auto &species: species_cache) {
-                oss << species.first << "," << species.second << std::endl;
+            for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
+                oss << it.key() << "," << it.value() << std::endl;
             }
 
             // Now we insert the new UUID alongside with its value
@@ -165,8 +165,8 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
         case StrucType::gkId:
         {
             auto id_cache = gkDbRead->get_misc_key_vals(StrucType::gkId);
-            for (const auto &id: id_cache) {
-                oss << id.first << "," << id.second << std::endl;
+            for (auto it = id_cache.begin(); it != id_cache.end(); ++it) {
+                oss << it.key() << "," << it.value() << std::endl;
             }
 
             // Now we insert the new UUID alongside with its value

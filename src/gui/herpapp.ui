@@ -1084,6 +1084,9 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
+            <widget class="QComboBox" name="comboBox_view_charts_select_species"/>
+           </item>
+           <item>
             <widget class="QComboBox" name="comboBox_view_charts_select_id"/>
            </item>
            <item>

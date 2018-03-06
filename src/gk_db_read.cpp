@@ -172,9 +172,9 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::g
  * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @return The information that was retrieved from the database.
+ * @return The information that was retrieved from the database; <Key: Species ID/Name ID, Value: Species Name/Name Value>
  */
-std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::StrucType &struc_type)
+QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::StrucType &struc_type)
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -182,7 +182,7 @@ std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const G
     std::string csv_read_data;
     std::lock_guard<std::mutex> locker(db_mutex);
 
-    std::unordered_map<std::string, std::string> cache;
+    QMultiMap<std::string, std::string> cache;
 
     switch (struc_type) {
         case GkRecords::StrucType::gkSpecies:
@@ -196,7 +196,7 @@ std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const G
 
                     while (iss.read_line()) {
                         iss >> species_id >> species_name;
-                        cache.insert(std::make_pair(species_id, species_name));
+                        cache.insertMulti(species_id, species_name);
                     }
                 } catch (const std::exception &e) {
                     QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
@@ -214,7 +214,7 @@ std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const G
                     std::string name_id, identity_str;
                     while (iss.read_line()) {
                         iss >> name_id >> identity_str;
-                        cache.insert(std::make_pair(name_id, identity_str));
+                        cache.insertMulti(name_id, identity_str);
                     }
                 } catch (const std::exception &e) {
                     QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);

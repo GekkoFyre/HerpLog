@@ -54,13 +54,13 @@
 #include <QResizeEvent>
 #include <QPointer>
 #include <QtCharts>
+#include <QMultiMap>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <list>
-#include <map>
 
 using namespace GekkoFyre;
 namespace fs = boost::filesystem;
@@ -103,6 +103,8 @@ private slots:
     void on_toolButton_new_hash_clicked();
     void on_toolButton_add_record_update_datetime_clicked();
     void on_toolButton_records_calendar_popup_clicked();
+    void on_comboBox_view_charts_select_species_currentIndexChanged(int index);
+    void on_comboBox_view_charts_select_id_currentIndexChanged(int index);
 
 private:
     Ui::HerpApp *ui;
@@ -115,7 +117,7 @@ private:
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
     void insert_charts();
-    void update_charts();
+    void update_charts(const std::string &name_id);
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;
@@ -132,11 +134,13 @@ private:
 
     std::unordered_map<std::string, std::pair<std::string, std::string>> record_id_cache;
     std::list<std::string> archive_records;
+    QMultiMap<std::string, std::pair<std::string, int>> species_cache; // <Key: Species ID, Value: <Species Name, Index No.>>
+    QMultiMap<std::string, std::pair<std::string, int>> animal_cache; // <Key: Animal ID, Value <Species ID, Index No.>>
     // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
     // the `Previous Record` button is pressed.
     std::list<std::string> viewed_records;
 
-    std::map<long int, GkRecords::GkGraph::WeightVsTime> weight_measurements; // The key is QDateTime
+    QMultiMap<long int, GkRecords::GkGraph::WeightVsTime> weight_measurements; // The key is QDateTime
     QPointer<QLineSeries> line_series_weight;
     QPointer<QChart> chart_weight;
     bool charts_tab_enabled;
