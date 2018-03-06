@@ -86,7 +86,7 @@ std::string GkDbRead::read_item_db(const std::string &record_id, const std::stri
     }
 }
 
-int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_id)
+long int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_id)
 {
     if (!record_id.empty()) {
         std::vector<std::string> dates_str_vec;
@@ -98,9 +98,9 @@ int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_id)
         }
 
         if (!dates_str_vec.empty()) {
-            std::vector<int> dates_vec;
+            std::vector<long int> dates_vec;
             for (const auto &date: dates_str_vec) {
-                dates_vec.push_back(std::stoi(date));
+                dates_vec.push_back(std::stol(date));
             }
 
             return *std::min_element(dates_vec.begin(), dates_vec.end());
@@ -110,7 +110,7 @@ int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_id)
     return 0;
 }
 
-int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_id)
+long int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_id)
 {
     if (!record_id.empty()) {
         std::vector<std::string> dates_str_vec;
@@ -122,9 +122,9 @@ int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_id)
         }
 
         if (!dates_str_vec.empty()) {
-            std::vector<int> dates_vec;
+            std::vector<long int> dates_vec;
             for (const auto &date: dates_str_vec) {
-                dates_vec.push_back(std::stoi(date));
+                dates_vec.push_back(std::stol(date));
             }
 
             return *std::max_element(dates_vec.begin(), dates_vec.end());
@@ -172,9 +172,9 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::g
  * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @return The information that was retrieved from the database.
+ * @return The information that was retrieved from the database; <Key: Species ID/Name ID, Value: Species Name/Name Value>
  */
-std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::StrucType &struc_type)
+QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::StrucType &struc_type)
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -182,7 +182,7 @@ std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const G
     std::string csv_read_data;
     std::lock_guard<std::mutex> locker(db_mutex);
 
-    std::unordered_map<std::string, std::string> cache;
+    QMultiMap<std::string, std::string> cache;
 
     switch (struc_type) {
         case GkRecords::StrucType::gkSpecies:
@@ -196,7 +196,7 @@ std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const G
 
                     while (iss.read_line()) {
                         iss >> species_id >> species_name;
-                        cache.insert(std::make_pair(species_id, species_name));
+                        cache.insertMulti(species_id, species_name);
                     }
                 } catch (const std::exception &e) {
                     QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
@@ -214,7 +214,7 @@ std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const G
                     std::string name_id, identity_str;
                     while (iss.read_line()) {
                         iss >> name_id >> identity_str;
-                        cache.insert(std::make_pair(name_id, identity_str));
+                        cache.insertMulti(name_id, identity_str);
                     }
                 } catch (const std::exception &e) {
                     QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
@@ -238,7 +238,7 @@ std::unordered_map<std::string, std::string> GkDbRead::get_misc_key_vals(const G
  * @param dateEnd The end of the date range, as UNIX Epoch Time.
  * @return The extracted Record IDs that lay within the given date range.
  */
-std::list<std::string> GkDbRead::extractRecords(const int &dateStart, const int &dateEnd)
+std::list<std::string> GkDbRead::extractRecords(const long int &dateStart, const long int &dateEnd)
 {
     // Extract all the possible Record IDs from the database
     auto record_id_cache = get_record_ids();
@@ -250,12 +250,12 @@ std::list<std::string> GkDbRead::extractRecords(const int &dateStart, const int 
             }
         }
 
-        std::list<int> collected_dates;
-        std::unordered_map<std::string, int> date_cache; // Key: Record IDs, Value: Dates
+        std::list<long int> collected_dates;
+        std::unordered_map<std::string, long int> date_cache; // Key: Record IDs, Value: Dates
 
         // Filter out the dates that match our criteria within the database
         for (const auto &record: record_ids) {
-            int possible_date = std::stoi(read_item_db(record, GkRecords::dateTime)); // Extract the dates one-by-one from the database
+            long int possible_date = std::stoi(read_item_db(record, GkRecords::dateTime)); // Extract the dates one-by-one from the database
             if (possible_date >= dateStart && possible_date <= dateEnd) { // Filter the dates through our criteria
                 collected_dates.push_back(possible_date); // Add the dates that meet our criteria to an std::list
                 date_cache.insert(std::make_pair(record, possible_date));
