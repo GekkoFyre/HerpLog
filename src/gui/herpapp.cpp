@@ -58,6 +58,7 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
 {
     ui->setupUi(this);
 
+    caches_enabled = false;
     db_ptr = database;
     global_db_temp_dir = temp_dir_path; // The (base) temporary directory where the database has been extracted to
     global_db_file_path = db_file_path; // The file-path to the (currently opened/newly created) database
@@ -296,18 +297,23 @@ void HerpApp::on_toolButton_records_calendar_popup_clicked()
 void HerpApp::on_comboBox_view_charts_select_species_currentIndexChanged(int index)
 {
     try {
-        int counter = 0;
-        auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
-        for (auto it_sp = species_cache.begin(); it_sp != species_cache.end(); ++it_sp) {
-            if (index == it_sp.value().second) {
-                auto it_an = animal_cache.find(it_sp.key()); // http://doc.qt.io/qt-5/qmultimap.html
-                while (it_an != animal_cache.end() && it_an.key() == it_sp.key()) {
-                    for (auto animal = animal_names.begin(); animal != animal_names.end(); ++animal) {
-                        ui->comboBox_view_charts_select_id->insertItem(counter, QString::fromStdString(animal.value()));
-                    }
+        if (caches_enabled) {
+            int counter = 0;
+            auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            ui->comboBox_existing_id->clear();
 
-                    ++counter;
-                    ++it_an;
+            for (auto it_sp = species_cache.begin(); it_sp != species_cache.end(); ++it_sp) {
+                if (index == it_sp.value().second) {
+                    auto it_an = animal_cache.find(it_sp.key()); // http://doc.qt.io/qt-5/qmultimap.html
+                    while (it_an != animal_cache.end() && it_an.key() == it_sp.key()) {
+                        for (auto animal = animal_names.begin(); animal != animal_names.end(); ++animal) {
+                            if (it_an.value().first == animal.key()) {
+                                ui->comboBox_view_charts_select_id->insertItem(counter, QString::fromStdString(animal.value()));
+                                ++counter;
+                                ++it_an;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -321,6 +327,35 @@ void HerpApp::on_comboBox_view_charts_select_id_currentIndexChanged(int index)
 {
     // update_charts("");
     return;
+}
+
+void HerpApp::on_comboBox_existing_species_currentIndexChanged(int index)
+{
+    try {
+        if (caches_enabled) {
+            int counter = 0;
+            auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            ui->comboBox_existing_id->clear();
+
+            for (auto it_sp = species_cache.begin(); it_sp != species_cache.end(); ++it_sp) {
+                if (index == it_sp.value().second) {
+                    auto it_an = animal_cache.find(it_sp.key()); // http://doc.qt.io/qt-5/qmultimap.html
+                    while (it_an != animal_cache.end() && it_an.key() == it_sp.key()) {
+                        for (auto animal = animal_names.begin(); animal != animal_names.end(); ++animal) {
+                            if (it_an.value().first == animal.key()) {
+                                ui->comboBox_existing_id->insertItem(counter, QString::fromStdString(animal.value()));
+                                ++counter;
+                                ++it_an;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+        return;
+    }
 }
 
 bool HerpApp::submit_record()
@@ -427,6 +462,7 @@ void HerpApp::refresh_caches()
         if (!record_id_cache.empty()) {
             std::vector<std::string> record_ids;
             auto animal_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            animal_cache.clear();
 
             for (const auto &ids: record_id_cache) {
                 if (!ids.first.empty()) {
@@ -434,11 +470,10 @@ void HerpApp::refresh_caches()
                 }
 
                 if (!animal_temp_cache.empty()) {
-                    animal_temp_cache.clear();
                     int counter = 0;
                     for (auto it = animal_temp_cache.begin(); it != animal_temp_cache.end(); ++it) {
                         if (it.key() == ids.second.second) {
-                            animal_cache.insertMulti(it.key(), std::make_pair(ids.second.first, counter));
+                            animal_cache.insertMulti(ids.second.first, std::make_pair(it.key(), counter));
                             ++counter;
                         }
                     }
@@ -449,10 +484,16 @@ void HerpApp::refresh_caches()
             maxDateTime = gkDbRead->determineMaximumDate(record_ids);
 
             if (!species_cache.empty()) { // We need Record IDs for this operation and any successive operations from this one to work
+                ui->comboBox_existing_species->clear();
                 ui->comboBox_view_charts_select_species->clear();
                 for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
+                    ui->comboBox_existing_species->insertItem(it.value().second, QString::fromStdString(it.value().first));
                     ui->comboBox_view_charts_select_species->insertItem(it.value().second, QString::fromStdString(it.value().first));
                 }
+            }
+
+            if (!caches_enabled) {
+                caches_enabled = true;
             }
 
             return;
