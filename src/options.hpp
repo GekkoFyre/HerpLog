@@ -88,6 +88,7 @@ namespace GekkoFyre {
         constexpr char weightMeasure[] = "weight_measurement";
 
         constexpr char LEVELDB_STORE_RECORD_ID[] = "store_unique_id";
+        constexpr char LEVELDB_STORE_LICENSEE_ID[] = "store_licensee_id";
         constexpr char LEVELDB_STORE_SPECIES_ID[] = "store_species_id";
         constexpr char LEVELDB_STORE_NAME_ID[] = "store_name_id";
 
@@ -118,12 +119,14 @@ namespace GekkoFyre {
         };
 
         enum MiscRecordType {
+            gkLicensee,
             gkSpecies,
             gkId
         };
 
-        enum AnimalNamesDropbox {
+        enum comboBoxType {
             AddRecord,
+            ViewRecords,
             ViewCharts
         };
 

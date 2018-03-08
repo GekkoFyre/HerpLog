@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+!setup_wizard/ms_win/redist/VCPP/*/*.exe
 
 # GekkoFyre's modifications
 *.user

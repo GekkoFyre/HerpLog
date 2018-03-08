@@ -5,7 +5,7 @@
  ##   compiling with the appropriate tools.
  ##
  ##
- ##   Copyright (C) 2017. GekkoFyre.
+ ##   Copyright (C) 2017-2018. GekkoFyre.
  ##
  ##
  ##   HerpLog is free software: you can redistribute it and/or modify

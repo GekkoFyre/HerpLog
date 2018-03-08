@@ -586,17 +586,55 @@ std::string HerpApp::browse_records(const std::list<std::string> &records, const
 }
 
 /**
+ * @brief HerpApp::find_species_types will fill out the specified comboBox(es) with the found `Species` for the
+ * given `Licensee`.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-08
+ * @param dropbox_type Whether to insert data to the `Species` comboBox within the `Add Record` section, `View Records`
+ * area, or in the `View Charts` bit.
+ * @param index_no An integer that corresponds to the given `Licensee` within the `licensee_cache` QMultiMap variable.
+ * @return A list of Species IDs that correspond to the given licensee.
+ */
+std::list<std::string> HerpApp::find_species_types(const GkRecords::comboBoxType &dropbox_type, const int &index_no)
+{
+    return std::list<std::string>();
+}
+
+/**
  * @brief HerpApp::find_animal_names will fill out the specified comboBox(es) with the found `Name / ID#`'s for the
  * given species.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-03-08
- * @param dropbox_type Whether to insert data to the `Name / ID#` comboBox in the `Add Record` section or
- * the `View Charts` area.
+ * @param dropbox_type Whether to insert data to the `Name / ID#` comboBox in the `Add Record` section, the
+ * `View Records` area, or `View Charts` bit.
  * @param index_no An integer that corresponds to the given species within the `species_cache` QMultiMap variable.
  * @return A list of Animal IDs that correspond to the given species.
  */
-std::list<std::string> HerpApp::find_animal_names(const GkRecords::AnimalNamesDropbox &dropbox_type, const int &index_no)
+std::list<std::string> HerpApp::find_animal_names(const GkRecords::comboBoxType &dropbox_type, const int &index_no)
 {
+    try {
+        int counter = 0;
+        auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
+        ui->comboBox_existing_id->clear();
+
+        for (auto it_sp = species_cache.begin(); it_sp != species_cache.end(); ++it_sp) {
+            if (index_no == it_sp.value().second) {
+                auto it_an = animal_cache.find(it_sp.key()); // http://doc.qt.io/qt-5/qmultimap.html
+                while (it_an != animal_cache.end() && it_an.key() == it_sp.key()) {
+                    for (auto animal = animal_names.begin(); animal != animal_names.end(); ++animal) {
+                        if (it_an.value().first == animal.key()) {
+                            ui->comboBox_existing_id->insertItem(counter, QString::fromStdString(animal.value()));
+                            ++counter;
+                            ++it_an;
+                        }
+                    }
+                }
+            }
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+    }
+
     return std::list<std::string>();
 }
 

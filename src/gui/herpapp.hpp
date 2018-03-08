@@ -120,7 +120,8 @@ private:
     void refresh_caches();
     void find_date_ranges();
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
-    std::list<std::string> find_animal_names(const GkRecords::AnimalNamesDropbox &dropbox_type, const int &index_no);
+    std::list<std::string> find_species_types(const GkRecords::comboBoxType &dropbox_type, const int &index_no);
+    std::list<std::string> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const int &index_no);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
     void insert_charts();

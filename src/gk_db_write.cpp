@@ -147,6 +147,21 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
     std::lock_guard<std::mutex> locker(create_key_mutex);
 
     switch (struc_type) {
+        case MiscRecordType::gkLicensee:
+        {
+            auto licensee_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkLicensee);
+            for (auto it = licensee_cache.begin(); it != licensee_cache.end(); ++it) {
+                oss << it.key() << "," << it.value() << std::endl;
+            }
+
+            // Now we insert the new UUID alongside with its value
+            oss << unique_id << "," << value << std::endl;
+
+            batch.Delete(LEVELDB_STORE_LICENSEE_ID);
+            batch.Put(LEVELDB_STORE_LICENSEE_ID, oss.str());
+        }
+
+            break;
         case MiscRecordType::gkSpecies:
         {
             auto species_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkSpecies);
@@ -178,7 +193,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
 
             break;
         default:
-            throw std::invalid_argument(tr("Unable to read Unique Identifier from database! This should not happen!").toStdString());
+            throw std::invalid_argument(tr("Unable to read Unique Identifier from database!").toStdString());
     }
 
     leveldb::Status s;
