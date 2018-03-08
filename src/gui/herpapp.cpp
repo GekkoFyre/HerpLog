@@ -294,12 +294,15 @@ void HerpApp::on_toolButton_add_record_update_datetime_clicked()
 void HerpApp::on_toolButton_records_calendar_popup_clicked()
 {}
 
+void HerpApp::on_comboBox_view_charts_select_licensee_currentIndexChanged(int index)
+{}
+
 void HerpApp::on_comboBox_view_charts_select_species_currentIndexChanged(int index)
 {
     try {
         if (caches_enabled) {
             int counter = 0;
-            auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
             ui->comboBox_existing_id->clear();
 
             for (auto it_sp = species_cache.begin(); it_sp != species_cache.end(); ++it_sp) {
@@ -329,12 +332,15 @@ void HerpApp::on_comboBox_view_charts_select_id_currentIndexChanged(int index)
     return;
 }
 
+void HerpApp::on_comboBox_existing_license_id_currentIndexChanged(int index)
+{}
+
 void HerpApp::on_comboBox_existing_species_currentIndexChanged(int index)
 {
     try {
         if (caches_enabled) {
             int counter = 0;
-            auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            auto animal_names = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
             ui->comboBox_existing_id->clear();
 
             for (auto it_sp = species_cache.begin(); it_sp != species_cache.end(); ++it_sp) {
@@ -357,6 +363,15 @@ void HerpApp::on_comboBox_existing_species_currentIndexChanged(int index)
         return;
     }
 }
+
+void HerpApp::on_comboBox_view_records_licensee_currentIndexChanged(int index)
+{}
+
+void HerpApp::on_comboBox_view_records_species_currentIndexChanged(int index)
+{}
+
+void HerpApp::on_comboBox_view_records_animal_name_currentIndexChanged(int index)
+{}
 
 bool HerpApp::submit_record()
 {
@@ -449,7 +464,7 @@ void HerpApp::refresh_caches()
         record_id_cache.clear();
         record_id_cache = gkDbRead->get_record_ids();
 
-        auto species_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkSpecies);
+        auto species_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
         if (!species_temp_cache.empty()) {
             species_cache.clear();
             int counter = 0;
@@ -461,7 +476,7 @@ void HerpApp::refresh_caches()
 
         if (!record_id_cache.empty()) {
             std::vector<std::string> record_ids;
-            auto animal_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            auto animal_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
             animal_cache.clear();
 
             for (const auto &ids: record_id_cache) {
@@ -570,11 +585,24 @@ std::string HerpApp::browse_records(const std::list<std::string> &records, const
     return "";
 }
 
+/**
+ * @brief HerpApp::find_animal_names will fill out the specified comboBox(es) with the found `Name / ID#`'s for the
+ * given species.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-08
+ * @param dropbox_type Whether to insert data to the `Name / ID#` comboBox in the `Add Record` section or
+ * the `View Charts` area.
+ * @param index_no An integer that corresponds to the given species within the `species_cache` QMultiMap variable.
+ * @return A list of Animal IDs that correspond to the given species.
+ */
+std::list<std::string> HerpApp::find_animal_names(const GkRecords::AnimalNamesDropbox &dropbox_type, const int &index_no)
+{
+    return std::list<std::string>();
+}
+
 void HerpApp::archive_clear_forms()
 {
     ui->lineEdit_records_dateTime->clear();
-    ui->lineEdit_records_species->clear();
-    ui->lineEdit_records_id->clear();
 
     ui->lineEdit_records_toilet_notes->clear();
     ui->lineEdit_records_hydration_notes->clear();
@@ -610,8 +638,8 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
                 }
             }
 
-            auto species_data = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkSpecies);
-            auto ident_data = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            auto species_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
+            auto ident_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
 
             for (auto it = species_data.begin(); it != species_data.end(); ++it) {
                 if (it.key() == submit_data.species.species_id) {
@@ -644,8 +672,6 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
                 QDateTime qdt;
                 qdt.setTime_t(submit_data.date_time);
                 ui->lineEdit_records_dateTime->setText(qdt.toString(tr("dd/MM/yyyy hh:mm:ss AP")));
-                ui->lineEdit_records_species->setText(QString::fromStdString(submit_data.species.species_name));
-                ui->lineEdit_records_id->setText(QString::fromStdString(submit_data.identifier.identifier_str));
 
                 if (!submit_data.toilet_notes.empty()) {
                     ui->lineEdit_records_toilet_notes->setText(QString::fromStdString(submit_data.toilet_notes));
@@ -713,7 +739,7 @@ void HerpApp::update_charts(const std::string &name_id)
         refresh_caches();
         if (!record_id_cache.empty()) {
             auto dated_record_ids = gkDbRead->extractRecords(minDateTime, maxDateTime);
-            auto ident_record_cache = gkDbRead->get_misc_key_vals(GkRecords::StrucType::gkId);
+            auto ident_record_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
             long int date_time;
             double weight_in_loop;
             GkRecords::GkSpecies species_struct;

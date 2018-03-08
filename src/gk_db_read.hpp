@@ -70,7 +70,7 @@ public:
     long int determineMinimumDate(const std::vector<std::string> &record_id);
     long int determineMaximumDate(const std::vector<std::string> &record_id);
     std::unordered_map<std::string, std::pair<std::string, std::string>> get_record_ids();
-    QMultiMap<std::string, std::string> get_misc_key_vals(const GkRecords::StrucType &struc_type);
+    QMultiMap<std::string, std::string> get_misc_key_vals(const GkRecords::MiscRecordType &struc_type);
     std::list<std::string> extractRecords(const long int &dateStart, const long int &dateEnd);
 
 private:

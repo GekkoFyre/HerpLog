@@ -130,12 +130,12 @@ void GkDbWrite::del_item_db(const std::string &record_id, const std::string &key
  * database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @param struc_type Whether we are adding a key for the Species or Name/ID sub-record.
+ * @param struc_type Whether to add data to `store_species_id` or `store_name_id` within the Google LevelDB database.
  * @param unique_id The Unique Identifier itself, usually a UUID in this case.
  * @param value The value to be stored alongside the UUID.
  * @return Whether the process was a success or not.
  */
-void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
+void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id,
                              const std::string &value)
 {
     std::ostringstream oss;
@@ -147,9 +147,9 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
     std::lock_guard<std::mutex> locker(create_key_mutex);
 
     switch (struc_type) {
-        case StrucType::gkSpecies:
+        case MiscRecordType::gkSpecies:
         {
-            auto species_cache = gkDbRead->get_misc_key_vals(StrucType::gkSpecies);
+            auto species_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkSpecies);
             for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
                 oss << it.key() << "," << it.value() << std::endl;
             }
@@ -162,9 +162,9 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
         }
 
             break;
-        case StrucType::gkId:
+        case MiscRecordType::gkId:
         {
-            auto id_cache = gkDbRead->get_misc_key_vals(StrucType::gkId);
+            auto id_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkId);
             for (auto it = id_cache.begin(); it != id_cache.end(); ++it) {
                 oss << it.key() << "," << it.value() << std::endl;
             }
@@ -212,12 +212,12 @@ bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkS
 
         if (!species.species_name.empty() && !species.species_id.empty()) {
             // We have a new entry for the Species sub-record!
-            add_misc_key_vals(StrucType::gkSpecies, species.species_id, species.species_name);
+            add_misc_key_vals(MiscRecordType::gkSpecies, species.species_id, species.species_name);
         }
 
         if (!id.identifier_str.empty()) {
             // We have a new entry for the Name/ID# sub-record!
-            add_misc_key_vals(StrucType::gkId, id.name_id, id.identifier_str);
+            add_misc_key_vals(MiscRecordType::gkId, id.name_id, id.identifier_str);
         }
 
         leveldb::WriteOptions write_options;

@@ -103,9 +103,14 @@ private slots:
     void on_toolButton_new_hash_clicked();
     void on_toolButton_add_record_update_datetime_clicked();
     void on_toolButton_records_calendar_popup_clicked();
+    void on_comboBox_view_charts_select_licensee_currentIndexChanged(int index);
     void on_comboBox_view_charts_select_species_currentIndexChanged(int index);
     void on_comboBox_view_charts_select_id_currentIndexChanged(int index);
+    void on_comboBox_existing_license_id_currentIndexChanged(int index);
     void on_comboBox_existing_species_currentIndexChanged(int index);
+    void on_comboBox_view_records_licensee_currentIndexChanged(int index);
+    void on_comboBox_view_records_species_currentIndexChanged(int index);
+    void on_comboBox_view_records_animal_name_currentIndexChanged(int index);
 
 private:
     Ui::HerpApp *ui;
@@ -115,6 +120,7 @@ private:
     void refresh_caches();
     void find_date_ranges();
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
+    std::list<std::string> find_animal_names(const GkRecords::AnimalNamesDropbox &dropbox_type, const int &index_no);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
     void insert_charts();

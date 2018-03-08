@@ -117,10 +117,14 @@ namespace GekkoFyre {
             double weight;                  // The weight of the lizard in question
         };
 
-        enum StrucType {
+        enum MiscRecordType {
             gkSpecies,
-            gkId,
-            gkSubmit
+            gkId
+        };
+
+        enum AnimalNamesDropbox {
+            AddRecord,
+            ViewCharts
         };
 
         namespace GkGraph {

@@ -83,8 +83,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>434</width>
-                   <height>625</height>
+                   <width>422</width>
+                   <height>742</height>
                   </rect>
                  </property>
                  <layout class="QFormLayout" name="formLayout">
@@ -105,229 +105,6 @@
                     <property name="text">
                      <string>Date &amp; Time: </string>
                     </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_species">
-                    <property name="text">
-                     <string>Species:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QComboBox" name="comboBox_existing_species"/>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QLineEdit" name="lineEdit_new_species">
-                    <property name="placeholderText">
-                     <string>Enter new species here...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0">
-                   <widget class="QLabel" name="label_id">
-                    <property name="text">
-                     <string>Name / ID#: </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QComboBox" name="comboBox_existing_id"/>
-                  </item>
-                  <item row="6" column="1">
-                   <spacer name="horizontalSpacer_notes">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="7" column="0">
-                   <widget class="QLabel" name="label_toilet_notes">
-                    <property name="text">
-                     <string>Toilet: </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="7" column="1">
-                   <widget class="QLineEdit" name="lineEdit_toilet_notes">
-                    <property name="placeholderText">
-                     <string>Notes...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="8" column="0">
-                   <widget class="QLabel" name="label_hydration_notes">
-                    <property name="text">
-                     <string>Hydration: </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="8" column="1">
-                   <widget class="QLineEdit" name="lineEdit_hydration_notes">
-                    <property name="placeholderText">
-                     <string>Notes...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="0">
-                   <widget class="QLabel" name="label_vitamins_notes">
-                    <property name="text">
-                     <string>Vitamins: </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="1">
-                   <widget class="QLineEdit" name="lineEdit_vitamins_notes">
-                    <property name="placeholderText">
-                     <string>Notes...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="10" column="0">
-                   <widget class="QLabel" name="label_weight_notes">
-                    <property name="text">
-                     <string>Weight: </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="10" column="1">
-                   <widget class="QLineEdit" name="lineEdit_weight_notes">
-                    <property name="placeholderText">
-                     <string>Notes...</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="11" column="1">
-                   <spacer name="horizontalSpacer_checkBox">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="12" column="1">
-                   <widget class="QCheckBox" name="checkBox_toilet">
-                    <property name="text">
-                     <string>Went Toilet</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="13" column="1">
-                   <widget class="QCheckBox" name="checkBox_hydration">
-                    <property name="text">
-                     <string>Had Hydration</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="14" column="1">
-                   <widget class="QCheckBox" name="checkBox_vitamins">
-                    <property name="text">
-                     <string>Had Vitamins</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="15" column="1">
-                   <widget class="QDoubleSpinBox" name="spinBox_weight">
-                    <property name="suffix">
-                     <string> g</string>
-                    </property>
-                    <property name="decimals">
-                     <number>3</number>
-                    </property>
-                    <property name="maximum">
-                     <double>50000.000000000000000</double>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="16" column="1">
-                   <spacer name="horizontalSpacer_14">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="17" column="1">
-                   <spacer name="horizontalSpacer_15">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="18" column="1">
-                   <widget class="QPushButton" name="pushButton_add_data">
-                    <property name="toolTip">
-                     <string>Submit as a new record in the database.</string>
-                    </property>
-                    <property name="text">
-                     <string>Submit</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="1">
-                   <widget class="QFrame" name="frame_add_record_nameid">
-                    <property name="frameShape">
-                     <enum>QFrame::NoFrame</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_6">
-                     <property name="spacing">
-                      <number>6</number>
-                     </property>
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QLineEdit" name="lineEdit_new_id">
-                       <property name="placeholderText">
-                        <string>New Name / ID#</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QToolButton" name="toolButton_new_hash">
-                       <property name="toolTip">
-                        <string>Create a new, random ID#.</string>
-                       </property>
-                       <property name="text">
-                        <string>...</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
                    </widget>
                   </item>
                   <item row="0" column="1">
@@ -375,6 +152,303 @@
                       </widget>
                      </item>
                     </layout>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_species">
+                    <property name="text">
+                     <string>Species:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QComboBox" name="comboBox_existing_species">
+                    <property name="toolTip">
+                     <string>The species of the animal in question</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLineEdit" name="lineEdit_new_species">
+                    <property name="toolTip">
+                     <string>Enter a new species of animal here</string>
+                    </property>
+                    <property name="placeholderText">
+                     <string>Enter new species here...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="label_id">
+                    <property name="text">
+                     <string>Name / ID#: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QComboBox" name="comboBox_existing_id">
+                    <property name="toolTip">
+                     <string>The name and/or ID# of the animal in question</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QFrame" name="frame_add_record_nameid">
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_6">
+                     <property name="spacing">
+                      <number>6</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QLineEdit" name="lineEdit_new_id">
+                       <property name="toolTip">
+                        <string>A new animal and/or ID# here</string>
+                       </property>
+                       <property name="placeholderText">
+                        <string>New Name / ID#</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QToolButton" name="toolButton_new_hash">
+                       <property name="toolTip">
+                        <string>Create a new, random ID#.</string>
+                       </property>
+                       <property name="text">
+                        <string>...</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="8" column="1">
+                   <spacer name="horizontalSpacer_notes">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="9" column="0">
+                   <widget class="QLabel" name="label_toilet_notes">
+                    <property name="text">
+                     <string>Toilet: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="1">
+                   <widget class="QLineEdit" name="lineEdit_toilet_notes">
+                    <property name="placeholderText">
+                     <string>Notes...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="0">
+                   <widget class="QLabel" name="label_hydration_notes">
+                    <property name="text">
+                     <string>Hydration: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="1">
+                   <widget class="QLineEdit" name="lineEdit_hydration_notes">
+                    <property name="placeholderText">
+                     <string>Notes...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="0">
+                   <widget class="QLabel" name="label_vitamins_notes">
+                    <property name="text">
+                     <string>Vitamins: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="1">
+                   <widget class="QLineEdit" name="lineEdit_vitamins_notes">
+                    <property name="placeholderText">
+                     <string>Notes...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="13" column="0">
+                   <widget class="QLabel" name="label_weight_notes">
+                    <property name="text">
+                     <string>Weight: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="13" column="1">
+                   <widget class="QLineEdit" name="lineEdit_weight_notes">
+                    <property name="placeholderText">
+                     <string>Notes...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="14" column="1">
+                   <spacer name="horizontalSpacer_checkBox">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="15" column="1">
+                   <widget class="QCheckBox" name="checkBox_toilet">
+                    <property name="toolTip">
+                     <string>Whether the animal had made excreta on this date/time</string>
+                    </property>
+                    <property name="text">
+                     <string>Went Toilet</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="16" column="1">
+                   <widget class="QCheckBox" name="checkBox_hydration">
+                    <property name="toolTip">
+                     <string>Has the animal had a drink of water on this date/time?</string>
+                    </property>
+                    <property name="text">
+                     <string>Had Hydration</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="17" column="1">
+                   <widget class="QCheckBox" name="checkBox_vitamins">
+                    <property name="toolTip">
+                     <string>Has the animal had an intake of vitamins on this date/time</string>
+                    </property>
+                    <property name="text">
+                     <string>Had Vitamins</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="18" column="1">
+                   <widget class="QDoubleSpinBox" name="spinBox_weight">
+                    <property name="toolTip">
+                     <string>The weight of the animal</string>
+                    </property>
+                    <property name="suffix">
+                     <string> g</string>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="maximum">
+                     <double>50000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="19" column="1">
+                   <spacer name="horizontalSpacer_14">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="20" column="1">
+                   <spacer name="horizontalSpacer_15">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="21" column="1">
+                   <widget class="QPushButton" name="pushButton_add_data">
+                    <property name="toolTip">
+                     <string>Submit as a new record in the database</string>
+                    </property>
+                    <property name="text">
+                     <string>Submit</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_license_id">
+                    <property name="text">
+                     <string>License ID#: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="comboBox_existing_license_id">
+                    <property name="toolTip">
+                     <string>The licensee of the animal in question</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="lineEdit_new_license_id">
+                    <property name="toolTip">
+                     <string>Enter a new licensee here</string>
+                    </property>
+                    <property name="placeholderText">
+                     <string>New License ID#</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="22" column="1">
+                   <widget class="QPushButton" name="pushButton_clear_data">
+                    <property name="toolTip">
+                     <string>Clear all the fields of any data on this form</string>
+                    </property>
+                    <property name="text">
+                     <string>Clear</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="12" column="0">
+                   <widget class="QLabel" name="label_temperature">
+                    <property name="text">
+                     <string>Temp.: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="12" column="1">
+                   <widget class="QLineEdit" name="lineEdit_temperature_notes">
+                    <property name="placeholderText">
+                     <string>Notes...</string>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -537,6 +611,9 @@
                       </item>
                       <item>
                        <widget class="QDateTimeEdit" name="dateTimeEdit_browse_start">
+                        <property name="toolTip">
+                         <string>The start date of when to search for records from henceforth</string>
+                        </property>
                         <property name="displayFormat">
                          <string>dd/MM/yyyy HH:mm</string>
                         </property>
@@ -557,6 +634,9 @@
                       </item>
                       <item>
                        <widget class="QDateTimeEdit" name="dateTimeEdit_browse_end">
+                        <property name="toolTip">
+                         <string>The end date of when to search for records up towards</string>
+                        </property>
                         <property name="displayFormat">
                          <string>dd/MM/yyyy HH:mm</string>
                         </property>
@@ -678,383 +758,425 @@
               <property name="title">
                <string>Record Archive</string>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <layout class="QVBoxLayout" name="verticalLayout_15">
                <item>
-                <widget class="QFrame" name="frame_view_records_left">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>60</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
+                <widget class="QFrame" name="frame_view_records_comboBoxes">
                  <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
+                  <enum>QFrame::StyledPanel</enum>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_18">
-                  <property name="leftMargin">
-                   <number>3</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>3</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>3</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>3</number>
-                  </property>
-                  <item>
-                   <widget class="QScrollArea" name="scrollArea_view_records_left">
-                    <property name="frameShape">
-                     <enum>QFrame::NoFrame</enum>
+                 <layout class="QFormLayout" name="formLayout_2">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_view_records_licensee">
+                    <property name="text">
+                     <string>Licensee: </string>
                     </property>
-                    <property name="widgetResizable">
-                     <bool>true</bool>
-                    </property>
-                    <widget class="QWidget" name="scrollAreaWidgetContents_records_left">
-                     <property name="geometry">
-                      <rect>
-                       <x>0</x>
-                       <y>0</y>
-                       <width>434</width>
-                       <height>625</height>
-                      </rect>
-                     </property>
-                     <layout class="QFormLayout" name="formLayout_5">
-                      <item row="0" column="0">
-                       <widget class="QLabel" name="label_records_dateTime">
-                        <property name="text">
-                         <string>Date &amp; Time: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="label_records_species">
-                        <property name="text">
-                         <string>Species: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_species">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>&lt;Species&gt;</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="0">
-                       <widget class="QLabel" name="label_records_id">
-                        <property name="text">
-                         <string>Name / ID#: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_id">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>&lt;ID#&gt;</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="4" column="1">
-                       <spacer name="horizontalSpacer_11">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item row="5" column="0">
-                       <widget class="QLabel" name="label_records_toilet_notes">
-                        <property name="text">
-                         <string>Toilet: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="5" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_toilet_notes">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>Notes...</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="6" column="0">
-                       <widget class="QLabel" name="label_records_hydration_notes">
-                        <property name="text">
-                         <string>Hydration: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="6" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_hydration_notes">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>Notes...</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="7" column="0">
-                       <widget class="QLabel" name="label_records_vitamins_notes">
-                        <property name="text">
-                         <string>Vitamins: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="7" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_vitamins_notes">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>Notes...</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="8" column="0">
-                       <widget class="QLabel" name="label_records_weight_notes">
-                        <property name="text">
-                         <string>Weight: </string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="8" column="1">
-                       <widget class="QLineEdit" name="lineEdit_records_weight_notes">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="placeholderText">
-                         <string>Notes...</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="9" column="1">
-                       <spacer name="horizontalSpacer_12">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item row="10" column="1">
-                       <widget class="QCheckBox" name="checkBox_records_went_toilet">
-                        <property name="text">
-                         <string>Went Toilet</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="11" column="1">
-                       <widget class="QCheckBox" name="checkBox_records_had_hydration">
-                        <property name="text">
-                         <string>Had Hydration</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="12" column="1">
-                       <widget class="QCheckBox" name="checkBox_records_had_vitamins">
-                        <property name="text">
-                         <string>Had Vitamins</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="13" column="1">
-                       <widget class="QDoubleSpinBox" name="doubleSpinBox_records_weight">
-                        <property name="readOnly">
-                         <bool>true</bool>
-                        </property>
-                        <property name="suffix">
-                         <string> g</string>
-                        </property>
-                        <property name="decimals">
-                         <number>3</number>
-                        </property>
-                        <property name="maximum">
-                         <double>50000.000000000000000</double>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="14" column="1">
-                       <spacer name="horizontalSpacer_5">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item row="15" column="1">
-                       <spacer name="horizontalSpacer_6">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item row="16" column="1">
-                       <widget class="QPushButton" name="pushButton_archive_next">
-                        <property name="text">
-                         <string>Next Record &gt;&gt;</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="17" column="1">
-                       <widget class="QPushButton" name="pushButton_archive_prev">
-                        <property name="text">
-                         <string>&lt;&lt; Prev. Record</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="18" column="1">
-                       <widget class="QPushButton" name="pushButton_archive_delete">
-                        <property name="text">
-                         <string>Delete Record</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="0" column="1">
-                       <widget class="QFrame" name="frame_records_datetime">
-                        <property name="frameShape">
-                         <enum>QFrame::StyledPanel</enum>
-                        </property>
-                        <property name="frameShadow">
-                         <enum>QFrame::Raised</enum>
-                        </property>
-                        <layout class="QHBoxLayout" name="horizontalLayout_7">
-                         <property name="leftMargin">
-                          <number>0</number>
-                         </property>
-                         <property name="topMargin">
-                          <number>0</number>
-                         </property>
-                         <property name="rightMargin">
-                          <number>0</number>
-                         </property>
-                         <property name="bottomMargin">
-                          <number>0</number>
-                         </property>
-                         <item>
-                          <widget class="QLineEdit" name="lineEdit_records_dateTime">
-                           <property name="readOnly">
-                            <bool>true</bool>
-                           </property>
-                           <property name="placeholderText">
-                            <string>&lt;Date/Time&gt;</string>
-                           </property>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QToolButton" name="toolButton_records_calendar_popup">
-                           <property name="text">
-                            <string>...</string>
-                           </property>
-                          </widget>
-                         </item>
-                        </layout>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
                    </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="comboBox_view_records_licensee"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_view_records_species">
+                    <property name="text">
+                     <string>Species: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="comboBox_view_records_species"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_view_records_animal_id">
+                    <property name="text">
+                     <string>Name / ID#: </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QComboBox" name="comboBox_view_records_animal_name"/>
                   </item>
                  </layout>
                 </widget>
                </item>
                <item>
-                <widget class="QFrame" name="frame_view_records_right">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>40</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
+                <widget class="QFrame" name="frame_view_records_forms">
                  <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
+                  <enum>QFrame::StyledPanel</enum>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_19">
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                   <property name="leftMargin">
-                   <number>3</number>
+                   <number>0</number>
                   </property>
                   <property name="topMargin">
-                   <number>3</number>
+                   <number>0</number>
                   </property>
                   <property name="rightMargin">
-                   <number>3</number>
+                   <number>0</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>3</number>
+                   <number>0</number>
                   </property>
                   <item>
-                   <widget class="QScrollArea" name="scrollArea_view_records_right">
+                   <widget class="QFrame" name="frame_view_records_left">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>60</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="frameShape">
                      <enum>QFrame::NoFrame</enum>
                     </property>
-                    <property name="widgetResizable">
-                     <bool>true</bool>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
                     </property>
-                    <widget class="QWidget" name="scrollAreaWidgetContents_records_right">
-                     <property name="geometry">
-                      <rect>
-                       <x>0</x>
-                       <y>0</y>
-                       <width>288</width>
-                       <height>625</height>
-                      </rect>
+                    <layout class="QVBoxLayout" name="verticalLayout_18">
+                     <property name="leftMargin">
+                      <number>3</number>
                      </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_20">
-                      <item>
-                       <widget class="QLabel" name="label_records_further_notes">
-                        <property name="text">
-                         <string>Further Notes: </string>
+                     <property name="topMargin">
+                      <number>3</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>3</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>3</number>
+                     </property>
+                     <item>
+                      <widget class="QScrollArea" name="scrollArea_view_records_left">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="widgetResizable">
+                        <bool>true</bool>
+                       </property>
+                       <widget class="QWidget" name="scrollAreaWidgetContents_records_left">
+                        <property name="geometry">
+                         <rect>
+                          <x>0</x>
+                          <y>0</y>
+                          <width>419</width>
+                          <height>574</height>
+                         </rect>
                         </property>
+                        <layout class="QFormLayout" name="formLayout_5">
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="label_records_dateTime">
+                           <property name="text">
+                            <string>Date &amp; Time: </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="1">
+                          <widget class="QFrame" name="frame_records_datetime">
+                           <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                           </property>
+                           <property name="frameShadow">
+                            <enum>QFrame::Raised</enum>
+                           </property>
+                           <layout class="QHBoxLayout" name="horizontalLayout_7">
+                            <property name="leftMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="rightMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>0</number>
+                            </property>
+                            <item>
+                             <widget class="QLineEdit" name="lineEdit_records_dateTime">
+                              <property name="readOnly">
+                               <bool>true</bool>
+                              </property>
+                              <property name="placeholderText">
+                               <string>&lt;Date/Time&gt;</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QToolButton" name="toolButton_records_calendar_popup">
+                              <property name="text">
+                               <string>...</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <spacer name="horizontalSpacer_11">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item row="3" column="0">
+                          <widget class="QLabel" name="label_records_toilet_notes">
+                           <property name="text">
+                            <string>Toilet: </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="3" column="1">
+                          <widget class="QLineEdit" name="lineEdit_records_toilet_notes">
+                           <property name="readOnly">
+                            <bool>true</bool>
+                           </property>
+                           <property name="placeholderText">
+                            <string>Notes...</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="4" column="0">
+                          <widget class="QLabel" name="label_records_hydration_notes">
+                           <property name="text">
+                            <string>Hydration: </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="4" column="1">
+                          <widget class="QLineEdit" name="lineEdit_records_hydration_notes">
+                           <property name="readOnly">
+                            <bool>true</bool>
+                           </property>
+                           <property name="placeholderText">
+                            <string>Notes...</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="5" column="0">
+                          <widget class="QLabel" name="label_records_vitamins_notes">
+                           <property name="text">
+                            <string>Vitamins: </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="5" column="1">
+                          <widget class="QLineEdit" name="lineEdit_records_vitamins_notes">
+                           <property name="readOnly">
+                            <bool>true</bool>
+                           </property>
+                           <property name="placeholderText">
+                            <string>Notes...</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="7" column="0">
+                          <widget class="QLabel" name="label_records_weight_notes">
+                           <property name="text">
+                            <string>Weight: </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="7" column="1">
+                          <widget class="QLineEdit" name="lineEdit_records_weight_notes">
+                           <property name="readOnly">
+                            <bool>true</bool>
+                           </property>
+                           <property name="placeholderText">
+                            <string>Notes...</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="8" column="1">
+                          <spacer name="horizontalSpacer_12">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item row="9" column="1">
+                          <widget class="QCheckBox" name="checkBox_records_went_toilet">
+                           <property name="text">
+                            <string>Went Toilet</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="10" column="1">
+                          <widget class="QCheckBox" name="checkBox_records_had_hydration">
+                           <property name="text">
+                            <string>Had Hydration</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="11" column="1">
+                          <widget class="QCheckBox" name="checkBox_records_had_vitamins">
+                           <property name="text">
+                            <string>Had Vitamins</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="12" column="1">
+                          <widget class="QDoubleSpinBox" name="doubleSpinBox_records_weight">
+                           <property name="readOnly">
+                            <bool>true</bool>
+                           </property>
+                           <property name="suffix">
+                            <string> g</string>
+                           </property>
+                           <property name="decimals">
+                            <number>3</number>
+                           </property>
+                           <property name="maximum">
+                            <double>50000.000000000000000</double>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="13" column="1">
+                          <spacer name="horizontalSpacer_5">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item row="14" column="1">
+                          <spacer name="horizontalSpacer_6">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item row="15" column="1">
+                          <widget class="QPushButton" name="pushButton_archive_next">
+                           <property name="text">
+                            <string>Next Record &gt;&gt;</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="16" column="1">
+                          <widget class="QPushButton" name="pushButton_archive_prev">
+                           <property name="text">
+                            <string>&lt;&lt; Prev. Record</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="17" column="1">
+                          <widget class="QPushButton" name="pushButton_archive_delete">
+                           <property name="text">
+                            <string>Delete Record</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="6" column="0">
+                          <widget class="QLabel" name="label_records_temperature">
+                           <property name="text">
+                            <string>Temp.: </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="6" column="1">
+                          <widget class="QLineEdit" name="lineEdit_records_temperature"/>
+                         </item>
+                        </layout>
                        </widget>
-                      </item>
-                      <item>
-                       <widget class="QPlainTextEdit" name="plainTextEdit_records_further_notes">
-                        <property name="readOnly">
-                         <bool>true</bool>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QFrame" name="frame_view_records_right">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>40</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_19">
+                     <property name="leftMargin">
+                      <number>3</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>3</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>3</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>3</number>
+                     </property>
+                     <item>
+                      <widget class="QScrollArea" name="scrollArea_view_records_right">
+                       <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                       </property>
+                       <property name="widgetResizable">
+                        <bool>true</bool>
+                       </property>
+                       <widget class="QWidget" name="scrollAreaWidgetContents_records_right">
+                        <property name="geometry">
+                         <rect>
+                          <x>0</x>
+                          <y>0</y>
+                          <width>287</width>
+                          <height>498</height>
+                         </rect>
                         </property>
-                        <property name="placeholderText">
-                         <string>Any notes of further interest go here...</string>
-                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_20">
+                         <item>
+                          <widget class="QLabel" name="label_records_further_notes">
+                           <property name="text">
+                            <string>Further Notes: </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPlainTextEdit" name="plainTextEdit_records_further_notes">
+                           <property name="readOnly">
+                            <bool>true</bool>
+                           </property>
+                           <property name="placeholderText">
+                            <string>Any notes of further interest go here...</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
                        </widget>
-                      </item>
-                     </layout>
-                    </widget>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>
@@ -1084,10 +1206,46 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QComboBox" name="comboBox_view_charts_select_species"/>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBox_view_charts_select_id"/>
+            <widget class="QFrame" name="frame_3">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_view_charts_select_licensee">
+                <property name="text">
+                 <string>Licensee: </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="comboBox_view_charts_select_licensee"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_view_charts_select_species">
+                <property name="text">
+                 <string>Species: </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="comboBox_view_charts_select_species"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_view_charts_select_id">
+                <property name="text">
+                 <string>Name / ID#: </string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="comboBox_view_charts_select_id"/>
+              </item>
+             </layout>
+            </widget>
            </item>
            <item>
             <widget class="QStackedWidget" name="stackedWidget_view_charts">

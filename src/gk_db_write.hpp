@@ -68,7 +68,7 @@ public:
     void add_item_db(const std::string &record_id, const std::string &key, std::string value);
     void del_item_db(const std::string &record_id, const std::string &key);
 
-    void add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
+    void add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id,
                            const std::string &value);
     bool add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id);
     std::string create_unique_id();

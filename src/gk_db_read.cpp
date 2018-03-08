@@ -172,9 +172,10 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::g
  * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
+ * @param struc_type Whether to get data from `store_species_id` or `store_name_id` within the Google LevelDB database.
  * @return The information that was retrieved from the database; <Key: Species ID/Name ID, Value: Species Name/Name Value>
  */
-QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::StrucType &struc_type)
+QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::MiscRecordType &struc_type)
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -185,7 +186,7 @@ QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords:
     QMultiMap<std::string, std::string> cache;
 
     switch (struc_type) {
-        case GkRecords::StrucType::gkSpecies:
+        case GkRecords::MiscRecordType::gkSpecies:
             db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_SPECIES_ID, &csv_read_data);
 
             if (!csv_read_data.empty()) {
@@ -204,7 +205,7 @@ QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords:
             }
 
             break;
-        case GkRecords::StrucType::gkId:
+        case GkRecords::MiscRecordType::gkId:
             db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_NAME_ID, &csv_read_data);
 
             if (!csv_read_data.empty()) {
