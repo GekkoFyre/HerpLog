@@ -38,21 +38,23 @@
 !include "LogicLib.nsh"
 !include "MUI2.nsh"
 !include "x64.nsh"
+!include "Sections.nsh"
   
 # --------------------------------
 # General
 
-!define GK_SETUP_WIZARD_TITLE "${GK_SETUP_WIZARD_TITLE}"
+!define GK_APP_TITLE "HerpLog"
+!define GK_SETUP_WIZARD_TITLE "${GK_APP_TITLE} Setup Wizard"
 
 # Name and File
 Name "${GK_SETUP_WIZARD_TITLE}"
 OutFile "HerpLog_Setup_Win.exe"
 
 # Define installation directory
-InstallDir $PROGRAMFILES64
+InstallDir "$PROGRAMFILES\HerpLog"
 
 # Get installation folder from registry if available
-InstallDirRegKey HKCU "Software\${GK_SETUP_WIZARD_TITLE}" ""
+InstallDirRegKey HKLM "Software\${GK_SETUP_WIZARD_TITLE}" "Install_Dir"
 
 # Request application privileges for Windows Vista
 # For removing Start Menu shortcut in Windows 7
@@ -66,10 +68,10 @@ RequestExecutionLevel user
 # --------------------------------
 # Pages
 
-!define MUI_ICON ".\..\..\ico\setup.ico"
+# !define MUI_ICON ".\..\..\ico\setup.ico"
 !define MUI_UNICON ".\..\..\ico\uninstall.ico"
 
-!insertmacro MUI_PAGE_LICENSE ".\..\..\..\License.txt"
+!insertmacro MUI_PAGE_LICENSE ".\..\..\..\LICENSE"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -111,31 +113,43 @@ SectionEnd
 !define MSVC_DIR ".\..\redist\VCPP\${MSVC_VERSION}"
 !define MSVC_REDIST_X64 "VC_redist.x64.exe"
 !define MSVC_REDIST_X86 "VC_redist.x86.exe"
+!define GK_HERPLOG_EXE_ICON "$INSTDIR\gekkofyre.ico"
 
 # Start default section
-Section
+SubSection "Main Application" MAIN_APP
+Section "HerpLog for 32/64-bit systems" HERPLOG_SUB_APP
     # Set the installation directory as the destination for the following actions
     SetOutPath "$INSTDIR"
     
-    # Check if the redistributable(s) are installed or not, and if so, that they are the right version
-    Call  CheckRedistributableInstalledX64
-    Pop $R0
-    ${If} $R0 == "2" # Version currently installed is older than what's provided with the setup wizard
-        File "${MSVC_DIR}\${MSVC_REDIST_X64}"
-        ExecWait '"$INSTDIR\${MSVC_REDIST_X64}" /passive /norestart'
+    ${If} ${RunningX64}
+        # Check if the redistributable(s) are installed or not, and if so, that they are the right version
+        Call  CheckRedistributableInstalledX64
+        Pop $R0
+        ${If} $R0 == "2" # Version currently installed is older than what's provided with the setup wizard
+            File "${MSVC_DIR}\${MSVC_REDIST_X64}"
+            ExecWait '"$INSTDIR\${MSVC_REDIST_X64}" /passive /norestart'
+        ${EndIf}
+        
+        # ADD THE X86_64 HERPLOG FILES HERE...
+    ${Else}
+        Call  CheckRedistributableInstalledX86
+        Pop $R1
+        ${If} $R1 == "2" # Version currently installed is older than what's provided with the setup wizard
+            File "${MSVC_DIR}\${MSVC_REDIST_X86}"
+            ExecWait '"$INSTDIR\${MSVC_REDIST_X86}" /passive /norestart'
+        ${EndIf}
+        
+        # ADD THE X86 HERPLOG FILES HERE...
     ${EndIf}
-    
-    Call  CheckRedistributableInstalledX86
-    Pop $R1
-    ${If} $R1 == "2" # Version currently installed is older than what's provided with the setup wizard
-        File "${MSVC_DIR}\${MSVC_REDIST_X86}"
-        ExecWait '"$INSTDIR\${MSVC_REDIST_X86}" /passive /norestart'
-    ${EndIf}
-    
-    # ADD THE HERPLOG FILES HERE...
     
     # Store installation folder
-    WriteRegStr HKCU "Software\${GK_SETUP_WIZARD_TITLE}" "" $INSTDIR
+    WriteRegStr HKLM "Software\${GK_SETUP_WIZARD_TITLE}" "" $INSTDIR
+    
+    # Write the uninstall keys for Microsoft Windows
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GK_APP_TITLE}" "DisplayName" "${GK_SETUP_WIZARD_TITLE}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GK_APP_TITLE}" "UninstallString" "$INSTDIR\uninstall.exe"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GK_APP_TITLE}" "NoModify" 1
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GK_APP_TITLE}" "NoRepair" 1
     
     # Create the uninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -144,6 +158,25 @@ Section
     # Point the new shortcut at the program uninstaller
     CreateShortCut "$SMPROGRAMS\Uninstall HerpLog.lnk" "$INSTDIR\uninstall.exe"
 SectionEnd
+
+Section "Start Menu Shortcuts" MAIN_APP_SHORTCUTS # Optional section (can be disabled by the user)
+    CreateDirectory "$SMPROGRAMS\${GK_APP_TITLE}"
+    CreateShortcut "$SMPROGRAMS\${GK_APP_TITLE}\Uninstall HerpLog.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+    CreateShortcut "$SMPROGRAMS\${GK_APP_TITLE}\${GK_APP_TITLE}.lnk" "$INSTDIR\herplog.exe" "${GK_HERPLOG_EXE_ICON}" "$INSTDIR\herplog.exe" 0
+SectionEnd
+SubSectionEnd
+
+Function .onSelChange
+    ${If} ${SectionIsSelected} ${MAIN_APP_SHORTCUTS}
+        !insertmacro SetSectionFlag ${MAIN_APP} ${SF_RO}
+        !insertmacro SelectSection ${MAIN_APP}
+        !insertmacro SetSectionFlag ${HERPLOG_SUB_APP} ${SF_RO}
+        !insertmacro SelectSection ${HERPLOG_SUB_APP}
+    ${Else}
+        !insertmacro ClearSectionFlag ${MAIN_APP} ${SF_RO}
+        !insertmacro ClearSectionFlag ${HERPLOG_SUB_APP} ${SF_RO}
+    ${EndIf}
+FunctionEnd
 
 # --------------------------------
 # Descriptions
@@ -159,18 +192,26 @@ LangString DESC_SecDummy ${LANG_ENGLISH} "Description goes here."
 # --------------------------------
 # Uninstaller section
 
-Section "uninstall"
-    # ADD HERPLOG'S FILES HERE...
+Section "Uninstall"
+    # Remove registry keys
+    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GK_APP_TITLE}"
+    DeleteRegKey /ifempty HKLM "SOFTWARE\${GK_SETUP_WIZARD_TITLE}"
 
+    ${If} ${RunningX64}
+        # ADD HerpLog's x86_64 FILES HERE...
+    ${Else}
+        # ADD HerpLog's x86 FILES HERE...
+    ${EndIf}
+    
     # First, delete the uninstaller
     Delete "$INSTDIR\uninstall.exe"
     
-    # Second, remove the link from the start menu
-    Delete "$SMPROGRAMS\Uninstall HerpLog.lnk"
+    # Second, remove the shortcuts from the start menu
+    Delete "$SMPROGRAMS\${GK_APP_TITLE}\*.*"
     
+    # Remove directories used
+    RMDir "$SMPROGRAMS\${GK_APP_TITLE}"
     RMDir "$INSTDIR"
-    
-    DeleteRegKey /ifempty HKCU "Software\${GK_SETUP_WIZARD_TITLE}"
 SectionEnd
 
 # --------------------------------
@@ -263,22 +304,16 @@ Function CheckRedistributableInstalledX64
     ClearErrors
     
     # Try to read the version sub-key to `R0`
-    ReadRegDword $R0 HKLM "Computer\HKEY_CLASSES_ROOT\Installer\Dependencies\,,amd64,14.0,bundle" "Version"
+    ReadRegStr $R0 HKCR "Installer\Dependencies\,,amd64,14.0,bundle" "Version"
     
-    # Was there error or not?
-    IfErrors 0 NoErrors
-    
-    # Error occurred, copy "Error" to R0
-    StrCpy $R0 "Error"
-    
-    NoErrors:
-        ${VersionCheckNew} "$R0" ${MSVC_VERSION} "$R1"
-        ${If} $R1 == "2" # Version currently installed is older than what's provided with the setup wizard
-            StrCpy $R1 $R0
-        ${Else}
-            StrCpy $R0 "0" # Version currently installed is equal or newer to what's provided with the setup wizard
+    ${VersionCheckNew} "$R0" ${MSVC_VERSION} "$R1" # Compare with the version provided with the setup and the installed version on the computer
+    ${If} $R1 == "2" # Version currently installed is older than what's provided with the setup wizard
+        StrCpy $R1 $R0
+    ${Else}
+        StrCpy $R0 "0" # Version currently installed is equal or newer to what's provided with the setup wizard
+    ${EndIf}
             
-        Exch $R0
+    Exch $R0
 FunctionEnd
 
 Function CheckRedistributableInstalledX86
@@ -287,23 +322,16 @@ Function CheckRedistributableInstalledX86
     ClearErrors
     
     # Try to read the version sub-key to `R0`
-    ReadRegDword $R0 HKLM "Computer\HKEY_CLASSES_ROOT\Installer\Dependencies\,,x86,14.0,bundle" "Version"
+    ReadRegStr $R0 HKCR "Installer\Dependencies\,,x86,14.0,bundle" "Version"
     
-    # Was there error or not?
-    IfErrors 0 NoErrors
-    
-    # Error occurred, copy "Error" to R0
-    StrCpy $R0 "Error"
-    
-    NoErrors:
-        ${VersionCheckNew} "$R0" ${MSVC_VERSION} "$R1"
-        ${If} $R1 == "2" # Version currently installed is older than what's provided with the setup wizard
-            StrCpy $R1 $R0
-        ${Else}
-            StrCpy $R0 "0" # Version currently installed is equal or newer to what's provided with the setup wizard
-        ${EndIf}
+    ${VersionCheckNew} "$R0" ${MSVC_VERSION} "$R1" # Compare with the version provided with the setup and the installed version on the computer
+    ${If} $R1 == "2" # Version currently installed is older than what's provided with the setup wizard
+        StrCpy $R1 $R0
+    ${Else}
+        StrCpy $R0 "0" # Version currently installed is equal or newer to what's provided with the setup wizard
+    ${EndIf}
             
-        Exch $R0
+    Exch $R0
 FunctionEnd
 
 # --------------------------------
