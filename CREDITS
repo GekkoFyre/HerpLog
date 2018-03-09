@@ -28,7 +28,7 @@ LevelDB (Windows support) patches by Netzeband
 		Public Domain
 
 C++: Minimalistic CSV Streams by shaovoon
-	<https://www.codeproject.com/Articles/741183/Cplusplus-Minimalistic-CSV-Streams>
+	<https://github.com/shaovoon/minicsv>
 		The MIT License
 
 Snappy by Robert Važan, et al. and Google Inc.

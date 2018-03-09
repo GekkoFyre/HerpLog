@@ -42,6 +42,7 @@
 
 #include "herpapp.hpp"
 #include "ui_herpapp.h"
+#include "gk_about_dialog.hpp"
 #include <boost/exception/all.hpp>
 #include <boost/lexical_cast.hpp>
 #include <QMessageBox>
@@ -226,7 +227,14 @@ void HerpApp::on_action_Documentation_triggered()
 {}
 
 void HerpApp::on_action_About_triggered()
-{}
+{
+    QPointer<GkAboutDialog> aboutDialog = new GkAboutDialog(this);
+    aboutDialog->setWindowFlags(Qt::Window);
+    aboutDialog->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
+    QObject::connect(aboutDialog, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
+    aboutDialog->show();
+    return;
+}
 
 void HerpApp::on_pushButton_archive_next_clicked()
 {
