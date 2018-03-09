@@ -140,7 +140,7 @@ long int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_i
  * @date 2018-02-21
  * @return The information that was retrieved from the database.
  */
-std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::get_record_ids()
+std::unordered_map<std::string, GkRecords::MiscUniqueIds> GkDbRead::get_record_ids()
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -149,15 +149,22 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::g
     std::lock_guard<std::mutex> locker(db_mutex);
     db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_RECORD_ID, &csv_read_data);
 
-    std::unordered_map<std::string, std::pair<std::string, std::string>> cache;
+    std::unordered_map<std::string, GkRecords::MiscUniqueIds> cache;
     if (!csv_read_data.empty()) {
         try {
             csv::istringstream iss(csv_read_data);
             iss.set_delimiter(',', "$$");
-            std::string record_id, species_id, name_id;
+            std::string record_id;
+            GkRecords::MiscUniqueIds unique_ids;
             while (iss.read_line()) {
-                iss >> record_id >> species_id >> name_id;
-                cache.insert(std::make_pair(record_id, std::make_pair(species_id, name_id)));
+                iss >> record_id >> unique_ids.licensee_id >> unique_ids.species_id >> unique_ids.name_id;
+
+                if ((!record_id.empty()) && (!unique_ids.licensee_id.empty()) && (!unique_ids.species_id.empty()) &&
+                        (!unique_ids.name_id.empty())) {
+                    cache.insert(std::make_pair(record_id, unique_ids));
+                } else {
+                    throw std::invalid_argument(tr("An error had occurred whilst obtaining information about stored-keys from the database!").toStdString());
+                }
             }
         } catch (const std::exception &e) {
             QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);

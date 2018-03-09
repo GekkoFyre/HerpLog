@@ -92,21 +92,35 @@ namespace GekkoFyre {
         constexpr char LEVELDB_STORE_SPECIES_ID[] = "store_species_id";
         constexpr char LEVELDB_STORE_NAME_ID[] = "store_name_id";
 
+        enum comboBoxType {
+            AddRecord,
+            ViewRecords,
+            ViewCharts
+        };
+
+        struct GkLicensee {
+            std::string licensee_id;        // The licensee Unique ID, for database purposes
+            std::string licensee_name;      // The licensee's serial-number/identifier/name/etc.
+        };
+
         struct GkSpecies {
-            std::string species_id;         // The species Unique ID
+            std::string species_id;         // The species Unique ID, for database purposes
             std::string species_name;       // The species of the animal/lizard in question
+            comboBoxType comboBox_type;
         };
 
         struct GkId {
-            std::string name_id;            // Self-explanatory
+            std::string name_id;            // Self-explanatory, for database purposes
             std::string identifier_str;     // The identifier as a string, for the animal/lizard in question
+            comboBoxType comboBox_type;
         };
 
         struct GkSubmit {
-            std::string record_id;          // The Unique Identifier for the entire record in question
+            std::string record_id;          // The Unique Identifier for the entire record in question, for database purposes
             std::time_t date_time;          // The epoch at the time of submitting/modifying this record
+            GkLicensee licensee;            // The licensee in regard to this record in question
             GkSpecies species;              // The species of the animal/lizard in question
-            GkId identifier;                // The identifier as a string, for the animal/lizard in question
+            GkId identifier;                // The identifier, for the animal/lizard in question
             std::string further_notes;      // Any further notes, usually as one, long std::string
             std::string vitamin_notes;      // Any extra notes about the lizard's vitamin intake
             std::string toilet_notes;       // Any extra notes about the lizard's bathroom habits
@@ -118,16 +132,16 @@ namespace GekkoFyre {
             double weight;                  // The weight of the lizard in question
         };
 
+        struct MiscUniqueIds {
+            std::string licensee_id;        // The licensee Unique ID, for database purposes
+            std::string species_id;         // The species Unique ID, for database purposes
+            std::string name_id;            // Self-explanatory, for database purposes
+        };
+
         enum MiscRecordType {
             gkLicensee,
             gkSpecies,
             gkId
-        };
-
-        enum comboBoxType {
-            AddRecord,
-            ViewRecords,
-            ViewCharts
         };
 
         namespace GkGraph {

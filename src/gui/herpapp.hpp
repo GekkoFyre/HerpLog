@@ -116,14 +116,19 @@ private:
     Ui::HerpApp *ui;
 
     bool remove_files(const fs::path &tmpDirLoc);
-    bool submit_record();
     void refresh_caches();
     void find_date_ranges();
+
+    std::string find_licensee_id(const int &index_no);
+    std::string find_species_id();
+    std::list<std::string> find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id);
+    std::list<std::string> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id);
+
+    bool submit_record();
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
-    std::list<std::string> find_species_types(const GkRecords::comboBoxType &dropbox_type, const int &index_no);
-    std::list<std::string> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const int &index_no);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
+
     void insert_charts();
     void update_charts(const std::string &name_id);
 
@@ -140,13 +145,18 @@ private:
     long int minDateTime;
     long int maxDateTime;
 
-    std::unordered_map<std::string, std::pair<std::string, std::string>> record_id_cache;
+    std::unordered_map<std::string, GkRecords::MiscUniqueIds> record_id_cache;
     std::list<std::string> archive_records;
-    QMultiMap<std::string, std::pair<std::string, int>> species_cache; // <Key: Species ID, Value: <Species Name, Index No.>>
+    QMultiMap<std::string, std::pair<std::string, int>> licensee_cache; // <Key: Licensee ID, Value: <Licensee Name, Index No.>>
+    QMultiMap<std::string, std::pair<std::string, int>> species_cache; // <Key: Licensee ID, Value: <Species ID, Index No.>>
     QMultiMap<std::string, std::pair<std::string, int>> animal_cache; // <Key: Species ID, Value <Animal ID, Index No.>>
     // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
     // the `Previous Record` button is pressed.
     std::list<std::string> viewed_records;
+
+    // Cached values for the comboBox selections
+    std::list<GkRecords::GkSpecies> comboBox_species;
+    std::list<GkRecords::GkId> comboBox_animals;
 
     QMultiMap<long int, GkRecords::GkGraph::WeightVsTime> weight_measurements; // The key is QDateTime
     QPointer<QLineSeries> line_series_weight;

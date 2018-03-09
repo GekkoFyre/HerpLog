@@ -70,7 +70,8 @@ public:
 
     void add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id,
                            const std::string &value);
-    bool add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id);
+    bool add_record_id(const std::string &unique_id, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
+                       const GkRecords::GkId &id);
     std::string create_unique_id();
 
 private:

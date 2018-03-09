@@ -209,9 +209,14 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
  * @brief GkDbWrite::add_record_id Adds a new Unique Identifier for the record in question to the Google LevelDB database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
+ * @param unique_id The unique Record ID tieing all the separate database entries/keys together.
+ * @param licensee The licensee in regard to this record in question.
+ * @param species The species of the animal/lizard in question.
+ * @param id The identifier, for the animal/lizard in question.
  * @return Whether the process was a success or not.
  */
-bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id)
+bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
+                              const GkRecords::GkId &id)
 {
     using namespace GkRecords;
 
@@ -219,18 +224,24 @@ bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkS
         std::ostringstream oss;
         auto record_cache = gkDbRead->get_record_ids();
         for (const auto &record: record_cache) {
-            oss << record.first << "," << record.second.first << "," << record.second.second << std::endl;
+            oss << record.first << "," << record.second.licensee_id << "," << record.second.species_id << ","
+                << record.second.name_id << std::endl;
         }
 
         // Now we insert the new UUID alongside with its value
-        oss << unique_id << "," << species.species_id << "," << id.name_id << std::endl;
+        oss << unique_id << "," << licensee.licensee_id << "," << species.species_id << "," << id.name_id << std::endl;
+
+        if (!licensee.licensee_id.empty() && !licensee.licensee_name.empty()) {
+            // We have a new entry for the Licensee sub-record!
+            add_misc_key_vals(MiscRecordType::gkLicensee, licensee.licensee_id, licensee.licensee_name);
+        }
 
         if (!species.species_name.empty() && !species.species_id.empty()) {
             // We have a new entry for the Species sub-record!
             add_misc_key_vals(MiscRecordType::gkSpecies, species.species_id, species.species_name);
         }
 
-        if (!id.identifier_str.empty()) {
+        if (!id.name_id.empty() && !id.identifier_str.empty()) {
             // We have a new entry for the Name/ID# sub-record!
             add_misc_key_vals(MiscRecordType::gkId, id.name_id, id.identifier_str);
         }
