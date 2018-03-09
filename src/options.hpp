@@ -95,7 +95,8 @@ namespace GekkoFyre {
         enum comboBoxType {
             AddRecord,
             ViewRecords,
-            ViewCharts
+            ViewCharts,
+            All
         };
 
         struct GkLicensee {

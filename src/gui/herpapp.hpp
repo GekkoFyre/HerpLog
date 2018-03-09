@@ -121,8 +121,8 @@ private:
 
     std::string find_licensee_id(const int &index_no);
     std::string find_species_id();
-    std::list<std::string> find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id);
-    std::list<std::string> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id);
+    std::list<GkRecords::GkSpecies> find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id);
+    std::list<GkRecords::GkId> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id);
 
     bool submit_record();
     std::string browse_records(const std::list<std::string> &records, const bool &forward);

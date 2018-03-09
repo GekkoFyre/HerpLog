@@ -470,10 +470,16 @@ void HerpApp::refresh_caches()
 
         auto licensee_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkLicensee);
         if (!licensee_temp_cache.empty()) {
-            licensee_temp_cache.clear();
+            licensee_cache.clear();
+            ui->comboBox_existing_license_id->clear();
+            ui->comboBox_view_records_licensee->clear();
+            ui->comboBox_view_charts_select_licensee->clear();
             int counter = 0;
             for (auto it = licensee_temp_cache.begin(); it != licensee_temp_cache.end(); ++it) {
                 licensee_cache.insertMulti(it.key(), std::make_pair(it.value(), counter));
+                ui->comboBox_existing_license_id->insertItem(counter, QString::fromStdString(it.value()));
+                ui->comboBox_view_records_licensee->insertItem(counter, QString::fromStdString(it.value()));
+                ui->comboBox_view_charts_select_licensee->insertItem(counter, QString::fromStdString(it.value()));
                 ++counter;
             }
         }
@@ -512,6 +518,19 @@ void HerpApp::refresh_caches()
 
             minDateTime = gkDbRead->determineMinimumDate(record_ids);
             maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+
+            if (!comboBox_species.empty()) {
+                comboBox_species.clear();
+            }
+
+            if (!comboBox_animals.empty()) {
+                comboBox_animals.clear();
+            }
+
+            if ((!licensee_cache.empty()) && (!species_cache.empty()) && (!animal_cache.empty())) {
+                std::string license_id = find_licensee_id(0);
+                comboBox_species = find_species_names(GkRecords::comboBoxType::All, license_id);
+            }
 
             if (!caches_enabled) {
                 caches_enabled = true;
@@ -633,67 +652,73 @@ std::string HerpApp::find_species_id()
  * @param licensee_id The unique Licensee ID that is attached to the Species Names in question.
  * @return A list of Species IDs that correspond to the given licensee.
  */
-std::list<std::string> HerpApp::find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id)
+std::list<GkRecords::GkSpecies> HerpApp::find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id)
 {
     try {
-        std::list<std::string> output; // A list of Species IDs that correspond to the given licensee.
-        std::vector<GkRecords::GkSpecies> species_vec;
-        int counter = 0;
-        for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
-            if (it.key() == licensee_id) {
-                std::string species_id = it.value().first;
-                GkRecords::GkSpecies species;
-                output.push_back(species_id);
-                species.species_id = species_id;
-
-                switch (dropbox_type) {
-                    case GkRecords::comboBoxType::AddRecord:
-                        ui->comboBox_existing_species->insertItem(counter, QString::fromStdString(species_id));
-                        species.comboBox_type = GkRecords::comboBoxType::AddRecord;
-                        species_vec.push_back(species);
-                        ++counter;
-                        break;
-                    case GkRecords::comboBoxType::ViewRecords:
-                        ui->comboBox_view_records_species->insertItem(counter, QString::fromStdString(species_id));
-                        species.comboBox_type = GkRecords::comboBoxType::ViewRecords;
-                        species_vec.push_back(species);
-                        ++counter;
-                        break;
-                    case GkRecords::comboBoxType::ViewCharts:
-                        ui->comboBox_view_charts_select_species->insertItem(counter, QString::fromStdString(species_id));
-                        species.comboBox_type = GkRecords::comboBoxType::ViewCharts;
-                        species_vec.push_back(species);
-                        ++counter;
-                        break;
-                    default:
-                        throw std::runtime_error(tr("An error occurred whilst filling a comboBox with info from the database!").toStdString());
-                }
-            }
-        }
-
-        if (!comboBox_species.empty()) {
-            comboBox_species.clear();
-        }
+        ui->comboBox_existing_species->clear();
+        ui->comboBox_view_records_species->clear();
+        ui->comboBox_view_charts_select_species->clear();
 
         auto tmp_species_db = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
-        for (auto it = tmp_species_db.begin(); it != tmp_species_db.end(); ++it) {
-            for (const auto &id: species_vec) {
-                if (it.key() == id.species_id) {
+        std::list<GkRecords::GkSpecies> output; // A list of Species Data that correspond to the given licensee.
+        int counter = 0;
+        if (!licensee_id.empty()) {
+            for (auto it_ca = species_cache.begin(); it_ca != species_cache.end(); ++it_ca) {
+                if (it_ca.key() == licensee_id) {
+                    std::string species_id = it_ca.value().first;
                     GkRecords::GkSpecies species;
-                    species.species_id = id.species_id;
-                    species.species_name = it.value();
-                    species.comboBox_type = id.comboBox_type;
-                    comboBox_species.push_back(species); // Cached values for the comboBox selections
+                    species.species_id = species_id;
+
+                    for (auto it_tmp = tmp_species_db.begin(); it_tmp != tmp_species_db.end(); ++it_tmp) {
+                        if (it_tmp.key() == species_id) {
+                            switch (dropbox_type) {
+                                case GkRecords::comboBoxType::AddRecord:
+                                    ui->comboBox_existing_species->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    species.species_name = it_tmp.value();
+                                    species.comboBox_type = GkRecords::comboBoxType::AddRecord;
+                                    output.push_back(species);
+                                    ++counter;
+                                    break;
+                                case GkRecords::comboBoxType::ViewRecords:
+                                    ui->comboBox_view_records_species->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    species.species_name = it_tmp.value();
+                                    species.comboBox_type = GkRecords::comboBoxType::ViewRecords;
+                                    output.push_back(species);
+                                    ++counter;
+                                    break;
+                                case GkRecords::comboBoxType::ViewCharts:
+                                    ui->comboBox_view_charts_select_species->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    species.species_name = it_tmp.value();
+                                    species.comboBox_type = GkRecords::comboBoxType::ViewCharts;
+                                    output.push_back(species);
+                                    ++counter;
+                                    break;
+                                case GkRecords::comboBoxType::All:
+                                    ui->comboBox_existing_species->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    ui->comboBox_view_records_species->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    ui->comboBox_view_charts_select_species->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    species.species_name = it_tmp.value();
+                                    species.comboBox_type = GkRecords::comboBoxType::All;
+                                    output.push_back(species);
+                                    ++counter;
+                                    break;
+                                default:
+                                    throw std::runtime_error(tr("An error occurred whilst filling a comboBox with info from the database!").toStdString());
+                            }
+
+                            break;
+                        }
+                    }
                 }
             }
-        }
 
-        return output;
+            return output;
+        }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
 
-    return std::list<std::string>();
+    return std::list<GkRecords::GkSpecies>();
 }
 
 /**
@@ -706,67 +731,71 @@ std::list<std::string> HerpApp::find_species_names(const GkRecords::comboBoxType
  * @param species_id The unique Species ID that is attached to the Animal Names in question.
  * @return A list of Animal IDs that correspond to the given species.
  */
-std::list<std::string> HerpApp::find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id)
+std::list<GkRecords::GkId> HerpApp::find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id)
 {
     try {
-        std::list<std::string> output; // A list of Animal IDs that correspond to the given species.
-        std::vector<GkRecords::GkId> animal_vec;
+        ui->comboBox_existing_id->clear();
+        ui->comboBox_view_records_animal_name->clear();
+        ui->comboBox_view_charts_select_id->clear();
+
+        std::list<GkRecords::GkId> output; // A list of Animal IDs that correspond to the given species.
         int counter = 0;
-        for (auto it = animal_cache.begin(); it != animal_cache.end(); ++it) {
-            if (it.key() == species_id) {
-                std::string animal_id = it.value().first;
-                GkRecords::GkId animal;
-                output.push_back(animal_id);
-                animal.name_id = animal_id;
-
-                switch (dropbox_type) {
-                    case GkRecords::comboBoxType::AddRecord:
-                        ui->comboBox_existing_id->insertItem(counter, QString::fromStdString(animal_id));
-                        animal.comboBox_type = GkRecords::comboBoxType::AddRecord;
-                        animal_vec.push_back(animal);
-                        ++counter;
-                        break;
-                    case GkRecords::comboBoxType::ViewRecords:
-                        ui->comboBox_view_records_animal_name->insertItem(counter, QString::fromStdString(animal_id));
-                        animal.comboBox_type = GkRecords::comboBoxType::ViewRecords;
-                        animal_vec.push_back(animal);
-                        ++counter;
-                        break;
-                    case GkRecords::comboBoxType::ViewCharts:
-                        ui->comboBox_view_charts_select_id->insertItem(counter, QString::fromStdString(animal_id));
-                        animal.comboBox_type = GkRecords::comboBoxType::ViewCharts;
-                        animal_vec.push_back(animal);
-                        ++counter;
-                        break;
-                    default:
-                        throw std::runtime_error(tr("An error occurred whilst filling a comboBox with info from the database!").toStdString());
-                }
-            }
-        }
-
-        if (!comboBox_animals.empty()) {
-            comboBox_animals.clear();
-        }
-
-        auto tmp_animals_db = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
-        for (auto it = tmp_animals_db.begin(); it != tmp_animals_db.end(); ++it) {
-            for (const auto &id: animal_vec) {
-                if (it.key() == id.name_id) {
+        if (!species_id.empty()) {
+            for (auto it_ca = animal_cache.begin(); it_ca != animal_cache.end(); ++it_ca) {
+                if (it_ca.key() == species_id) {
+                    std::string animal_id = it_ca.value().first;
                     GkRecords::GkId animal;
-                    animal.name_id = id.name_id;
-                    animal.identifier_str = it.value();
-                    animal.comboBox_type = id.comboBox_type;
-                    comboBox_animals.push_back(animal); // Cached values for the comboBox selections
+                    animal.name_id = animal_id;
+
+                    auto tmp_animals_db = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
+                    for (auto it_tmp = tmp_animals_db.begin(); it_tmp != tmp_animals_db.end(); ++it_tmp) {
+                        if (it_tmp.key() == animal_id) {
+                            switch (dropbox_type) {
+                                case GkRecords::comboBoxType::AddRecord:
+                                    ui->comboBox_existing_id->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    animal.identifier_str = it_tmp.value();
+                                    animal.comboBox_type = GkRecords::comboBoxType::AddRecord;
+                                    output.push_back(animal);
+                                    ++counter;
+                                    break;
+                                case GkRecords::comboBoxType::ViewRecords:
+                                    ui->comboBox_view_records_animal_name->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    animal.identifier_str = it_tmp.value();
+                                    animal.comboBox_type = GkRecords::comboBoxType::ViewRecords;
+                                    output.push_back(animal);
+                                    ++counter;
+                                    break;
+                                case GkRecords::comboBoxType::ViewCharts:
+                                    ui->comboBox_view_charts_select_id->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    animal.identifier_str = it_tmp.value();
+                                    animal.comboBox_type = GkRecords::comboBoxType::ViewCharts;
+                                    output.push_back(animal);
+                                    ++counter;
+                                    break;
+                                case GkRecords::comboBoxType::All:
+                                    ui->comboBox_existing_id->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    ui->comboBox_view_records_animal_name->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    ui->comboBox_view_charts_select_id->insertItem(counter, QString::fromStdString(it_tmp.value()));
+                                    animal.identifier_str = it_tmp.value();
+                                    animal.comboBox_type = GkRecords::comboBoxType::All;
+                                    output.push_back(animal);
+                                    ++counter;
+                                    break;
+                                default:
+                                    throw std::runtime_error(tr("An error occurred whilst filling a comboBox with info from the database!").toStdString());
+                            }
+                        }
+                    }
                 }
             }
-        }
 
-        return output;
+            return output;
+        }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
 
-    return std::list<std::string>();
+    return std::list<GkRecords::GkId>();
 }
 
 void HerpApp::archive_clear_forms()
