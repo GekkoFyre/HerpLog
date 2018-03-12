@@ -308,7 +308,8 @@ void HerpApp::on_comboBox_view_charts_select_licensee_currentIndexChanged(int in
 {
     if (!licensee_cache.empty()) {
         std::string license_id = find_comboBox_id(GkRecords::MiscRecordType::gkLicensee, GkRecords::comboBoxType::ViewCharts, index);
-        record_species_index(find_species_names(GkRecords::comboBoxType::ViewCharts, license_id), GkRecords::comboBoxType::ViewCharts);
+        auto species_index = find_species_names(GkRecords::comboBoxType::ViewCharts, license_id);
+        record_species_index(species_index, GkRecords::comboBoxType::ViewCharts);
         comboBox_view_graphs_licensee_sel = index;
         emit on_comboBox_view_charts_select_species_currentIndexChanged(index);
     }
@@ -321,7 +322,8 @@ void HerpApp::on_comboBox_view_charts_select_species_currentIndexChanged(int ind
         for (const auto &species: comboBox_species) {
             if (species.comboBox.comboBox_type == GkRecords::ViewCharts) {
                 if (species.comboBox.index_no == index) {
-                    record_animals_index(find_animal_names(GkRecords::comboBoxType::ViewCharts, species.species_id), GkRecords::comboBoxType::ViewCharts);
+                    auto animals_index = find_animal_names(GkRecords::comboBoxType::ViewCharts, species.species_id);
+                    record_animals_index(animals_index, GkRecords::comboBoxType::ViewCharts);
                     break;
                 }
             }
@@ -340,7 +342,8 @@ void HerpApp::on_comboBox_existing_license_id_currentIndexChanged(int index)
 {
     if (!licensee_cache.empty()) {
         std::string license_id = find_comboBox_id(GkRecords::MiscRecordType::gkLicensee, GkRecords::comboBoxType::AddRecord, index);
-        record_species_index(find_species_names(GkRecords::comboBoxType::AddRecord, license_id), GkRecords::comboBoxType::AddRecord);
+        auto species_index = find_species_names(GkRecords::comboBoxType::AddRecord, license_id);
+        record_species_index(species_index, GkRecords::comboBoxType::AddRecord);
         comboBox_add_records_licensee_sel = index;
         emit on_comboBox_existing_species_currentIndexChanged(index);
     }
@@ -353,7 +356,8 @@ void HerpApp::on_comboBox_existing_species_currentIndexChanged(int index)
         for (const auto &species: comboBox_species) {
             if (species.comboBox.comboBox_type == GkRecords::AddRecord) {
                 if (species.comboBox.index_no == index) {
-                    record_animals_index(find_animal_names(GkRecords::comboBoxType::AddRecord, species.species_id), GkRecords::comboBoxType::AddRecord);
+                    auto animals_index = find_animal_names(GkRecords::comboBoxType::AddRecord, species.species_id);
+                    record_animals_index(animals_index, GkRecords::comboBoxType::AddRecord);
                     break;
                 }
             }
@@ -372,7 +376,8 @@ void HerpApp::on_comboBox_view_records_licensee_currentIndexChanged(int index)
 {
     if (!licensee_cache.empty()) {
         std::string license_id = find_comboBox_id(GkRecords::MiscRecordType::gkLicensee, GkRecords::comboBoxType::ViewRecords, index);
-        record_species_index(find_species_names(GkRecords::comboBoxType::ViewRecords, license_id), GkRecords::comboBoxType::ViewRecords);
+        auto species_index = find_species_names(GkRecords::comboBoxType::ViewRecords, license_id);
+        record_species_index(species_index, GkRecords::comboBoxType::ViewRecords);
         emit on_comboBox_view_records_species_currentIndexChanged(index);
     }
 }
@@ -383,7 +388,8 @@ void HerpApp::on_comboBox_view_records_species_currentIndexChanged(int index)
         for (const auto &species: comboBox_species) {
             if (species.comboBox.comboBox_type == GkRecords::ViewRecords) {
                 if (species.comboBox.index_no == index) {
-                    record_animals_index(find_animal_names(GkRecords::comboBoxType::ViewRecords, species.species_id), GkRecords::comboBoxType::ViewRecords);
+                    auto animals_index = find_animal_names(GkRecords::comboBoxType::ViewRecords, species.species_id);
+                    record_animals_index(animals_index, GkRecords::comboBoxType::ViewRecords);
                     break;
                 }
             }
@@ -570,23 +576,25 @@ void HerpApp::refresh_caches()
                     record_ids.push_back(ids.first);
                 }
 
-                auto species_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
-                if (!species_temp_cache.empty()) {
-                    int counter = 0;
-                    for (auto it = species_temp_cache.begin(); it != species_temp_cache.end(); ++it) {
-                        if (it.key() == ids.second.species_id) {
-                            species_cache.insertMulti(ids.second.licensee_id, std::make_pair(ids.second.species_id, counter));
-                            ++counter;
+                if (!species_cache.contains(ids.second.licensee_id, ids.second.species_id)) {
+                    auto species_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
+                    if (!species_temp_cache.empty()) {
+                        for (auto it = species_temp_cache.begin(); it != species_temp_cache.end(); ++it) {
+                            if (it.key() == ids.second.species_id) {
+                                species_cache.insertMulti(ids.second.licensee_id, ids.second.species_id);
+                                break;
+                            }
                         }
                     }
                 }
 
-                if (!animal_temp_cache.empty()) {
-                    int counter = 0;
-                    for (auto it = animal_temp_cache.begin(); it != animal_temp_cache.end(); ++it) {
-                        if (it.key() == ids.second.name_id) {
-                            animal_cache.insertMulti(ids.second.species_id, std::make_pair(ids.second.name_id, counter));
-                            ++counter;
+                if (!animal_cache.contains(ids.second.species_id, ids.second.name_id)) {
+                    if (!animal_temp_cache.empty()) {
+                        for (auto it = animal_temp_cache.begin(); it != animal_temp_cache.end(); ++it) {
+                            if (it.key() == ids.second.name_id) {
+                                animal_cache.insertMulti(ids.second.species_id, ids.second.name_id);
+                                break;
+                            }
                         }
                     }
                 }
@@ -751,7 +759,7 @@ std::list<GkRecords::GkSpecies> HerpApp::find_species_names(const GkRecords::com
         if ((!licensee_id.empty()) && (!species_cache.empty())) {
             for (auto it_ca = species_cache.begin(); it_ca != species_cache.end(); ++it_ca) {
                 if (it_ca.key() == licensee_id) {
-                    std::string species_id = it_ca.value().first;
+                    std::string species_id = it_ca.value();
                     GkRecords::GkSpecies species;
                     species.species_id = species_id;
 
@@ -831,7 +839,7 @@ std::list<GkRecords::GkId> HerpApp::find_animal_names(const GkRecords::comboBoxT
         if ((!species_id.empty()) && (!animal_cache.empty())) {
             for (auto it_ca = animal_cache.begin(); it_ca != animal_cache.end(); ++it_ca) {
                 if (it_ca.key() == species_id) {
-                    std::string animal_id = it_ca.value().first;
+                    std::string animal_id = it_ca.value();
                     GkRecords::GkId animal;
                     animal.name_id = animal_id;
 
@@ -1131,7 +1139,7 @@ void HerpApp::update_charts(const std::string &name_id)
 
                                 for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
                                     if (species_struct.species_id == it.key()) {
-                                        species_struct.species_name = it.value().first;
+                                        species_struct.species_name = it.value();
                                     }
                                 }
 

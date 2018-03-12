@@ -153,8 +153,8 @@ private:
     std::unordered_map<std::string, GkRecords::MiscUniqueIds> record_id_cache;
     std::list<std::string> archive_records;
     QMultiMap<std::string, std::pair<std::string, int>> licensee_cache; // <Key: Licensee ID, Value: <Licensee Name, Index No.>>
-    QMultiMap<std::string, std::pair<std::string, int>> species_cache; // <Key: Licensee ID, Value: <Species ID, Index No.>>
-    QMultiMap<std::string, std::pair<std::string, int>> animal_cache; // <Key: Species ID, Value <Animal ID, Index No.>>
+    QMultiMap<std::string, std::string> species_cache; // <Key: Licensee ID, Value: Species ID>
+    QMultiMap<std::string, std::string> animal_cache; // <Key: Species ID, Value: Animal ID>
     // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
     // the `Previous Record` button is pressed.
     std::list<std::string> viewed_records;
