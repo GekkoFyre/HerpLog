@@ -140,7 +140,7 @@ long int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_i
  * @date 2018-02-21
  * @return The information that was retrieved from the database.
  */
-std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::get_record_ids()
+std::unordered_map<std::string, GkRecords::MiscUniqueIds> GkDbRead::get_record_ids()
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -149,15 +149,22 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::g
     std::lock_guard<std::mutex> locker(db_mutex);
     db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_RECORD_ID, &csv_read_data);
 
-    std::unordered_map<std::string, std::pair<std::string, std::string>> cache;
+    std::unordered_map<std::string, GkRecords::MiscUniqueIds> cache;
     if (!csv_read_data.empty()) {
         try {
             csv::istringstream iss(csv_read_data);
             iss.set_delimiter(',', "$$");
-            std::string record_id, species_id, name_id;
+            std::string record_id;
+            GkRecords::MiscUniqueIds unique_ids;
             while (iss.read_line()) {
-                iss >> record_id >> species_id >> name_id;
-                cache.insert(std::make_pair(record_id, std::make_pair(species_id, name_id)));
+                iss >> record_id >> unique_ids.licensee_id >> unique_ids.species_id >> unique_ids.name_id;
+
+                if ((!record_id.empty()) && (!unique_ids.licensee_id.empty()) && (!unique_ids.species_id.empty()) &&
+                        (!unique_ids.name_id.empty())) {
+                    cache.insert(std::make_pair(record_id, unique_ids));
+                } else {
+                    throw std::invalid_argument(tr("An error had occurred whilst obtaining information about stored-keys from the database!").toStdString());
+                }
             }
         } catch (const std::exception &e) {
             QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
@@ -172,61 +179,51 @@ std::unordered_map<std::string, std::pair<std::string, std::string>> GkDbRead::g
  * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
+ * @param struc_type Whether to get data from `store_species_id` or `store_name_id` within the Google LevelDB database.
  * @return The information that was retrieved from the database; <Key: Species ID/Name ID, Value: Species Name/Name Value>
  */
-QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::StrucType &struc_type)
+QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::MiscRecordType &struc_type)
 {
-    leveldb::ReadOptions read_opt;
-    read_opt.verify_checksums = true;
+    try {
+        leveldb::ReadOptions read_opt;
+        read_opt.verify_checksums = true;
 
-    std::string csv_read_data;
-    std::lock_guard<std::mutex> locker(db_mutex);
+        std::string csv_read_data;
+        std::lock_guard<std::mutex> locker(db_mutex);
 
-    QMultiMap<std::string, std::string> cache;
+        QMultiMap<std::string, std::string> cache;
 
-    switch (struc_type) {
-        case GkRecords::StrucType::gkSpecies:
-            db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_SPECIES_ID, &csv_read_data);
+        switch (struc_type) {
+            case GkRecords::MiscRecordType::gkLicensee:
+                db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_LICENSEE_ID, &csv_read_data);
+                break;
+            case GkRecords::MiscRecordType::gkSpecies:
+                db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_SPECIES_ID, &csv_read_data);
+                break;
+            case GkRecords::MiscRecordType::gkId:
+                db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_NAME_ID, &csv_read_data);
+                break;
+            default:
+                throw std::invalid_argument(tr("Unable to read Unique Identifier from database!").toStdString());
+        }
 
-            if (!csv_read_data.empty()) {
-                try {
-                    csv::istringstream iss(csv_read_data);
-                    iss.set_delimiter(',', "$$");
-                    std::string species_id, species_name;
+        if (!csv_read_data.empty()) {
+            csv::istringstream iss(csv_read_data);
+            iss.set_delimiter(',', "$$");
+            std::string id, name;
 
-                    while (iss.read_line()) {
-                        iss >> species_id >> species_name;
-                        cache.insertMulti(species_id, species_name);
-                    }
-                } catch (const std::exception &e) {
-                    QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
-                }
+            while (iss.read_line()) {
+                iss >> id >> name;
+                cache.insertMulti(id, name);
             }
+        }
 
-            break;
-        case GkRecords::StrucType::gkId:
-            db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_NAME_ID, &csv_read_data);
-
-            if (!csv_read_data.empty()) {
-                try {
-                    csv::istringstream iss(csv_read_data);
-                    iss.set_delimiter(',', "$$");
-                    std::string name_id, identity_str;
-                    while (iss.read_line()) {
-                        iss >> name_id >> identity_str;
-                        cache.insertMulti(name_id, identity_str);
-                    }
-                } catch (const std::exception &e) {
-                    QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
-                }
-            }
-
-            break;
-        default:
-            throw std::invalid_argument(tr("Unable to read Unique Identifier from database! This should not happen!").toStdString());
+        return cache;
+    } catch (const std::exception &e) {
+        QMessageBox::warning(nullptr, tr("Error!"), tr("Unable to read Unique Identifier from database! Error:\n\n%1").arg(e.what()), QMessageBox::Ok);
     }
 
-    return cache;
+    return QMultiMap<std::string, std::string>();
 }
 
 /**

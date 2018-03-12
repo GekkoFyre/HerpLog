@@ -130,12 +130,12 @@ void GkDbWrite::del_item_db(const std::string &record_id, const std::string &key
  * database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @param struc_type Whether we are adding a key for the Species or Name/ID sub-record.
+ * @param struc_type Whether to add data to `store_species_id` or `store_name_id` within the Google LevelDB database.
  * @param unique_id The Unique Identifier itself, usually a UUID in this case.
  * @param value The value to be stored alongside the UUID.
  * @return Whether the process was a success or not.
  */
-void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const std::string &unique_id,
+void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id,
                              const std::string &value)
 {
     std::ostringstream oss;
@@ -147,9 +147,24 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
     std::lock_guard<std::mutex> locker(create_key_mutex);
 
     switch (struc_type) {
-        case StrucType::gkSpecies:
+        case MiscRecordType::gkLicensee:
         {
-            auto species_cache = gkDbRead->get_misc_key_vals(StrucType::gkSpecies);
+            auto licensee_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkLicensee);
+            for (auto it = licensee_cache.begin(); it != licensee_cache.end(); ++it) {
+                oss << it.key() << "," << it.value() << std::endl;
+            }
+
+            // Now we insert the new UUID alongside with its value
+            oss << unique_id << "," << value << std::endl;
+
+            batch.Delete(LEVELDB_STORE_LICENSEE_ID);
+            batch.Put(LEVELDB_STORE_LICENSEE_ID, oss.str());
+        }
+
+            break;
+        case MiscRecordType::gkSpecies:
+        {
+            auto species_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkSpecies);
             for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
                 oss << it.key() << "," << it.value() << std::endl;
             }
@@ -162,9 +177,9 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
         }
 
             break;
-        case StrucType::gkId:
+        case MiscRecordType::gkId:
         {
-            auto id_cache = gkDbRead->get_misc_key_vals(StrucType::gkId);
+            auto id_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkId);
             for (auto it = id_cache.begin(); it != id_cache.end(); ++it) {
                 oss << it.key() << "," << it.value() << std::endl;
             }
@@ -178,7 +193,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
 
             break;
         default:
-            throw std::invalid_argument(tr("Unable to read Unique Identifier from database! This should not happen!").toStdString());
+            throw std::invalid_argument(tr("Unable to read Unique Identifier from database!").toStdString());
     }
 
     leveldb::Status s;
@@ -194,9 +209,14 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::StrucType &struc_type, const 
  * @brief GkDbWrite::add_record_id Adds a new Unique Identifier for the record in question to the Google LevelDB database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
+ * @param unique_id The unique Record ID tieing all the separate database entries/keys together.
+ * @param licensee The licensee in regard to this record in question.
+ * @param species The species of the animal/lizard in question.
+ * @param id The identifier, for the animal/lizard in question.
  * @return Whether the process was a success or not.
  */
-bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkSpecies &species, const GkRecords::GkId &id)
+bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
+                              const GkRecords::GkId &id)
 {
     using namespace GkRecords;
 
@@ -204,20 +224,26 @@ bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkS
         std::ostringstream oss;
         auto record_cache = gkDbRead->get_record_ids();
         for (const auto &record: record_cache) {
-            oss << record.first << "," << record.second.first << "," << record.second.second << std::endl;
+            oss << record.first << "," << record.second.licensee_id << "," << record.second.species_id << ","
+                << record.second.name_id << std::endl;
         }
 
         // Now we insert the new UUID alongside with its value
-        oss << unique_id << "," << species.species_id << "," << id.name_id << std::endl;
+        oss << unique_id << "," << licensee.licensee_id << "," << species.species_id << "," << id.name_id << std::endl;
+
+        if (!licensee.licensee_id.empty() && !licensee.licensee_name.empty()) {
+            // We have a new entry for the Licensee sub-record!
+            add_misc_key_vals(MiscRecordType::gkLicensee, licensee.licensee_id, licensee.licensee_name);
+        }
 
         if (!species.species_name.empty() && !species.species_id.empty()) {
             // We have a new entry for the Species sub-record!
-            add_misc_key_vals(StrucType::gkSpecies, species.species_id, species.species_name);
+            add_misc_key_vals(MiscRecordType::gkSpecies, species.species_id, species.species_name);
         }
 
-        if (!id.identifier_str.empty()) {
+        if (!id.name_id.empty() && !id.identifier_str.empty()) {
             // We have a new entry for the Name/ID# sub-record!
-            add_misc_key_vals(StrucType::gkId, id.name_id, id.identifier_str);
+            add_misc_key_vals(MiscRecordType::gkId, id.name_id, id.identifier_str);
         }
 
         leveldb::WriteOptions write_options;

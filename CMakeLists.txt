@@ -5,7 +5,7 @@
  ##   compiling with the appropriate tools.
  ##
  ##
- ##   Copyright (C) 2017. GekkoFyre.
+ ##   Copyright (C) 2017-2018. GekkoFyre.
  ##
  ##
  ##   HerpLog is free software: you can redistribute it and/or modify
@@ -101,12 +101,15 @@ set(SOURCE_FILES
             src/gui/mainwindow.cpp
             src/gui/herpapp.hpp
             src/gui/herpapp.cpp
+            src/gui/gk_about_dialog.hpp
+            src/gui/gk_about_dialog.cpp
             3rd_party/minicsv/minicsv.h)
 
 # http://www.executionunit.com/blog/2014/01/22/moving-from-qmake-to-cmake/
 qt5_wrap_ui(UI_HEADERS
             src/gui/mainwindow.ui
-            src/gui/herpapp.ui)
+            src/gui/herpapp.ui
+            src/gui/gk_about_dialog.ui)
 
 qt5_add_resources(UI_RESOURCES src/assets.qrc)
 
@@ -230,21 +233,21 @@ set(HERPLOG_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/archive" CACHE STRING "The compilat
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${HERPLOG_INSTALL_DIR}")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${HERPLOG_LIB_DIR}")
-    message(STATUS "FyreDL will be installed towards the directory: \"${HERPLOG_INSTALL_DIR}\"")
+    message(STATUS "HerpLog will be installed towards the directory: \"${HERPLOG_INSTALL_DIR}\"")
 
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${HERPLOG_ARCHIVE_DIR}")
     message(STATUS "Archive directory has been set to: \"${HERPLOG_ARCHIVE_DIR}\"")
 elseif(CMAKE_BUILD_TYPE MATCHES "Release")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${HERPLOG_INSTALL_DIR}")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${HERPLOG_LIB_DIR}")
-    message(STATUS "FyreDL will be installed towards the directory: \"${HERPLOG_INSTALL_DIR}\"")
+    message(STATUS "HerpLog will be installed towards the directory: \"${HERPLOG_INSTALL_DIR}\"")
 
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${HERPLOG_ARCHIVE_DIR}")
     message(STATUS "Archive directory has been set to: \"${HERPLOG_ARCHIVE_DIR}\"")
 else()
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${HERPLOG_INSTALL_DIR}")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${HERPLOG_LIB_DIR}")
-    message(STATUS "FyreDL will be installed towards the directory: \"${HERPLOG_INSTALL_DIR}\"")
+    message(STATUS "HerpLog will be installed towards the directory: \"${HERPLOG_INSTALL_DIR}\"")
 
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${HERPLOG_ARCHIVE_DIR}")
     message(STATUS "Archive directory has been set to: \"${HERPLOG_ARCHIVE_DIR}\"")
