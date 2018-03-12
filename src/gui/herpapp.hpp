@@ -123,6 +123,8 @@ private:
     std::string find_species_id();
     std::list<GkRecords::GkSpecies> find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id);
     std::list<GkRecords::GkId> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id);
+    void record_species_index(const std::list<GkRecords::GkSpecies> &species_list, const GkRecords::comboBoxType &comboBox_type);
+    void record_animals_index(const std::list<GkRecords::GkId> &animals_list, const GkRecords::comboBoxType &comboBox_type);
 
     bool submit_record();
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
@@ -140,7 +142,9 @@ private:
 
     fs::path global_db_temp_dir;
     std::string global_db_file_path;
-    std::mutex w_record_mtx;
+    std::mutex r_browse_mtx;
+    std::mutex r_cache_mtx;
+    std::mutex r_charts_mtx;
 
     long int minDateTime;
     long int maxDateTime;
@@ -155,8 +159,8 @@ private:
     std::list<std::string> viewed_records;
 
     // Cached values for the comboBox selections
-    std::list<GkRecords::GkSpecies> comboBox_species;
-    std::list<GkRecords::GkId> comboBox_animals;
+    QMultiMap<GkRecords::comboBoxType, GkRecords::GkSpecies> comboBox_species;
+    QMultiMap<GkRecords::comboBoxType, GkRecords::GkId> comboBox_animals;
 
     QMultiMap<long int, GkRecords::GkGraph::WeightVsTime> weight_measurements; // The key is QDateTime
     QPointer<QLineSeries> line_series_weight;

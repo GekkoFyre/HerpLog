@@ -99,6 +99,11 @@ namespace GekkoFyre {
             All
         };
 
+        struct GkComboBox {
+            comboBoxType comboBox_type;
+            int index_no;
+        };
+
         struct GkLicensee {
             std::string licensee_id;        // The licensee Unique ID, for database purposes
             std::string licensee_name;      // The licensee's serial-number/identifier/name/etc.
@@ -107,13 +112,13 @@ namespace GekkoFyre {
         struct GkSpecies {
             std::string species_id;         // The species Unique ID, for database purposes
             std::string species_name;       // The species of the animal/lizard in question
-            comboBoxType comboBox_type;
+            GkComboBox comboBox;
         };
 
         struct GkId {
             std::string name_id;            // Self-explanatory, for database purposes
             std::string identifier_str;     // The identifier as a string, for the animal/lizard in question
-            comboBoxType comboBox_type;
+            GkComboBox comboBox;
         };
 
         struct GkSubmit {
