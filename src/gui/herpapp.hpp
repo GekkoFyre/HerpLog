@@ -108,6 +108,7 @@ private slots:
     void on_comboBox_view_charts_select_id_currentIndexChanged(int index);
     void on_comboBox_existing_license_id_currentIndexChanged(int index);
     void on_comboBox_existing_species_currentIndexChanged(int index);
+    void on_comboBox_existing_id_currentIndexChanged(int index);
     void on_comboBox_view_records_licensee_currentIndexChanged(int index);
     void on_comboBox_view_records_species_currentIndexChanged(int index);
     void on_comboBox_view_records_animal_name_currentIndexChanged(int index);
@@ -119,8 +120,8 @@ private:
     void refresh_caches();
     void find_date_ranges();
 
-    std::string find_licensee_id(const int &index_no);
-    std::string find_species_id();
+    std::string find_comboBox_id(const GkRecords::MiscRecordType &record_type, const GkRecords::comboBoxType &comboBox_type,
+                                 const int &index_no);
     std::list<GkRecords::GkSpecies> find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id);
     std::list<GkRecords::GkId> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id);
     void record_species_index(const std::list<GkRecords::GkSpecies> &species_list, const GkRecords::comboBoxType &comboBox_type);
@@ -159,6 +160,13 @@ private:
     std::list<std::string> viewed_records;
 
     // Cached values for the comboBox selections
+    int comboBox_add_records_licensee_sel;
+    int comboBox_view_graphs_licensee_sel;
+    int comboBox_add_records_species_sel;
+    int comboBox_view_graphs_species_sel;
+    int comboBox_add_records_animals_sel;
+    int comboBox_view_records_animals_sel;
+    int comboBox_view_graphs_animals_sel;
     QMultiMap<GkRecords::comboBoxType, GkRecords::GkSpecies> comboBox_species;
     QMultiMap<GkRecords::comboBoxType, GkRecords::GkId> comboBox_animals;
 

@@ -80,6 +80,7 @@ namespace GekkoFyre {
         constexpr char furtherNotes[] = "further_notes";
         constexpr char vitaminNotes[] = "vitamin_notes";
         constexpr char toiletNotes[] = "toilet_notes";
+        constexpr char tempNotes[] = "temp_notes";
         constexpr char weightNotes[] = "weight_notes";
         constexpr char hydrationNotes[] = "hydration_notes";
         constexpr char boolWentToilet[] = "bool_went_toilet";
@@ -95,8 +96,7 @@ namespace GekkoFyre {
         enum comboBoxType {
             AddRecord,
             ViewRecords,
-            ViewCharts,
-            All
+            ViewCharts
         };
 
         struct GkComboBox {
@@ -130,6 +130,7 @@ namespace GekkoFyre {
             std::string further_notes;      // Any further notes, usually as one, long std::string
             std::string vitamin_notes;      // Any extra notes about the lizard's vitamin intake
             std::string toilet_notes;       // Any extra notes about the lizard's bathroom habits
+            std::string temp_notes;         // Any extra notes about the lizard's temperature
             std::string weight_notes;       // Any extra notes about the lizard's weight
             std::string hydration_notes;    // Any extra notes about the lizard's hydration intake
             bool went_toilet;               // Whether the lizard went to the bathroom or not

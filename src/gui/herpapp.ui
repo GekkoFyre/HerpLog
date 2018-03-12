@@ -1101,7 +1101,11 @@
                           </widget>
                          </item>
                          <item row="6" column="1">
-                          <widget class="QLineEdit" name="lineEdit_records_temperature"/>
+                          <widget class="QLineEdit" name="lineEdit_records_temperature">
+                           <property name="placeholderText">
+                            <string>Notes...</string>
+                           </property>
+                          </widget>
                          </item>
                         </layout>
                        </widget>
@@ -1522,6 +1526,61 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>interface_tabWidget</tabstop>
+  <tabstop>add_db_left_scrollArea</tabstop>
+  <tabstop>dateTime_add_record</tabstop>
+  <tabstop>toolButton_add_record_update_datetime</tabstop>
+  <tabstop>comboBox_existing_license_id</tabstop>
+  <tabstop>lineEdit_new_license_id</tabstop>
+  <tabstop>comboBox_existing_species</tabstop>
+  <tabstop>lineEdit_new_species</tabstop>
+  <tabstop>comboBox_existing_id</tabstop>
+  <tabstop>lineEdit_new_id</tabstop>
+  <tabstop>toolButton_new_hash</tabstop>
+  <tabstop>lineEdit_toilet_notes</tabstop>
+  <tabstop>lineEdit_hydration_notes</tabstop>
+  <tabstop>lineEdit_vitamins_notes</tabstop>
+  <tabstop>lineEdit_temperature_notes</tabstop>
+  <tabstop>lineEdit_weight_notes</tabstop>
+  <tabstop>checkBox_toilet</tabstop>
+  <tabstop>checkBox_hydration</tabstop>
+  <tabstop>checkBox_vitamins</tabstop>
+  <tabstop>spinBox_weight</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>plainTextEdit_furtherNotes</tabstop>
+  <tabstop>pushButton_add_data</tabstop>
+  <tabstop>pushButton_clear_data</tabstop>
+  <tabstop>scrollArea_browseRecords</tabstop>
+  <tabstop>dateTimeEdit_browse_start</tabstop>
+  <tabstop>dateTimeEdit_browse_end</tabstop>
+  <tabstop>pushButton_browse_submit</tabstop>
+  <tabstop>comboBox_view_records_licensee</tabstop>
+  <tabstop>comboBox_view_records_species</tabstop>
+  <tabstop>comboBox_view_records_animal_name</tabstop>
+  <tabstop>scrollArea_view_records_left</tabstop>
+  <tabstop>lineEdit_records_dateTime</tabstop>
+  <tabstop>toolButton_records_calendar_popup</tabstop>
+  <tabstop>lineEdit_records_toilet_notes</tabstop>
+  <tabstop>lineEdit_records_hydration_notes</tabstop>
+  <tabstop>lineEdit_records_vitamins_notes</tabstop>
+  <tabstop>lineEdit_records_weight_notes</tabstop>
+  <tabstop>checkBox_records_went_toilet</tabstop>
+  <tabstop>checkBox_records_had_hydration</tabstop>
+  <tabstop>checkBox_records_had_vitamins</tabstop>
+  <tabstop>doubleSpinBox_records_weight</tabstop>
+  <tabstop>pushButton_archive_next</tabstop>
+  <tabstop>pushButton_archive_prev</tabstop>
+  <tabstop>pushButton_archive_delete</tabstop>
+  <tabstop>lineEdit_records_temperature</tabstop>
+  <tabstop>scrollArea_view_records_right</tabstop>
+  <tabstop>plainTextEdit_records_further_notes</tabstop>
+  <tabstop>comboBox_view_charts_select_licensee</tabstop>
+  <tabstop>comboBox_view_charts_select_species</tabstop>
+  <tabstop>comboBox_view_charts_select_id</tabstop>
+  <tabstop>pushButton_view_charts_prev_page</tabstop>
+  <tabstop>pushButton_view_charts_next_page</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
