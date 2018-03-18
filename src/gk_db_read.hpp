@@ -67,8 +67,8 @@ public:
 
     std::string read_item_db(const std::string &record_id, const std::string &key);
 
-    long int determineMinimumDate(const std::vector<std::string> &record_id);
-    long int determineMaximumDate(const std::vector<std::string> &record_id);
+    long int determineMinimumDate(const std::vector<std::string> &record_ids);
+    long int determineMaximumDate(const std::vector<std::string> &record_ids);
     std::unordered_map<std::string, GkRecords::MiscUniqueIds> get_record_ids();
     QMultiMap<std::string, std::string> get_misc_key_vals(const GkRecords::MiscRecordType &struc_type);
     std::list<std::string> extractRecords(const long int &dateStart, const long int &dateEnd);
@@ -78,6 +78,7 @@ private:
     GkFile::FileDb db_conn;
 
     std::mutex db_mutex;
+    std::mutex analyze_mutex;
 };
 }
 

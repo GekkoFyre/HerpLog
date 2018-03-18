@@ -86,11 +86,12 @@ std::string GkDbRead::read_item_db(const std::string &record_id, const std::stri
     }
 }
 
-long int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_id)
+long int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_ids)
 {
-    if (!record_id.empty()) {
+    std::lock_guard<std::mutex> locker(analyze_mutex);
+    if (!record_ids.empty()) {
         std::vector<std::string> dates_str_vec;
-        for (const auto &id: record_id) {
+        for (const auto &id: record_ids) {
             std::string db_val = read_item_db(id, GkRecords::dateTime);
             if (!db_val.empty()) {
                 dates_str_vec.push_back(db_val);
@@ -110,11 +111,12 @@ long int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_i
     return 0;
 }
 
-long int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_id)
+long int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_ids)
 {
-    if (!record_id.empty()) {
+    std::lock_guard<std::mutex> locker(analyze_mutex);
+    if (!record_ids.empty()) {
         std::vector<std::string> dates_str_vec;
-        for (const auto &id: record_id) {
+        for (const auto &id: record_ids) {
             std::string db_val = read_item_db(id, GkRecords::dateTime);
             if (!db_val.empty()) {
                 dates_str_vec.push_back(db_val);
@@ -238,6 +240,7 @@ QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords:
 std::list<std::string> GkDbRead::extractRecords(const long int &dateStart, const long int &dateEnd)
 {
     // Extract all the possible Record IDs from the database
+    std::lock_guard<std::mutex> locker(analyze_mutex);
     auto record_id_cache = get_record_ids();
     if (!record_id_cache.empty()) {
         std::vector<std::string> record_ids;

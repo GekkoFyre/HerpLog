@@ -70,8 +70,11 @@ public:
 
     void add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id,
                            const std::string &value);
+    void del_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id);
     bool add_record_id(const std::string &unique_id, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
                        const GkRecords::GkId &id);
+    bool del_record_id(const std::string &unique_id, const std::string &licensee_id,
+                       const std::string &species_id, const std::string &name_id);
     std::string create_unique_id();
 
 private:
@@ -80,7 +83,6 @@ private:
     std::shared_ptr<GkDbRead> gkDbRead;
 
     std::mutex db_mutex;
-    std::mutex create_key_mutex;
 };
 }
 

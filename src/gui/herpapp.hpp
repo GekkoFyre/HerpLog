@@ -118,7 +118,8 @@ private:
 
     bool remove_files(const fs::path &tmpDirLoc);
     void refresh_caches();
-    void find_date_ranges();
+    std::pair<long int, long int> find_date_ranges(const long int &min_date_time = 0, const long int &max_date_time = 0);
+    void set_date_ranges();
 
     std::string find_comboBox_id(const GkRecords::MiscRecordType &record_type, const GkRecords::comboBoxType &comboBox_type,
                                  const int &index_no);
@@ -128,12 +129,13 @@ private:
     void record_animals_index(const std::list<GkRecords::GkId> &animals_list, const GkRecords::comboBoxType &comboBox_type);
 
     bool submit_record();
+    bool delete_record(const std::string &record_id);
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
 
     void insert_charts();
-    void update_charts(const std::string &name_id);
+    void update_charts(const bool &update_caches = false);
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;
@@ -150,7 +152,7 @@ private:
     long int minDateTime;
     long int maxDateTime;
 
-    std::unordered_map<std::string, GkRecords::MiscUniqueIds> record_id_cache;
+    std::unordered_map<std::string, GkRecords::MiscUniqueIds> unique_id_map; // A unordered map of all the Unique IDs
     std::list<std::string> archive_records;
     QMultiMap<std::string, std::pair<std::string, int>> licensee_cache; // <Key: Licensee ID, Value: <Licensee Name, Index No.>>
     QMultiMap<std::string, std::string> species_cache; // <Key: Licensee ID, Value: Species ID>
@@ -158,6 +160,7 @@ private:
     // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
     // the `Previous Record` button is pressed.
     std::list<std::string> viewed_records;
+    std::string archive_curr_sel_record; // The currently selected record within the tab `viewRecords`.
 
     // Cached values for the comboBox selections
     int comboBox_add_records_licensee_sel;
