@@ -137,12 +137,12 @@ long int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_i
 }
 
 /**
- * @brief GkDbRead::get_record_ids will obtain all the Unique Identifiers for each record that's in the database.
+ * @brief GkDbRead::get_uuids will obtain all the Unique Identifiers for each record that's in the database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
  * @return The information that was retrieved from the database.
  */
-std::unordered_map<std::string, GkRecords::MiscUniqueIds> GkDbRead::get_record_ids()
+std::unordered_map<std::string, GkRecords::MiscUniqueIds> GkDbRead::get_uuids()
 {
     leveldb::ReadOptions read_opt;
     read_opt.verify_checksums = true;
@@ -181,10 +181,10 @@ std::unordered_map<std::string, GkRecords::MiscUniqueIds> GkDbRead::get_record_i
  * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @param struc_type Whether to get data from `store_species_id` or `store_name_id` within the Google LevelDB database.
+ * @param record_type Whether to get data from `store_species_id` or `store_name_id` within the Google LevelDB database.
  * @return The information that was retrieved from the database; <Key: Species ID/Name ID, Value: Species Name/Name Value>
  */
-QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::MiscRecordType &struc_type)
+QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::MiscRecordType &record_type)
 {
     try {
         leveldb::ReadOptions read_opt;
@@ -195,7 +195,7 @@ QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords:
 
         QMultiMap<std::string, std::string> cache;
 
-        switch (struc_type) {
+        switch (record_type) {
             case GkRecords::MiscRecordType::gkLicensee:
                 db_conn.db->Get(read_opt, GkRecords::LEVELDB_STORE_LICENSEE_ID, &csv_read_data);
                 break;
@@ -241,7 +241,7 @@ std::list<std::string> GkDbRead::extractRecords(const long int &dateStart, const
 {
     // Extract all the possible Record IDs from the database
     std::lock_guard<std::mutex> locker(analyze_mutex);
-    auto record_id_cache = get_record_ids();
+    auto record_id_cache = get_uuids();
     if (!record_id_cache.empty()) {
         std::vector<std::string> record_ids;
         for (const auto &ids: record_id_cache) {

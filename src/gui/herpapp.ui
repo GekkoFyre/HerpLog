@@ -776,7 +776,35 @@
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QComboBox" name="comboBox_view_records_licensee"/>
+                   <widget class="QFrame" name="frame_view_records_licensee_comboBox">
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_9">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QComboBox" name="comboBox_view_records_licensee"/>
+                     </item>
+                     <item>
+                      <widget class="QToolButton" name="toolButton_view_records_licensee">
+                       <property name="text">
+                        <string>Del.</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
                   </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_view_records_species">
@@ -785,9 +813,6 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QComboBox" name="comboBox_view_records_species"/>
-                  </item>
                   <item row="2" column="0">
                    <widget class="QLabel" name="label_view_records_animal_id">
                     <property name="text">
@@ -795,8 +820,70 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="1" column="1">
+                   <widget class="QFrame" name="frame_view_records_species_comboBox">
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_10">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QComboBox" name="comboBox_view_records_species"/>
+                     </item>
+                     <item>
+                      <widget class="QToolButton" name="toolButton_view_records_species">
+                       <property name="text">
+                        <string>Del.</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
                   <item row="2" column="1">
-                   <widget class="QComboBox" name="comboBox_view_records_animal_name"/>
+                   <widget class="QFrame" name="frame_view_records_animal_comboBox">
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_11">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <widget class="QComboBox" name="comboBox_view_records_animal_name"/>
+                     </item>
+                     <item>
+                      <widget class="QToolButton" name="toolButton_view_records_animal">
+                       <property name="text">
+                        <string>Del.</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -1555,9 +1642,6 @@
   <tabstop>dateTimeEdit_browse_start</tabstop>
   <tabstop>dateTimeEdit_browse_end</tabstop>
   <tabstop>pushButton_browse_submit</tabstop>
-  <tabstop>comboBox_view_records_licensee</tabstop>
-  <tabstop>comboBox_view_records_species</tabstop>
-  <tabstop>comboBox_view_records_animal_name</tabstop>
   <tabstop>scrollArea_view_records_left</tabstop>
   <tabstop>lineEdit_records_dateTime</tabstop>
   <tabstop>toolButton_records_calendar_popup</tabstop>
