@@ -57,6 +57,7 @@
 #include <sstream>
 #include <utility>
 #include <algorithm>
+#include <vector>
 
 using namespace GekkoFyre;
 using namespace mini;
@@ -130,16 +131,16 @@ void GkDbWrite::del_item_db(const std::string &record_id, const std::string &key
  * within the Google LevelDB database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @param struc_type Whether to add data to `store_licensee_id`, `store_species_id`, or `store_name_id` within
+ * @param record_type Whether to add data to `store_licensee_id`, `store_species_id`, or `store_name_id` within
  * the Google LevelDB database.
- * @param unique_id The Unique Identifier itself, usually a UUID in this case.
+ * @param record_id The Unique Identifier itself, usually a UUID in this case.
  * @param value The value to be stored alongside the UUID.
  * @return Whether the process was a success or not.
  */
-void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id,
-                             const std::string &value)
+void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
+                                  const std::string &value)
 {
-    if ((!unique_id.empty()) && (!value.empty())) {
+    if ((!record_id.empty()) && (!value.empty())) {
         std::ostringstream oss;
         using namespace GkRecords;
 
@@ -147,7 +148,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
         write_options.sync = true;
         leveldb::WriteBatch batch;
 
-        switch (struc_type) {
+        switch (record_type) {
             case MiscRecordType::gkLicensee:
             {
                 auto licensee_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkLicensee);
@@ -158,7 +159,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
                 }
 
                 // Now we insert the new UUID alongside with its value
-                oss << unique_id << "," << value << std::endl;
+                oss << record_id << "," << value << std::endl;
 
                 batch.Delete(LEVELDB_STORE_LICENSEE_ID);
                 batch.Put(LEVELDB_STORE_LICENSEE_ID, oss.str());
@@ -175,7 +176,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
                 }
 
                 // Now we insert the new UUID alongside with its value
-                oss << unique_id << "," << value << std::endl;
+                oss << record_id << "," << value << std::endl;
 
                 batch.Delete(LEVELDB_STORE_SPECIES_ID);
                 batch.Put(LEVELDB_STORE_SPECIES_ID, oss.str());
@@ -192,7 +193,7 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
                 }
 
                 // Now we insert the new UUID alongside with its value
-                oss << unique_id << "," << value << std::endl;
+                oss << record_id << "," << value << std::endl;
 
                 batch.Delete(LEVELDB_STORE_NAME_ID);
                 batch.Put(LEVELDB_STORE_NAME_ID, oss.str());
@@ -221,13 +222,13 @@ void GkDbWrite::add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
  * Name/ID sub-record within the Google LevelDB database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-03-13
- * @param struc_type Whether to remove data from `store_licensee_id`, `store_species_id`, or `store_name_id` within
+ * @param record_type Whether to remove data from `store_licensee_id`, `store_species_id`, or `store_name_id` within
  * the Google LevelDB database.
- * @param unique_id The Unique Identifier itself, usually a UUID in this case.
+ * @param record_id The Unique Identifier itself, usually a UUID in this case.
  */
-void GkDbWrite::del_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id)
+void GkDbWrite::del_misc_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id)
 {
-    if (!unique_id.empty()) {
+    if (!record_id.empty()) {
         std::ostringstream oss;
         using namespace GkRecords;
 
@@ -235,14 +236,14 @@ void GkDbWrite::del_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
         write_options.sync = true;
         leveldb::WriteBatch batch;
 
-        switch (struc_type) {
+        switch (record_type) {
             case MiscRecordType::gkLicensee:
             {
                 auto licensee_cache = gkDbRead->get_misc_key_vals(MiscRecordType::gkLicensee);
                 bool write_db = false;
                 if (!licensee_cache.empty()) {
                     for (auto it = licensee_cache.begin(); it != licensee_cache.end(); ++it) {
-                        if (it.key() != unique_id) { // Write out all the key/value pairs except for the specified one, thus deleting it
+                        if (it.key() != record_id) { // Write out all the key/value pairs except for the specified one, thus deleting it
                             oss << it.key() << "," << it.value() << std::endl;
                             write_db = true;
                         }
@@ -263,7 +264,7 @@ void GkDbWrite::del_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
                 bool write_db = false;
                 if (species_cache.empty()) {
                     for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
-                        if (it.key() != unique_id) { // Write out all the key/value pairs except for the specified one, thus deleting it
+                        if (it.key() != record_id) { // Write out all the key/value pairs except for the specified one, thus deleting it
                             oss << it.key() << "," << it.value() << std::endl;
                             write_db = true;
                         }
@@ -284,7 +285,7 @@ void GkDbWrite::del_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
                 bool write_db = false;
                 if (!id_cache.empty()) {
                     for (auto it = id_cache.begin(); it != id_cache.end(); ++it) {
-                        if (it.key() != unique_id) { // Write out all the key/value pairs except for the specified one, thus deleting it
+                        if (it.key() != record_id) { // Write out all the key/value pairs except for the specified one, thus deleting it
                             oss << it.key() << "," << it.value() << std::endl;
                             write_db = true;
                         }
@@ -317,50 +318,71 @@ void GkDbWrite::del_misc_key_vals(const GkRecords::MiscRecordType &struc_type, c
 }
 
 /**
- * @brief GkDbWrite::add_record_id Adds a new Unique Identifier for the record in question to the Google LevelDB database.
+ * @brief GkDbWrite::add_uuid Adds a new Unique Identifier for the record in question to the Google LevelDB database.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
- * @param unique_id The unique Record ID tieing all the separate database entries/keys together.
+ * @param uuid The UUID tieing all the separate database entries/keys together.
  * @param licensee The licensee in regard to this record in question.
  * @param species The species of the animal/lizard in question.
  * @param id The identifier, for the animal/lizard in question.
  * @return Whether the process was a success or not.
  */
-bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkLicensee &licensee,
-                              const GkRecords::GkSpecies &species, const GkRecords::GkId &id)
+bool GkDbWrite::add_uuid(const std::string &uuid, const GkRecords::GkLicensee &licensee,
+                         const GkRecords::GkSpecies &species, const GkRecords::GkId &id)
 {
     try {
         using namespace GkRecords;
         std::ostringstream oss;
-        auto record_cache = gkDbRead->get_record_ids();
+        auto record_cache = gkDbRead->get_uuids();
+        bool licensee_existing = false;
+        bool species_existing = false;
+        bool animal_existing = false;
         if (!record_cache.empty()) {
             for (const auto &record: record_cache) {
                 oss << record.first << "," << record.second.licensee_id << "," << record.second.species_id << ","
                     << record.second.name_id << std::endl;
+
+                if (record.second.licensee_id == licensee.licensee_id) {
+                    licensee_existing = true;
+                }
+
+                if (record.second.species_id == species.species_id) {
+                    species_existing = true;
+                }
+
+                if (record.second.name_id == id.name_id) {
+                    animal_existing = true;
+                }
             }
         }
 
-        if ((!unique_id.empty()) && (!licensee.licensee_id.empty()) && (!species.species_id.empty()) &&
+        if ((!uuid.empty()) && (!licensee.licensee_id.empty()) && (!species.species_id.empty()) &&
                 (!id.name_id.empty())) {
             // Now we insert the new UUID alongside with its value
-            oss << unique_id << "," << licensee.licensee_id << "," << species.species_id << "," << id.name_id << std::endl;
+            oss << uuid << "," << licensee.licensee_id << "," << species.species_id << "," << id.name_id << std::endl;
         } else {
             throw std::invalid_argument(tr("One of the given Unique IDs are empty!").toStdString());
         }
 
         if (!licensee.licensee_id.empty()) {
-            // We have a new entry for the Licensee sub-record!
-            add_misc_key_vals(MiscRecordType::gkLicensee, licensee.licensee_id, licensee.licensee_name);
+            if (!licensee_existing) { // Check that the `Licensee` does not already exist in the database
+                // We have a new entry for the Licensee sub-record!
+                add_misc_key_vals(MiscRecordType::gkLicensee, licensee.licensee_id, licensee.licensee_name);
+            }
         }
 
         if (!species.species_id.empty()) {
-            // We have a new entry for the Species sub-record!
-            add_misc_key_vals(MiscRecordType::gkSpecies, species.species_id, species.species_name);
+            if (!species_existing) { // Check that the `Species` does not already exist in the database
+                // We have a new entry for the Species sub-record!
+                add_misc_key_vals(MiscRecordType::gkSpecies, species.species_id, species.species_name);
+            }
         }
 
         if (!id.name_id.empty()) {
-            // We have a new entry for the Name/ID# sub-record!
-            add_misc_key_vals(MiscRecordType::gkId, id.name_id, id.identifier_str);
+            if (!animal_existing) { // Check that the `Animal ID` does not already exist in the database
+                // We have a new entry for the Name/ID# sub-record!
+                add_misc_key_vals(MiscRecordType::gkId, id.name_id, id.identifier_str);
+            }
         }
 
         leveldb::WriteOptions write_options;
@@ -385,6 +407,208 @@ bool GkDbWrite::add_record_id(const std::string &unique_id, const GkRecords::GkL
     return false;
 }
 
+/**
+ * @brief GkDbWrite::del_uuid Deletes a specified Unique Identifier for the record in question from the Google LevelDB
+ * database.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03
+ * @param uuid The UUID tieing all the separate database entries/keys together.
+ * @param record_type Whether to delete data from `store_licensee_id`, `store_species_id`, or `store_name_id` from within
+ * the Google LevelDB database (provided it's specified).
+ * @param misc_id The Unique ID relating to the Licensee, Species, or Animal in question that's to be deleted (provided
+ * it's specified).
+ * @return Whether the operation was a success or not.
+ */
+bool GkDbWrite::del_uuid(const std::string &uuid, const GkRecords::MiscRecordType &record_type,
+                         const std::string &misc_id)
+{
+    try {
+        if (!uuid.empty()) {
+            using namespace GkRecords;
+
+            // TODO: Finish updating this function!
+            leveldb::WriteOptions write_options;
+            write_options.sync = true;
+            leveldb::WriteBatch batch;
+
+            std::ostringstream oss;
+            auto record_cache = gkDbRead->get_uuids();
+            bool write_db = false;
+
+            if (!record_cache.empty()) {
+                for (const auto &record: record_cache) {
+                    if (record.first != uuid) {
+                        oss << record.first << "," << record.second.licensee_id << "," << record.second.species_id << ","
+                            << record.second.name_id << std::endl;
+                        write_db = true;
+                    }
+                }
+            } else {
+                throw std::runtime_error(tr("There are no entries to delete!").toStdString());
+            }
+
+            batch.Delete(LEVELDB_STORE_RECORD_ID);
+            if (write_db) { // There is at least one key/value pair that needs to be written back to the database
+                batch.Put(LEVELDB_STORE_RECORD_ID, oss.str());
+            }
+
+            std::lock_guard<std::mutex> locker(db_mutex);
+            leveldb::Status s;
+            s = db_conn.db->Write(write_options, &batch);
+            if (!s.ok()) {
+                throw std::runtime_error(s.ToString());
+            }
+
+            return true;
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
+    }
+
+    return false;
+}
+
+/**
+ * @brief GkDbWrite::mass_del_id Will delete any number of records (depending on what's associated) from the Google LevelDB
+ * database in one, swift go.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-19
+ * @param record_type Whether to delete data from `store_licensee_id`, `store_species_id`, and/or `store_name_id` from within
+ * the Google LevelDB database.
+ * @param record_id The Unique ID of the record in question.
+ * @param recursive If records of another type should be deleted recursively as well, or not.
+ * @return Whether the operation was a success or not.
+ */
+bool GkDbWrite::mass_del_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
+                            const bool &recursive)
+{
+    try {
+        if (!record_id.empty()) {
+            using namespace GkRecords;
+
+            // TODO: Finish writing this function!
+            switch (record_type) {
+                case MiscRecordType::gkLicensee:
+                {
+                    if (recursive) {
+                        del_misc_key_vals(MiscRecordType::gkLicensee, record_id);
+                    } else {
+                        // Must firstly determine what species and animals are associated with this licensee record
+                        auto record_cache = gkDbRead->get_uuids();
+                        std::vector<MiscUniqueIds> unique_id_vec;
+                        std::string uuid;
+
+                        for (const auto &cached_id: record_cache) {
+                            if (cached_id.second.licensee_id == record_id) {
+                                MiscUniqueIds unique_id_struc;
+                                unique_id_struc.licensee_id = record_id;
+                                unique_id_struc.species_id = cached_id.second.species_id;
+                                unique_id_struc.name_id = cached_id.second.name_id;
+                                uuid = cached_id.first;
+
+                                unique_id_vec.push_back(unique_id_struc);
+                                break;
+                            }
+                        }
+
+                        del_misc_key_vals(MiscRecordType::gkLicensee, record_id);
+
+                        for (const auto &id: unique_id_vec) {
+                            mass_del_id(MiscRecordType::gkSpecies, id.species_id, true);
+                            mass_del_id(MiscRecordType::gkId, id.name_id, true);
+                        }
+
+                        // Now delete the main UUID itself!
+                        del_uuid(uuid);
+                    }
+                }
+
+                    return true;
+                case MiscRecordType::gkSpecies:
+                {
+                    if (recursive) {
+                        del_misc_key_vals(MiscRecordType::gkSpecies, record_id);
+                    } else {
+                        // We must determine what licensees and animals are associated with this species record.
+                        auto record_cache = gkDbRead->get_uuids();
+                        std::vector<MiscUniqueIds> unique_id_vec;
+                        std::string uuid;
+
+                        for (const auto &cached_id: record_cache) {
+                            if (cached_id.second.species_id == record_id) {
+                                MiscUniqueIds unique_id_struc;
+                                unique_id_struc.licensee_id = cached_id.second.licensee_id;
+                                unique_id_struc.species_id = record_id;
+                                unique_id_struc.name_id = cached_id.second.name_id;
+                                uuid = cached_id.first;
+
+                                unique_id_vec.push_back(unique_id_struc);
+                                break;
+                            }
+                        }
+
+                        del_misc_key_vals(MiscRecordType::gkSpecies, record_id);
+
+                        for (const auto &id: unique_id_vec) {
+                            mass_del_id(MiscRecordType::gkLicensee, id.licensee_id, true);
+                            mass_del_id(MiscRecordType::gkId, id.name_id, true);
+                        }
+
+                        // Now delete the main UUID itself!
+                        del_uuid(uuid);
+                    }
+                }
+
+                    return true;
+                case MiscRecordType::gkId:
+                {
+                    if (recursive) {
+                        del_misc_key_vals(MiscRecordType::gkId, record_id);
+                    } else {
+                        // We must determine what licensees and species are associated with this animal record.
+                        auto record_cache = gkDbRead->get_uuids();
+                        std::vector<MiscUniqueIds> unique_id_vec;
+                        std::string uuid;
+
+                        for (const auto &cached_id: record_cache) {
+                            if (cached_id.second.name_id == record_id) {
+                                MiscUniqueIds unique_id_struc;
+                                unique_id_struc.licensee_id = cached_id.second.licensee_id;
+                                unique_id_struc.species_id = cached_id.second.species_id;
+                                unique_id_struc.name_id = record_id;
+                                uuid = cached_id.first;
+
+                                unique_id_vec.push_back(unique_id_struc);
+                                break;
+                            }
+                        }
+
+                        del_misc_key_vals(MiscRecordType::gkId, record_id);
+
+                        for (const auto &id: unique_id_vec) {
+                            mass_del_id(MiscRecordType::gkLicensee, id.licensee_id, true);
+                            mass_del_id(MiscRecordType::gkSpecies, id.species_id, true);
+                        }
+
+                        // Now delete the main UUID itself!
+                        del_uuid(uuid);
+                    }
+                }
+
+                    return true;
+                default:
+                    throw std::runtime_error(tr("Unable to delete records from the database!").toStdString());
+            }
+        } else {
+            throw std::invalid_argument(tr("One of the given Unique IDs are empty!").toStdString());
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
+    }
+
+    return false;
+}
+
 std::string GkDbWrite::create_unique_id()
 {
     boost::mt19937 ran;
@@ -395,65 +619,4 @@ std::string GkDbWrite::create_unique_id()
     std::string result = boost::uuids::to_string(u); // Convert the Boost UUID to a std::string
     boost::to_upper(result); // Convert to uppercase
     return result;
-}
-
-/**
- * @brief GkDbWrite::del_record_id Deletes a specified Unique Identifier for the record in question from
- * the Google LevelDB database.
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-02-21
- * @param unique_id The unique Record ID tieing all the separate database entries/keys together.
- * @param licensee The licensee in regard to this record in question.
- * @param species
- * @param id
- * @return
- */
-bool GkDbWrite::del_record_id(const std::string &unique_id, const std::string &licensee_id,
-                              const std::string &species_id, const std::string &name_id)
-{
-    try {
-        using namespace GkRecords;
-
-        leveldb::WriteOptions write_options;
-        write_options.sync = true;
-        leveldb::WriteBatch batch;
-
-        std::ostringstream oss;
-        auto record_cache = gkDbRead->get_record_ids();
-        bool write_db = false;
-
-        if (!record_cache.empty()) {
-            for (const auto &record: record_cache) {
-                if (record.first != unique_id) {
-                    oss << record.first << "," << record.second.licensee_id << "," << record.second.species_id << ","
-                        << record.second.name_id << std::endl;
-                    write_db = true;
-                }
-            }
-        } else {
-            throw std::runtime_error(tr("There are no entries to delete!").toStdString());
-        }
-
-        del_misc_key_vals(MiscRecordType::gkLicensee, licensee_id);
-        del_misc_key_vals(MiscRecordType::gkSpecies, species_id);
-        del_misc_key_vals(MiscRecordType::gkId, name_id);
-        batch.Delete(LEVELDB_STORE_RECORD_ID);
-
-        if (write_db) { // There is at least one key/value pair that needs to be written back to the database
-            batch.Put(LEVELDB_STORE_RECORD_ID, oss.str());
-        }
-
-        std::lock_guard<std::mutex> locker(db_mutex);
-        leveldb::Status s;
-        s = db_conn.db->Write(write_options, &batch);
-        if (!s.ok()) {
-            throw std::runtime_error(s.ToString());
-        }
-
-        return true;
-    } catch (const std::exception &e) {
-        QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
-    }
-
-    return false;
 }

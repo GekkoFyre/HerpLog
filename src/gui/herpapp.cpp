@@ -420,6 +420,58 @@ void HerpApp::on_comboBox_view_records_animal_name_currentIndexChanged(int index
     }
 }
 
+void HerpApp::on_toolButton_view_records_licensee_clicked()
+{
+    // Delete `Licensee` entry
+    // TODO: Finish this!
+    if (!licensee_cache.empty()) {
+        int curr_sel = ui->comboBox_view_records_licensee->currentIndex();
+        std::string licensee_id;
+        for (auto it = licensee_cache.begin(); it != licensee_cache.end(); ++it) {
+            if (it.value().second == curr_sel) {
+                licensee_id = it.key();
+                break;
+            }
+        }
+    }
+}
+
+void HerpApp::on_toolButton_view_records_species_clicked()
+{
+    // Delete `Species` entry
+    // TODO: Finish this!
+    if (!comboBox_species.empty()) {
+        int curr_sel = ui->comboBox_view_records_species->currentIndex();
+        std::string species_id;
+        for (auto it = comboBox_species.begin(); it != comboBox_species.end(); ++it) {
+            if (it.value().comboBox.comboBox_type == GkRecords::comboBoxType::ViewRecords) {
+                if (it.value().comboBox.index_no == curr_sel) {
+                    species_id = it.value().species_id;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void HerpApp::on_toolButton_view_records_animal_clicked()
+{
+    // Delete `Animals` entry
+    // TODO: Finish this!
+    if (!comboBox_animals.empty()) {
+        int curr_sel = ui->comboBox_view_records_animal_name->currentIndex();
+        std::string animal_id;
+        for (auto it = comboBox_animals.begin(); it != comboBox_animals.end(); ++it) {
+            if (it.value().comboBox.comboBox_type == GkRecords::comboBoxType::ViewRecords) {
+                if (it.value().comboBox.index_no == curr_sel) {
+                    animal_id = it.value().name_id;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 bool HerpApp::submit_record()
 {
     try {
@@ -486,7 +538,7 @@ bool HerpApp::submit_record()
 
                     if ((!unique_id.empty()) && (!submit.licensee.licensee_id.empty()) && (!submit.species.species_id.empty()) &&
                             (!submit.identifier.name_id.empty())) {
-                        gkDbWrite->add_record_id(unique_id, submit.licensee, submit.species, submit.identifier);
+                        gkDbWrite->add_uuid(unique_id, submit.licensee, submit.species, submit.identifier);
                         gkDbWrite->add_item_db(unique_id, dateTime, std::to_string(submit.date_time));
                         gkDbWrite->add_item_db(unique_id, furtherNotes, submit.further_notes);
                         gkDbWrite->add_item_db(unique_id, vitaminNotes, submit.vitamin_notes);
@@ -594,13 +646,7 @@ bool HerpApp::delete_record(const std::string &record_id)
                     gkDbWrite->del_item_db(record_id, boolHadHydration);
                     gkDbWrite->del_item_db(record_id, boolHadVitamins);
                     gkDbWrite->del_item_db(record_id, weightMeasure);
-
-                    for (const auto &id: unique_id_map) {
-                        if (id.first == record_id) {
-                            gkDbWrite->del_record_id(id.first, id.second.licensee_id, id.second.species_id, id.second.name_id);
-                            break;
-                        }
-                    }
+                    gkDbWrite->del_uuid(record_id);
 
                     set_date_ranges();
                     update_charts();
@@ -636,7 +682,7 @@ void HerpApp::refresh_caches()
         std::lock_guard<std::mutex> locker(r_cache_mtx);
 
         unique_id_map.clear();
-        unique_id_map = gkDbRead->get_record_ids();
+        unique_id_map = gkDbRead->get_uuids();
 
         auto licensee_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkLicensee);
         if (!licensee_temp_cache.empty()) {
@@ -1197,6 +1243,46 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
     }
 
     return;
+}
+
+/**
+ * @brief HerpApp::delete_category_id
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-19
+ * @param record_type
+ * @param record_id
+ * @return
+ */
+bool HerpApp::delete_category_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id)
+{
+    try {
+        if (!record_id.empty()) {
+            using namespace GkRecords;
+            switch (record_type) {
+                case MiscRecordType::gkLicensee:
+                {
+                    gkDbWrite->mass_del_id(MiscRecordType::gkLicensee, record_id);
+                }
+                    return true;
+                case MiscRecordType::gkSpecies:
+                {
+                    gkDbWrite->mass_del_id(MiscRecordType::gkSpecies, record_id);
+                }
+                    return true;
+                case MiscRecordType::gkId:
+                {
+                    gkDbWrite->mass_del_id(MiscRecordType::gkId, record_id);
+                }
+                    return true;
+                default:
+                    throw std::runtime_error(tr("An error occurred whilst deleting records from the database!").toStdString());
+            }
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+    }
+
+    return false;
 }
 
 /**

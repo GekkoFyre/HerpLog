@@ -50,7 +50,6 @@
 #include <QtCore/QObject>
 #include <unordered_map>
 #include <string>
-#include <vector>
 #include <mutex>
 #include <utility>
 #include <memory>
@@ -62,22 +61,26 @@ class GkDbWrite : public QObject {
     Q_OBJECT
 
 public:
-    explicit GkDbWrite(const GkFile::FileDb &gk_db_conn, const std::shared_ptr<GkDbRead> &gk_db_read, const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
+    explicit GkDbWrite(const GkFile::FileDb &gk_db_conn, const std::shared_ptr<GkDbRead> &gk_db_read,
+                       const std::shared_ptr<GkStringOp> &gk_str_op, QObject *parent = nullptr);
     ~GkDbWrite();
 
     void add_item_db(const std::string &record_id, const std::string &key, std::string value);
     void del_item_db(const std::string &record_id, const std::string &key);
-
-    void add_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id,
-                           const std::string &value);
-    void del_misc_key_vals(const GkRecords::MiscRecordType &struc_type, const std::string &unique_id);
-    bool add_record_id(const std::string &unique_id, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
-                       const GkRecords::GkId &id);
-    bool del_record_id(const std::string &unique_id, const std::string &licensee_id,
-                       const std::string &species_id, const std::string &name_id);
+    bool add_uuid(const std::string &uuid, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
+                  const GkRecords::GkId &id);
+    bool del_uuid(const std::string &uuid,
+                  const GkRecords::MiscRecordType &record_type = GkRecords::MiscRecordType::None,
+                  const std::string &misc_id = "");
+    bool mass_del_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
+                     const bool &recursive = false);
     std::string create_unique_id();
 
 private:
+    void add_misc_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
+                           const std::string &value);
+    void del_misc_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
+
     std::shared_ptr<GkStringOp> gkStrOp;
     GkFile::FileDb db_conn;
     std::shared_ptr<GkDbRead> gkDbRead;

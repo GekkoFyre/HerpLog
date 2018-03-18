@@ -148,7 +148,8 @@ namespace GekkoFyre {
         enum MiscRecordType {
             gkLicensee,
             gkSpecies,
-            gkId
+            gkId,
+            None
         };
 
         namespace GkGraph {

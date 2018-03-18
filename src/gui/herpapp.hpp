@@ -112,6 +112,9 @@ private slots:
     void on_comboBox_view_records_licensee_currentIndexChanged(int index);
     void on_comboBox_view_records_species_currentIndexChanged(int index);
     void on_comboBox_view_records_animal_name_currentIndexChanged(int index);
+    void on_toolButton_view_records_licensee_clicked();
+    void on_toolButton_view_records_species_clicked();
+    void on_toolButton_view_records_animal_clicked();
 
 private:
     Ui::HerpApp *ui;
@@ -121,18 +124,24 @@ private:
     std::pair<long int, long int> find_date_ranges(const long int &min_date_time = 0, const long int &max_date_time = 0);
     void set_date_ranges();
 
-    std::string find_comboBox_id(const GkRecords::MiscRecordType &record_type, const GkRecords::comboBoxType &comboBox_type,
-                                 const int &index_no);
-    std::list<GkRecords::GkSpecies> find_species_names(const GkRecords::comboBoxType &dropbox_type, const std::string &licensee_id);
-    std::list<GkRecords::GkId> find_animal_names(const GkRecords::comboBoxType &dropbox_type, const std::string &species_id);
-    void record_species_index(const std::list<GkRecords::GkSpecies> &species_list, const GkRecords::comboBoxType &comboBox_type);
-    void record_animals_index(const std::list<GkRecords::GkId> &animals_list, const GkRecords::comboBoxType &comboBox_type);
+    std::string find_comboBox_id(const GkRecords::MiscRecordType &record_type,
+                                 const GkRecords::comboBoxType &comboBox_type, const int &index_no);
+    std::list<GkRecords::GkSpecies> find_species_names(const GkRecords::comboBoxType &dropbox_type,
+                                                       const std::string &licensee_id);
+    std::list<GkRecords::GkId> find_animal_names(const GkRecords::comboBoxType &dropbox_type,
+                                                 const std::string &species_id);
+    void record_species_index(const std::list<GkRecords::GkSpecies> &species_list,
+                              const GkRecords::comboBoxType &comboBox_type);
+    void record_animals_index(const std::list<GkRecords::GkId> &animals_list,
+                              const GkRecords::comboBoxType &comboBox_type);
 
     bool submit_record();
     bool delete_record(const std::string &record_id);
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
+
+    bool delete_category_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
 
     void insert_charts();
     void update_charts(const bool &update_caches = false);
