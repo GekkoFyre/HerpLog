@@ -82,7 +82,8 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     ui->dateTime_add_record->setTime(QTime::currentTime());
 
     charts_tab_enabled = false;
-    find_date_ranges();
+    set_date_ranges();
+    update_charts();
     insert_charts();
 }
 
@@ -286,6 +287,7 @@ void HerpApp::on_pushButton_browse_submit_clicked()
 
             viewed_records.clear();
             std::string next_record = browse_records(archive_records, true);
+            archive_curr_sel_record = next_record;
             archive_fill_form_data(next_record);
             return;
         } else {
@@ -535,7 +537,8 @@ bool HerpApp::submit_record()
                         emit on_comboBox_view_charts_select_id_currentIndexChanged(0);
 
                         on_toolButton_new_hash_clicked();
-                        find_date_ranges();
+                        set_date_ranges();
+                        update_charts();
 
                         return true;
                     }
@@ -567,7 +570,7 @@ bool HerpApp::submit_record()
 bool HerpApp::delete_record(const std::string &record_id)
 {
     try {
-        if ((!record_id.empty()) && (!record_id_cache.empty())) {
+        if ((!record_id.empty()) && (!unique_id_map.empty())) {
             QMessageBox msgBox;
             msgBox.setText(tr("Delete Record..."));
             msgBox.setInformativeText(tr("Are you really sure about deleting this record?"));
@@ -592,12 +595,19 @@ bool HerpApp::delete_record(const std::string &record_id)
                     gkDbWrite->del_item_db(record_id, boolHadVitamins);
                     gkDbWrite->del_item_db(record_id, weightMeasure);
 
-                    for (const auto &id: record_id_cache) {
+                    for (const auto &id: unique_id_map) {
                         if (id.first == record_id) {
                             gkDbWrite->del_record_id(id.first, id.second.licensee_id, id.second.species_id, id.second.name_id);
                             break;
                         }
                     }
+
+                    set_date_ranges();
+                    update_charts();
+                    archive_clear_forms();
+                    std::string prev_record = browse_records(archive_records, false);
+                    archive_curr_sel_record = prev_record;
+                    archive_fill_form_data(prev_record);
                 }
                     return true;
                 case QMessageBox::No:
@@ -625,8 +635,8 @@ void HerpApp::refresh_caches()
     try {
         std::lock_guard<std::mutex> locker(r_cache_mtx);
 
-        record_id_cache.clear();
-        record_id_cache = gkDbRead->get_record_ids();
+        unique_id_map.clear();
+        unique_id_map = gkDbRead->get_record_ids();
 
         auto licensee_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkLicensee);
         if (!licensee_temp_cache.empty()) {
@@ -644,12 +654,12 @@ void HerpApp::refresh_caches()
             }
         }
 
-        if (!record_id_cache.empty()) {
+        if (!unique_id_map.empty()) {
             std::vector<std::string> record_ids;
             auto animal_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
             animal_cache.clear();
 
-            for (const auto &ids: record_id_cache) {
+            for (const auto &ids: unique_id_map) {
                 if (!ids.first.empty()) {
                     record_ids.push_back(ids.first);
                 }
@@ -678,8 +688,10 @@ void HerpApp::refresh_caches()
                 }
             }
 
-            minDateTime = gkDbRead->determineMinimumDate(record_ids);
-            maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+            if (!record_ids.empty()) {
+                minDateTime = gkDbRead->determineMinimumDate(record_ids);
+                maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+            }
 
             if (!caches_enabled) {
                 caches_enabled = true;
@@ -693,10 +705,31 @@ void HerpApp::refresh_caches()
     }
 }
 
-void HerpApp::find_date_ranges()
+/**
+ * @brief HerpApp::find_date_ranges will find the most minimum/maximum possible date ranges for existing records between
+ * the given `min_date_time` and `max_date_time` parameters.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-18
+ * @param min_date_time The minimum applicable date and time.
+ * @param max_date_time The maximum applicable date and time.
+ * @return The found most <minimum/maximum> possible dates as dependent on what records exist between the values given
+ * for the two parameters.
+ */
+std::pair<long int, long int> HerpApp::find_date_ranges(const long &min_date_time, const long &max_date_time)
+{
+    return std::make_pair(0, 0);
+}
+
+/**
+ * @brief HerpApp::set_date_ranges will assign the most minimum/maximum possible date ranges to the UI
+ * `dateTimeEdit_browse_start`, `dateTimeEdit_browse_end` QComboBoxes.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03
+ */
+void HerpApp::set_date_ranges()
 {
     refresh_caches();
-    if (!record_id_cache.empty()) {
+    if (!unique_id_map.empty()) {
         if ((minDateTime > 0) && (maxDateTime > 0)) {
             if (!ui->dateTimeEdit_browse_start->isEnabled() && !ui->dateTimeEdit_browse_end->isEnabled()) {
                 ui->dateTimeEdit_browse_start->setEnabled(true);
@@ -754,7 +787,6 @@ std::string HerpApp::browse_records(const std::list<std::string> &records, const
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
-        return "";
     }
 
     return "";
@@ -1037,6 +1069,7 @@ void HerpApp::archive_clear_forms()
     ui->lineEdit_records_toilet_notes->clear();
     ui->lineEdit_records_hydration_notes->clear();
     ui->lineEdit_records_vitamins_notes->clear();
+    ui->lineEdit_records_temperature->clear();
     ui->lineEdit_records_weight_notes->clear();
 
     ui->checkBox_records_went_toilet->setChecked(false);
@@ -1066,7 +1099,7 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
                                                               GkRecords::comboBoxType::ViewRecords,
                                                               comboBox_view_records_animals_sel);
 
-            for (const auto &cached_record: record_id_cache) {
+            for (const auto &cached_record: unique_id_map) {
                 if (cached_record.first == record_id) {
                     submit_data.record_id = record_id;
                     if (cached_record.second.name_id == submit_data.identifier.name_id) {
@@ -1156,10 +1189,11 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
                 QMessageBox::information(this, tr("No data!"), tr("There is no information to present with the given variables. Please try another selection."),
                                          QMessageBox::Ok);
             }
+        } else {
+            archive_clear_forms();
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
-        return;
     }
 
     return;
@@ -1191,29 +1225,34 @@ void HerpApp::insert_charts()
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-03-04
  */
-void HerpApp::update_charts(const std::string &name_id)
+void HerpApp::update_charts(const bool &update_caches)
 {
     try {
         std::lock_guard<std::mutex> locker(r_charts_mtx);
         line_series_weight = new QLineSeries(this);
-        refresh_caches();
-        if (!record_id_cache.empty()) {
-            auto dated_record_ids = gkDbRead->extractRecords(minDateTime, maxDateTime);
-            auto ident_record_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
-            long int date_time;
-            double weight_in_loop;
-            GkRecords::GkSpecies species_struct;
-            GkRecords::GkId ident_struct;
 
-            if ((!dated_record_ids.empty()) && (!species_cache.empty()) && (!ident_record_cache.empty())) {
+        if (update_caches) {
+            refresh_caches();
+        }
+
+        if (!unique_id_map.empty()) {
+            using namespace GkRecords;
+            auto dated_record_ids = gkDbRead->extractRecords(minDateTime, maxDateTime);
+            long int date_time;
+
+            if ((!dated_record_ids.empty()) && (!species_cache.empty()) && (!animal_cache.empty())) { // Check that the values we're using aren't empty
                 for (const auto &dated_id: dated_record_ids) {
-                    date_time = std::stol(gkDbRead->read_item_db(dated_id, GkRecords::dateTime));
+                    date_time = std::stol(gkDbRead->read_item_db(dated_id, dateTime)); // Extract dateTime values from the database
                     if (!weight_measurements.contains(date_time)) { // Check that the key does not already exist in the cache!
-                        for (const auto &cached_id: record_id_cache) {
-                            if (dated_id == cached_id.first) {
-                                weight_in_loop = std::stod(gkDbRead->read_item_db(dated_id, GkRecords::weightMeasure));
-                                species_struct.species_id = cached_id.second.species_id;
-                                ident_struct.name_id = cached_id.second.name_id;
+                        for (const auto &mapped_id: unique_id_map) {
+                            GkSpecies species_struct;
+                            GkId ident_struct;
+                            double weight_in_loop;
+
+                            if (dated_id == mapped_id.first) {
+                                weight_in_loop = std::stod(gkDbRead->read_item_db(dated_id, weightMeasure));
+                                species_struct.species_id = mapped_id.second.species_id;
+                                ident_struct.name_id = mapped_id.second.name_id;
 
                                 for (auto it = species_cache.begin(); it != species_cache.end(); ++it) {
                                     if (species_struct.species_id == it.key()) {
@@ -1221,13 +1260,13 @@ void HerpApp::update_charts(const std::string &name_id)
                                     }
                                 }
 
-                                for (auto it = ident_record_cache.begin(); it != ident_record_cache.end(); ++it) {
+                                for (auto it = animal_cache.begin(); it != animal_cache.end(); ++it) {
                                     if (ident_struct.name_id == it.key()) {
                                         ident_struct.identifier_str = it.value();
                                     }
                                 }
 
-                                GkRecords::GkGraph::WeightVsTime weight_struct;
+                                GkGraph::WeightVsTime weight_struct;
                                 weight_struct.record_id = dated_id;
                                 weight_struct.species = species_struct;
                                 weight_struct.identifier = ident_struct;
@@ -1241,7 +1280,7 @@ void HerpApp::update_charts(const std::string &name_id)
                     }
                 }
 
-                if (dated_record_ids.size() > 1) { // Therefore there are two plot points for the graph(s)
+                if (dated_record_ids.size() >= 2) { // Therefore there are at least two plot points for the graph(s)
                     if (!charts_tab_enabled) {
                         ui->interface_tabWidget->setTabEnabled(3, true);
                         charts_tab_enabled = true;

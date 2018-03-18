@@ -413,9 +413,15 @@ bool GkDbWrite::del_record_id(const std::string &unique_id, const std::string &l
 {
     try {
         using namespace GkRecords;
+
+        leveldb::WriteOptions write_options;
+        write_options.sync = true;
+        leveldb::WriteBatch batch;
+
         std::ostringstream oss;
         auto record_cache = gkDbRead->get_record_ids();
         bool write_db = false;
+
         if (!record_cache.empty()) {
             for (const auto &record: record_cache) {
                 if (record.first != unique_id) {
@@ -431,21 +437,17 @@ bool GkDbWrite::del_record_id(const std::string &unique_id, const std::string &l
         del_misc_key_vals(MiscRecordType::gkLicensee, licensee_id);
         del_misc_key_vals(MiscRecordType::gkSpecies, species_id);
         del_misc_key_vals(MiscRecordType::gkId, name_id);
+        batch.Delete(LEVELDB_STORE_RECORD_ID);
 
         if (write_db) { // There is at least one key/value pair that needs to be written back to the database
-            leveldb::WriteOptions write_options;
-            write_options.sync = true;
-            leveldb::WriteBatch batch;
-            std::lock_guard<std::mutex> locker(db_mutex);
-
-            batch.Delete(LEVELDB_STORE_RECORD_ID);
             batch.Put(LEVELDB_STORE_RECORD_ID, oss.str());
+        }
 
-            leveldb::Status s;
-            s = db_conn.db->Write(write_options, &batch);
-            if (!s.ok()) {
-                throw std::runtime_error(s.ToString());
-            }
+        std::lock_guard<std::mutex> locker(db_mutex);
+        leveldb::Status s;
+        s = db_conn.db->Write(write_options, &batch);
+        if (!s.ok()) {
+            throw std::runtime_error(s.ToString());
         }
 
         return true;
