@@ -240,18 +240,32 @@ void HerpApp::on_action_About_triggered()
 
 void HerpApp::on_pushButton_archive_next_clicked()
 {
+    // Go to `Next Record`
     std::string next_record = browse_records(archive_records, true);
+    archive_curr_sel_record = next_record;
     archive_fill_form_data(next_record);
+    return;
 }
 
 void HerpApp::on_pushButton_archive_prev_clicked()
 {
+    // Go to `Previous Record`
     std::string prev_record = browse_records(archive_records, false);
+    archive_curr_sel_record = prev_record;
     archive_fill_form_data(prev_record);
+    return;
 }
 
 void HerpApp::on_pushButton_archive_delete_clicked()
-{}
+{
+    // `Delete Record`
+    if (!archive_curr_sel_record.empty()) {
+        delete_record(archive_curr_sel_record);
+        archive_curr_sel_record.clear();
+    }
+
+    return;
+}
 
 void HerpApp::on_pushButton_browse_submit_clicked()
 {
@@ -537,6 +551,70 @@ bool HerpApp::submit_record()
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
         return false;
+    }
+
+    return false;
+}
+
+/**
+ * @brief HerpApp::delete_record Will delete a given database entry and all of its related data from the Google LevelDB
+ * database when given a specified unique Record ID.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-13
+ * @param record_id The unique Record ID of all the database entries that must be deleted.
+ * @return Whether the operation was a success or not.
+ */
+bool HerpApp::delete_record(const std::string &record_id)
+{
+    try {
+        if ((!record_id.empty()) && (!record_id_cache.empty())) {
+            QMessageBox msgBox;
+            msgBox.setText(tr("Delete Record..."));
+            msgBox.setInformativeText(tr("Are you really sure about deleting this record?"));
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Yes);
+            int ret = msgBox.exec();
+
+            switch (ret) {
+                case QMessageBox::Yes:
+                    // Delete the record
+                {
+                    using namespace GkRecords;
+                    gkDbWrite->del_item_db(record_id, dateTime);
+                    gkDbWrite->del_item_db(record_id, furtherNotes);
+                    gkDbWrite->del_item_db(record_id, vitaminNotes);
+                    gkDbWrite->del_item_db(record_id, toiletNotes);
+                    gkDbWrite->del_item_db(record_id, tempNotes);
+                    gkDbWrite->del_item_db(record_id, weightNotes);
+                    gkDbWrite->del_item_db(record_id, hydrationNotes);
+                    gkDbWrite->del_item_db(record_id, boolWentToilet);
+                    gkDbWrite->del_item_db(record_id, boolHadHydration);
+                    gkDbWrite->del_item_db(record_id, boolHadVitamins);
+                    gkDbWrite->del_item_db(record_id, weightMeasure);
+
+                    for (const auto &id: record_id_cache) {
+                        if (id.first == record_id) {
+                            gkDbWrite->del_record_id(id.first, id.second.licensee_id, id.second.species_id, id.second.name_id);
+                            break;
+                        }
+                    }
+                }
+                    return true;
+                case QMessageBox::No:
+                    // Do not delete the record
+                    return true;
+                case QMessageBox::Cancel:
+                    // Do not delete the record
+                    return true;
+                default:
+                    // Should never be reached
+                    return true;
+            }
+        } else {
+            throw std::invalid_argument(tr("Unable to read Record ID!").toStdString());
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
 
     return false;
@@ -1117,7 +1195,7 @@ void HerpApp::update_charts(const std::string &name_id)
 {
     try {
         std::lock_guard<std::mutex> locker(r_charts_mtx);
-        line_series_weight = new QLineSeries();
+        line_series_weight = new QLineSeries(this);
         refresh_caches();
         if (!record_id_cache.empty()) {
             auto dated_record_ids = gkDbRead->extractRecords(minDateTime, maxDateTime);

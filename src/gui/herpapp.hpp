@@ -128,6 +128,7 @@ private:
     void record_animals_index(const std::list<GkRecords::GkId> &animals_list, const GkRecords::comboBoxType &comboBox_type);
 
     bool submit_record();
+    bool delete_record(const std::string &record_id);
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
@@ -158,6 +159,7 @@ private:
     // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
     // the `Previous Record` button is pressed.
     std::list<std::string> viewed_records;
+    std::string archive_curr_sel_record; // The currently selected record within the tab `viewRecords`.
 
     // Cached values for the comboBox selections
     int comboBox_add_records_licensee_sel;
