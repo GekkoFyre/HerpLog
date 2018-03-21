@@ -67,11 +67,11 @@ public:
 
     std::string read_item_db(const std::string &record_id, const std::string &key);
 
-    long int determineMinimumDate(const std::vector<std::string> &record_ids);
-    long int determineMaximumDate(const std::vector<std::string> &record_ids);
+    long int determine_min_date_time(const std::vector<std::string> &record_ids);
+    long int determine_max_date_time(const std::vector<std::string> &record_ids);
     std::unordered_map<std::string, GkRecords::MiscUniqueIds> get_uuids();
-    QMultiMap<std::string, std::string> get_misc_key_vals(const GkRecords::MiscRecordType &record_type);
-    std::list<std::string> extractRecords(const long int &dateStart, const long int &dateEnd);
+    QMultiMap<std::string, std::string> get_cat_key_vals(const GkRecords::MiscRecordType &record_type);
+    std::list<std::string> extract_records(const long int &dateStart, const long int &dateEnd);
 
 private:
     std::shared_ptr<GkStringOp> gkStrOp;

@@ -276,7 +276,7 @@ void HerpApp::on_pushButton_browse_submit_clicked()
 
         archive_records.clear();
         if (archive_records.empty()) {
-            archive_records = gkDbRead->extractRecords(dateTimeStart, dateTimeEnd);
+            archive_records = gkDbRead->extract_records(dateTimeStart, dateTimeEnd);
         } else {
             throw std::runtime_error(tr("There was an error in gathering the data. Please exit the program and try again!").toStdString());
         }
@@ -423,7 +423,6 @@ void HerpApp::on_comboBox_view_records_animal_name_currentIndexChanged(int index
 void HerpApp::on_toolButton_view_records_licensee_clicked()
 {
     // Delete `Licensee` entry
-    // TODO: Finish this!
     if (!licensee_cache.empty()) {
         int curr_sel = ui->comboBox_view_records_licensee->currentIndex();
         std::string licensee_id;
@@ -433,13 +432,14 @@ void HerpApp::on_toolButton_view_records_licensee_clicked()
                 break;
             }
         }
+
+        delete_category_id(GkRecords::MiscRecordType::gkLicensee, licensee_id);
     }
 }
 
 void HerpApp::on_toolButton_view_records_species_clicked()
 {
     // Delete `Species` entry
-    // TODO: Finish this!
     if (!comboBox_species.empty()) {
         int curr_sel = ui->comboBox_view_records_species->currentIndex();
         std::string species_id;
@@ -451,13 +451,14 @@ void HerpApp::on_toolButton_view_records_species_clicked()
                 }
             }
         }
+
+        delete_category_id(GkRecords::MiscRecordType::gkSpecies, species_id);
     }
 }
 
 void HerpApp::on_toolButton_view_records_animal_clicked()
 {
     // Delete `Animals` entry
-    // TODO: Finish this!
     if (!comboBox_animals.empty()) {
         int curr_sel = ui->comboBox_view_records_animal_name->currentIndex();
         std::string animal_id;
@@ -469,6 +470,8 @@ void HerpApp::on_toolButton_view_records_animal_clicked()
                 }
             }
         }
+
+        delete_category_id(GkRecords::MiscRecordType::gkId, animal_id);
     }
 }
 
@@ -481,10 +484,10 @@ bool HerpApp::submit_record()
                     using namespace GkRecords;
 
                     GkSubmit submit;
-                    std::string unique_id = gkDbWrite->create_unique_id();
+                    std::string unique_id = gkDbWrite->create_uuid();
                     if (!ui->lineEdit_new_license_id->text().isEmpty()) {
                         submit.licensee.licensee_name = ui->lineEdit_new_license_id->text().toStdString();
-                        submit.licensee.licensee_id = gkDbWrite->create_unique_id();
+                        submit.licensee.licensee_id = gkDbWrite->create_uuid();
                     } else {
                         if (!ui->comboBox_existing_license_id->currentText().isEmpty()) {
                             submit.licensee.licensee_name = ui->comboBox_existing_license_id->currentText().toStdString();
@@ -498,7 +501,7 @@ bool HerpApp::submit_record()
 
                     if (!ui->lineEdit_new_species->text().isEmpty()) {
                         submit.species.species_name = ui->lineEdit_new_species->text().toStdString();
-                        submit.species.species_id = gkDbWrite->create_unique_id();
+                        submit.species.species_id = gkDbWrite->create_uuid();
                     } else {
                         if (!ui->comboBox_existing_species->currentText().isEmpty()) {
                             submit.species.species_name = ui->comboBox_existing_species->currentText().toStdString();
@@ -512,7 +515,7 @@ bool HerpApp::submit_record()
 
                     if (!ui->lineEdit_new_id->text().isEmpty()) {
                         submit.identifier.identifier_str = ui->lineEdit_new_id->text().toStdString();
-                        submit.identifier.name_id = gkDbWrite->create_unique_id();
+                        submit.identifier.name_id = gkDbWrite->create_uuid();
                     } else {
                         if (!ui->comboBox_existing_id->currentText().isEmpty()) {
                             submit.identifier.identifier_str = ui->comboBox_existing_id->currentText().toStdString();
@@ -684,7 +687,7 @@ void HerpApp::refresh_caches()
         unique_id_map.clear();
         unique_id_map = gkDbRead->get_uuids();
 
-        auto licensee_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkLicensee);
+        auto licensee_temp_cache = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkLicensee);
         if (!licensee_temp_cache.empty()) {
             licensee_cache.clear();
             ui->comboBox_existing_license_id->clear();
@@ -702,7 +705,7 @@ void HerpApp::refresh_caches()
 
         if (!unique_id_map.empty()) {
             std::vector<std::string> record_ids;
-            auto animal_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
+            auto animal_temp_cache = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkId);
             animal_cache.clear();
 
             for (const auto &ids: unique_id_map) {
@@ -711,7 +714,7 @@ void HerpApp::refresh_caches()
                 }
 
                 if (!species_cache.contains(ids.second.licensee_id, ids.second.species_id)) {
-                    auto species_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
+                    auto species_temp_cache = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkSpecies);
                     if (!species_temp_cache.empty()) {
                         for (auto it = species_temp_cache.begin(); it != species_temp_cache.end(); ++it) {
                             if (it.key() == ids.second.species_id) {
@@ -735,8 +738,8 @@ void HerpApp::refresh_caches()
             }
 
             if (!record_ids.empty()) {
-                minDateTime = gkDbRead->determineMinimumDate(record_ids);
-                maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+                minDateTime = gkDbRead->determine_min_date_time(record_ids);
+                maxDateTime = gkDbRead->determine_max_date_time(record_ids);
             }
 
             if (!caches_enabled) {
@@ -909,7 +912,7 @@ std::list<GkRecords::GkSpecies> HerpApp::find_species_names(const GkRecords::com
                 throw std::runtime_error(tr("An error occurred whilst filling a comboBox with info from the database!").toStdString());
         }
 
-        auto tmp_species_db = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
+        auto tmp_species_db = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkSpecies);
         std::list<GkRecords::GkSpecies> output; // A list of Species Data that correspond to the given licensee.
         int counter = 0;
         if ((!licensee_id.empty()) && (!species_cache.empty())) {
@@ -999,7 +1002,7 @@ std::list<GkRecords::GkId> HerpApp::find_animal_names(const GkRecords::comboBoxT
                     GkRecords::GkId animal;
                     animal.name_id = animal_id;
 
-                    auto tmp_animals_db = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
+                    auto tmp_animals_db = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkId);
                     for (auto it_tmp = tmp_animals_db.begin(); it_tmp != tmp_animals_db.end(); ++it_tmp) {
                         if (it_tmp.key() == animal_id) {
                             switch (dropbox_type) {
@@ -1157,9 +1160,9 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
             }
 
             if ((!submit_data.licensee.licensee_id.empty()) && (!submit_data.species.species_id.empty())) {
-                auto licensee_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkLicensee);
-                auto species_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
-                auto ident_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
+                auto licensee_data = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkLicensee);
+                auto species_data = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkSpecies);
+                auto ident_data = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkId);
 
                 for (auto it = licensee_data.begin(); it != licensee_data.end(); ++it) {
                     if (it.key() == submit_data.licensee.licensee_id) {
@@ -1255,23 +1258,24 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
  */
 bool HerpApp::delete_category_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id)
 {
+    // TODO: Finish this!
     try {
         if (!record_id.empty()) {
             using namespace GkRecords;
             switch (record_type) {
                 case MiscRecordType::gkLicensee:
                 {
-                    gkDbWrite->mass_del_id(MiscRecordType::gkLicensee, record_id);
+                    gkDbWrite->mass_del_cat(MiscRecordType::gkLicensee, record_id);
                 }
                     return true;
                 case MiscRecordType::gkSpecies:
                 {
-                    gkDbWrite->mass_del_id(MiscRecordType::gkSpecies, record_id);
+                    gkDbWrite->mass_del_cat(MiscRecordType::gkSpecies, record_id);
                 }
                     return true;
                 case MiscRecordType::gkId:
                 {
-                    gkDbWrite->mass_del_id(MiscRecordType::gkId, record_id);
+                    gkDbWrite->mass_del_cat(MiscRecordType::gkId, record_id);
                 }
                     return true;
                 default:
@@ -1323,7 +1327,7 @@ void HerpApp::update_charts(const bool &update_caches)
 
         if (!unique_id_map.empty()) {
             using namespace GkRecords;
-            auto dated_record_ids = gkDbRead->extractRecords(minDateTime, maxDateTime);
+            auto dated_record_ids = gkDbRead->extract_records(minDateTime, maxDateTime);
             long int date_time;
 
             if ((!dated_record_ids.empty()) && (!species_cache.empty()) && (!animal_cache.empty())) { // Check that the values we're using aren't empty

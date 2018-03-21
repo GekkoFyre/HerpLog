@@ -61,7 +61,7 @@ public:
     ~GkDbConn();
 
 public:
-    GkFile::FileDb openDatabase(const std::string &dbFile);
+    GkFile::FileDb open_database(const std::string &dbFile);
 };
 }
 
