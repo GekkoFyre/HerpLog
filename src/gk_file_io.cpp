@@ -136,65 +136,73 @@ bool GkFileIo::compress_files(const std::string &folderLoc, const std::string &s
  */
 std::string GkFileIo::decompress_file(const std::string &fileLoc)
 {
-    Unzipper unzipper(fileLoc);
-    std::vector<ZipEntry> entries = unzipper.entries();
-    std::vector<unsigned char> unzipped_data_csv;
-    unzipper.extractEntryToMemory(GkFile::GkCsv::zip_contents_csv, unzipped_data_csv);
+    try {
+        Unzipper unzipper(fileLoc);
+        std::vector<ZipEntry> entries = unzipper.entries();
+        std::vector<unsigned char> unzipped_data_csv;
+        unzipper.extractEntryToMemory(GkFile::GkCsv::zip_contents_csv, unzipped_data_csv);
 
-    csv::istringstream iss(std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())));
-    std::string csv_file_entry, csv_hash_entry, hashType;
-    fs::path fileName = fs::path(fileLoc).filename();
+        csv::istringstream iss(std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())));
+        std::string csv_file_entry, csv_hash_entry, hashType;
+        fs::path fileName = fs::path(fileLoc).filename();
 
-    // Remove all file-extensions from the filename
-    while(!fileName.extension().empty()) {
-        fileName = fileName.stem();
-    }
+        // Remove all file-extensions from the filename
+        while(!fileName.extension().empty()) {
+            fileName = fileName.stem();
+        }
 
-    const std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName.string());
-    checkExistingTempDir(temp_dir, true, true);
+        const std::string temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + fileName.string());
+        checkExistingTempDir(temp_dir, true, true);
 
-    unzipper.extract(temp_dir); // Extract the contents of the zip-file into a temporary directory
-    while (iss.read_line()) { // Read out the CSV information
-        iss >> csv_file_entry >> csv_hash_entry >> hashType;
-        if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) { // Make sure the CSV strings are not empty, otherwise abort
-            for (const auto &entry: entries) { // Read out the information contained within the zip-file datastream itself
-                if (!entry.name.empty()) { // Make sure the filename is valid
-                    const std::string cur_file = entry.name;
-                    if (cur_file == csv_file_entry) {
-                        // The full-path to the currently addressed, unzipped file
-                        std::ostringstream cur_file_full_path_oss;
-                        cur_file_full_path_oss << temp_dir << fs::path::preferred_separator << cur_file;
-                        fs::path cur_file_full_path = cur_file_full_path_oss.str();
+        unzipper.extract(temp_dir); // Extract the contents of the zip-file into a temporary directory
+        while (iss.read_line()) { // Read out the CSV information
+            iss >> csv_file_entry >> csv_hash_entry >> hashType;
+            if (!csv_file_entry.empty() && !csv_hash_entry.empty() && !hashType.empty()) { // Make sure the CSV strings are not empty, otherwise abort
+                for (const auto &entry: entries) { // Read out the information contained within the zip-file datastream itself
+                    if (!entry.name.empty()) { // Make sure the filename is valid
+                        const std::string cur_file = entry.name;
+                        if (cur_file == csv_file_entry) {
+                            // The full-path to the currently addressed, unzipped file
+                            std::ostringstream cur_file_full_path_oss;
+                            cur_file_full_path_oss << temp_dir << fs::path::preferred_separator << cur_file;
+                            fs::path cur_file_full_path = cur_file_full_path_oss.str();
 
-                        sys::error_code ec;
-                        if (fs::exists(cur_file_full_path, ec)) {
-                            // The binary data of the currently addressed file within a std::string
-                            std::string fileData = readFileToString(cur_file_full_path.string());
+                            sys::error_code ec;
+                            if (fs::exists(cur_file_full_path, ec)) {
+                                // The binary data of the currently addressed file within a std::string
+                                std::string fileData = readFileToString(cur_file_full_path.string());
 
-                            // The CRC32 Hash of the currently addressed file
-                            std::string crc32 = getCrc32(fileData);
-                            if (crc32 == csv_hash_entry) {
-                                continue;
+                                // The CRC32 Hash of the currently addressed file
+                                std::string crc32 = getCrc32(fileData);
+                                if (crc32 == csv_hash_entry) {
+                                    continue;
+                                } else {
+                                    QMessageBox::warning(nullptr, tr("Error!"), tr("The database, \"%1\", appears to be corrupt. Aborting...")
+                                            .arg(QString::fromStdString(fileName.string())), QMessageBox::Ok);
+                                    unzipper.close();
+                                    return "";
+                                }
                             } else {
-                                QMessageBox::warning(nullptr, tr("Error!"), tr("The database, \"%1\", appears to be corrupt. Aborting...")
-                                        .arg(QString::fromStdString(fileName.string())), QMessageBox::Ok);
+                                QMessageBox::warning(nullptr, tr("Error!"), tr("A problem was encountered whilst opening your saved database. Error:\n\n%1")
+                                        .arg(QString::fromStdString(ec.message())), QMessageBox::Ok);
                                 unzipper.close();
-                                return nullptr;
+                                return "";
                             }
-                        } else {
-                            QMessageBox::warning(nullptr, tr("Error!"), tr("A problem was encountered whilst opening your saved database. Error:\n\n%1")
-                                    .arg(QString::fromStdString(ec.message())), QMessageBox::Ok);
-                            unzipper.close();
-                            return nullptr;
                         }
                     }
                 }
             }
         }
+
+        unzipper.close();
+        return temp_dir;
+    } catch (const std::exception &e) {
+        QMessageBox::warning(nullptr, tr("Error!"), tr("An issue has been encountered whilst opening your database file. Please ensure that the "
+                                                               "integrity of the file is intact before trying once more. Error:\n\n%1").arg(e.what()),
+                             QMessageBox::Ok);
     }
 
-    unzipper.close();
-    return temp_dir;
+    return "";
 }
 
 /**

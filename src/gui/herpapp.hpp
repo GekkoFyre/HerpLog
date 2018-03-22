@@ -83,14 +83,8 @@ private slots:
     void on_action_Disconnect_triggered();
     void on_action_Save_triggered();
     void on_actionSave_As_triggered();
-    void on_actionSave_A_ll_triggered();
     void on_action_Print_triggered();
     void on_actionE_xit_triggered();
-    void on_action_Undo_triggered();
-    void on_action_Redo_triggered();
-    void on_actionCu_t_triggered();
-    void on_action_Copy_triggered();
-    void on_action_Paste_triggered();
     void on_actionF_ind_triggered();
     void on_action_Settings_triggered();
     void on_action_Documentation_triggered();

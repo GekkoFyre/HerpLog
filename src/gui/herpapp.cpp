@@ -80,6 +80,17 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     ui->dateTime_add_record->setDate(QDate::currentDate());
     ui->dateTime_add_record->setTime(QTime::currentTime());
 
+    fs::path db_path = db_file_path;
+    QString db_file_name = db_path.filename().c_str();
+
+    if (db_file_name.length() < 24) {
+        ui->action_Save->setText(tr("Save \"%1\"").arg(db_file_name));
+        ui->actionSave_As->setText(tr("Save \"%1\" As").arg(db_file_name));
+    } else {
+        ui->action_Save->setText(tr("Save \"...\"").arg(db_file_name));
+        ui->actionSave_As->setText(tr("Save \"...\" As").arg(db_file_name));
+    }
+
     charts_tab_enabled = false;
     set_date_ranges();
     update_charts();
@@ -190,43 +201,35 @@ void HerpApp::on_actionSave_As_triggered()
     return;
 }
 
-void HerpApp::on_actionSave_A_ll_triggered()
+void HerpApp::on_action_Print_triggered()
+{
+    QMessageBox::information(this, tr("Notice"), tr("The ability to print is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
+
+void HerpApp::on_actionE_xit_triggered()
+{
+    QApplication::quit();
+    return;
+}
+
+void HerpApp::on_actionF_ind_triggered()
 {
     QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
     return;
 }
 
-void HerpApp::on_action_Print_triggered()
-{}
-
-void HerpApp::on_actionE_xit_triggered()
+void HerpApp::on_action_Settings_triggered()
 {
-    QApplication::quit();
+    QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
 }
 
-void HerpApp::on_action_Undo_triggered()
-{}
-
-void HerpApp::on_action_Redo_triggered()
-{}
-
-void HerpApp::on_actionCu_t_triggered()
-{}
-
-void HerpApp::on_action_Copy_triggered()
-{}
-
-void HerpApp::on_action_Paste_triggered()
-{}
-
-void HerpApp::on_actionF_ind_triggered()
-{}
-
-void HerpApp::on_action_Settings_triggered()
-{}
-
 void HerpApp::on_action_Documentation_triggered()
-{}
+{
+    QMessageBox::information(this, tr("Notice"), tr("Documentation is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
 
 void HerpApp::on_action_About_triggered()
 {

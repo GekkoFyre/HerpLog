@@ -618,7 +618,7 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
                         // We must determine what licensees and species are associated with this animal record.
                         auto uuid_cache = gkDbRead->get_uuids();
                         QMap<std::string, std::string> unique_licensees_map; // <Key: UUID, Value: License ID>
-                        QMap<std::string, std::pair<std::string, std::string>> unique_species_map; // <Key: UUID, Value: <License ID, Species ID>>
+                        QMap<std::string, std::pair<std::string, std::string>> unique_species_map; // <Key: UUID, Value: <Species ID, Animal ID>>
 
                         for (const auto &uuid: uuid_cache) {
                             if (uuid.second.name_id == record_id) {
@@ -627,8 +627,8 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
                                 }
 
                                 if (!unique_species_map.contains(uuid.first)) {
-                                    unique_species_map.insert(uuid.first, std::make_pair(uuid.second.licensee_id,
-                                                                                         uuid.second.species_id));
+                                    unique_species_map.insert(uuid.first, std::make_pair(uuid.second.species_id,
+                                                                                         uuid.second.name_id));
                                 }
                             }
                         }
@@ -652,14 +652,14 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
                             }
 
                             for (auto it = unique_species_map.begin(); it != unique_species_map.end(); ++it) {
-                                mass_del_cat(MiscRecordType::gkSpecies, it.value().second, true);
+                                mass_del_cat(MiscRecordType::gkSpecies, it.value().first, true);
 
                                 if (!unique_uuid_vec.contains(it.key())) {
                                     unique_uuid_vec.push_back(it.key());
                                 }
 
-                                if (!unique_animals_vec.contains(it.value().first)) {
-                                    unique_animals_vec.push_back(it.value().first);
+                                if (!unique_animals_vec.contains(it.value().second)) {
+                                    unique_animals_vec.push_back(it.value().second);
                                 }
                             }
 
