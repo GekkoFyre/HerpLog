@@ -61,9 +61,7 @@ public:
 
     std::string random_hash();
     std::string multipart_key(const std::initializer_list<std::string> &args);
-    bool del_cat_msg_box(const QMap<std::string, std::string> &cat_map_one,
-                         const QMap<std::string, std::string> &cat_map_two, const std::string &record_id,
-                         const GkRecords::MiscRecordType &record_type);
+    bool del_cat_msg_box(const GkRecords::GkCategories &cat_struct, const GkRecords::MiscRecordType &record_type);
 };
 }
 

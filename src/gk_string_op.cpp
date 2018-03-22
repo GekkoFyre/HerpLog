@@ -107,11 +107,9 @@ std::string GkStringOp::multipart_key(const std::initializer_list<std::string> &
  * @return Whether the user wants to delete the specified categories in question (TRUE) or not (FALSE).
  * @see GekkoFyre::GkDbWrite::mass_del_cat()
  */
-bool GkStringOp::del_cat_msg_box(const QMap<std::string, std::string> &cat_map_one,
-                                 const QMap<std::string, std::string> &cat_map_two, const std::string &record_id,
-                                 const GkRecords::MiscRecordType &record_type)
+bool GkStringOp::del_cat_msg_box(const GkRecords::GkCategories &cat_struct, const GkRecords::MiscRecordType &record_type)
 {
-    if ((!record_id.empty())) {
+    if ((!cat_struct.spec_record_id.empty())) {
         using namespace GkRecords;
         QMessageBox msgBox;
         msgBox.setWindowTitle(tr("Proceed?"));
@@ -124,27 +122,136 @@ bool GkStringOp::del_cat_msg_box(const QMap<std::string, std::string> &cat_map_o
             case MiscRecordType::gkLicensee:
             {
                 count_licensees += 1;
-                // Calculate the numbers of each `category` that will be deleted
+                if ((!cat_struct.species_cache.empty()) && (!cat_struct.animals_cache.empty())) {
+                    QVector<std::string> unique_uuid_vec;
+                    QVector<std::string> unique_licensee_vec;
+                    QVector<std::string> unique_species_vec;
+                    QVector<std::string> unique_animals_vec;
 
-                // Calculate the amount of `log entries` that will be deleted
+                    for (auto it = cat_struct.species_cache.begin(); it != cat_struct.species_cache.end(); ++it) {
+                        if (!unique_uuid_vec.contains(it.key())) {
+                            unique_uuid_vec.push_back(it.key());
+                        }
+
+                        if (!unique_licensee_vec.contains(it.value().first)) {
+                            unique_licensee_vec.push_back(it.value().first);
+                        }
+
+                        if (!unique_species_vec.contains(it.value().second)) {
+                            unique_species_vec.push_back(it.value().second);
+                        }
+                    }
+
+                    for (auto it = cat_struct.animals_cache.begin(); it != cat_struct.animals_cache.end(); ++it) {
+                        if (!unique_uuid_vec.contains(it.key())) {
+                            unique_uuid_vec.push_back(it.key());
+                        }
+
+                        if (!unique_animals_vec.contains(it.value().second)) {
+                            unique_animals_vec.push_back(it.value().second);
+                        }
+                    }
+
+                    // Calculate the numbers of each `category` that will be deleted
+                    count_licensees = unique_licensee_vec.size();
+                    count_species = unique_species_vec.size();
+                    count_animal_ids = unique_animals_vec.size();
+
+                    // Calculate the amount of `log entries` that will be deleted
+                    count_log_entries = unique_uuid_vec.size();
+                } else {
+                    throw std::invalid_argument(tr("Cache is not initialized! It's empty!").toStdString());
+                }
             }
 
                 break;
             case MiscRecordType::gkSpecies:
             {
-                // Calculate the numbers of each `category` that will be deleted
-                ++count_species;
+                if ((!cat_struct.licensee_cache.empty()) && (!cat_struct.animals_cache.empty())) {
+                    QVector<std::string> unique_uuid_vec;
+                    QVector<std::string> unique_licensee_vec;
+                    QVector<std::string> unique_species_vec;
+                    QVector<std::string> unique_animals_vec;
 
-                // Calculate the amount of `log entries` that will be deleted
+                    for (auto it = cat_struct.licensee_cache.begin(); it != cat_struct.licensee_cache.end(); ++it) {
+                        if (!unique_uuid_vec.contains(it.key())) {
+                            unique_uuid_vec.push_back(it.key());
+                        }
+
+                        if (!unique_licensee_vec.contains(it.value())) {
+                            unique_licensee_vec.push_back(it.value());
+                        }
+                    }
+
+                    for (auto it = cat_struct.animals_cache.begin(); it != cat_struct.animals_cache.end(); ++it) {
+                        if (!unique_uuid_vec.contains(it.key())) {
+                            unique_uuid_vec.push_back(it.key());
+                        }
+
+                        if (!unique_species_vec.contains(it.value().first)) {
+                            unique_species_vec.push_back(it.value().first);
+                        }
+
+                        if (!unique_animals_vec.contains(it.value().second)) {
+                            unique_animals_vec.push_back(it.value().second);
+                        }
+                    }
+
+                    // Calculate the numbers of each `category` that will be deleted
+                    count_licensees = unique_licensee_vec.size();
+                    count_species = unique_species_vec.size();
+                    count_animal_ids = unique_animals_vec.size();
+
+                    // Calculate the amount of `log entries` that will be deleted
+                    count_log_entries = unique_uuid_vec.size();
+                } else {
+                    throw std::invalid_argument(tr("Cache is not initialized! It's empty!").toStdString());
+                }
             }
 
                 break;
             case MiscRecordType::gkId:
             {
-                // Calculate the numbers of each `category` that will be deleted
-                ++count_animal_ids;
+                if ((!cat_struct.licensee_cache.empty()) && (!cat_struct.species_cache.empty())) {
+                    QVector<std::string> unique_uuid_vec;
+                    QVector<std::string> unique_licensee_vec;
+                    QVector<std::string> unique_species_vec;
+                    QVector<std::string> unique_animals_vec;
 
-                // Calculate the amount of `log entries` that will be deleted
+                    for (auto it = cat_struct.licensee_cache.begin(); it != cat_struct.licensee_cache.end(); ++it) {
+                        if (!unique_uuid_vec.contains(it.key())) {
+                            unique_uuid_vec.push_back(it.key());
+                        }
+
+                        if (!unique_licensee_vec.contains(it.value())) {
+                            unique_licensee_vec.push_back(it.value());
+                        }
+                    }
+
+                    for (auto it = cat_struct.species_cache.begin(); it != cat_struct.species_cache.end(); ++it) {
+                        if (!unique_uuid_vec.contains(it.key())) {
+                            unique_uuid_vec.push_back(it.key());
+                        }
+
+                        if (!unique_licensee_vec.contains(it.value().first)) {
+                            unique_licensee_vec.push_back(it.value().first);
+                        }
+
+                        if (!unique_species_vec.contains(it.value().second)) {
+                            unique_species_vec.push_back(it.value().second);
+                        }
+                    }
+
+                    // Calculate the numbers of each `category` that will be deleted
+                    count_licensees = unique_licensee_vec.size();
+                    count_species = unique_species_vec.size();
+                    count_animal_ids = 0;
+
+                    // Calculate the amount of `log entries` that will be deleted
+                    count_log_entries = unique_uuid_vec.size();
+                } else {
+                    throw std::invalid_argument(tr("Cache is not initialized! It's empty!").toStdString());
+                }
             }
 
                 break;
@@ -158,9 +265,19 @@ bool GkStringOp::del_cat_msg_box(const QMap<std::string, std::string> &cat_map_o
                                        .arg(QString::number(count_species))
                                        .arg(QString::number(count_animal_ids))
                                        .arg(QString::number(count_log_entries)));
+        int ret = msgBox.exec();
+        switch (ret) {
+            case QMessageBox::YesToAll:
+                return true;
+            case QMessageBox::No:
+                return false;
+            case QMessageBox::Cancel:
+                return false;
+            default:
+                // Should never be reached!
+                throw std::invalid_argument(tr("Unable to read Unique Identifier from database!").toStdString());
+        }
     } else {
         throw std::invalid_argument(tr("One of the given UUID caches are empty!").toStdString());
     }
-
-    return false;
 }

@@ -141,8 +141,6 @@ private:
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
 
-    bool delete_category_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
-
     void insert_charts();
     void update_charts(const bool &update_caches = false);
 

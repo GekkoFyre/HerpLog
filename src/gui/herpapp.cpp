@@ -432,7 +432,7 @@ void HerpApp::on_toolButton_view_records_licensee_clicked()
             }
         }
 
-        delete_category_id(GkRecords::MiscRecordType::gkLicensee, licensee_id);
+        gkDbWrite->mass_del_cat(GkRecords::MiscRecordType::gkLicensee, licensee_id, false);
     }
 }
 
@@ -451,7 +451,7 @@ void HerpApp::on_toolButton_view_records_species_clicked()
             }
         }
 
-        delete_category_id(GkRecords::MiscRecordType::gkSpecies, species_id);
+        gkDbWrite->mass_del_cat(GkRecords::MiscRecordType::gkSpecies, species_id, false);
     }
 }
 
@@ -470,7 +470,7 @@ void HerpApp::on_toolButton_view_records_animal_clicked()
             }
         }
 
-        delete_category_id(GkRecords::MiscRecordType::gkId, animal_id);
+        gkDbWrite->mass_del_cat(GkRecords::MiscRecordType::gkId, animal_id, false);
     }
 }
 
@@ -1245,47 +1245,6 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
     }
 
     return;
-}
-
-/**
- * @brief HerpApp::delete_category_id
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-03-19
- * @param record_type
- * @param record_id
- * @return
- */
-bool HerpApp::delete_category_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id)
-{
-    // TODO: Finish this!
-    try {
-        if (!record_id.empty()) {
-            using namespace GkRecords;
-            switch (record_type) {
-                case MiscRecordType::gkLicensee:
-                {
-                    gkDbWrite->mass_del_cat(MiscRecordType::gkLicensee, record_id);
-                }
-                    return true;
-                case MiscRecordType::gkSpecies:
-                {
-                    gkDbWrite->mass_del_cat(MiscRecordType::gkSpecies, record_id);
-                }
-                    return true;
-                case MiscRecordType::gkId:
-                {
-                    gkDbWrite->mass_del_cat(MiscRecordType::gkId, record_id);
-                }
-                    return true;
-                default:
-                    throw std::runtime_error(tr("An error occurred whilst deleting records from the database!").toStdString());
-            }
-        }
-    } catch (const std::exception &e) {
-        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
-    }
-
-    return false;
 }
 
 /**
