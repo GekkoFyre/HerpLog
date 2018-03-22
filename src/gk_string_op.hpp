@@ -43,9 +43,11 @@
 #ifndef GKSTRINGOP_HPP
 #define GKSTRINGOP_HPP
 
+#include "options.hpp"
 #include <QtCore/QObject>
 #include <initializer_list>
 #include <string>
+#include <QMap>
 
 namespace GekkoFyre {
 class GkStringOp;
@@ -57,10 +59,11 @@ public:
     explicit GkStringOp(QObject *parent = nullptr);
     ~GkStringOp();
 
-    std::string getCrc32(const std::string &input);
     std::string random_hash();
-
     std::string multipart_key(const std::initializer_list<std::string> &args);
+    bool del_cat_msg_box(const QMap<std::string, std::string> &cat_map_one,
+                         const QMap<std::string, std::string> &cat_map_two, const std::string &record_id,
+                         const GkRecords::MiscRecordType &record_type);
 };
 }
 

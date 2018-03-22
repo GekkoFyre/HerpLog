@@ -53,7 +53,6 @@
 #include <exception>
 #include <random>
 #include <vector>
-#include <future>
 
 namespace sys = boost::system;
 HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_path, const std::string &db_file_path,
@@ -627,8 +626,8 @@ bool HerpApp::delete_record(const std::string &record_id)
     try {
         if ((!record_id.empty()) && (!unique_id_map.empty())) {
             QMessageBox msgBox;
-            msgBox.setText(tr("Delete Record..."));
-            msgBox.setInformativeText(tr("Are you really sure about deleting this record?"));
+            msgBox.setWindowTitle(tr("Delete Record..."));
+            msgBox.setText(tr("Are you really sure about deleting this record?"));
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
             msgBox.setDefaultButton(QMessageBox::Yes);
             int ret = msgBox.exec();

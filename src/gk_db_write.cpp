@@ -53,6 +53,7 @@
 #include <leveldb/cache.h>
 #include <QMessageBox>
 #include <QVector>
+#include <QMap>
 #include <random>
 #include <exception>
 #include <sstream>
@@ -466,97 +467,6 @@ bool GkDbWrite::del_uuid(const std::string &uuid)
 }
 
 /**
- * @brief GkDbWrite::mass_del_uuid deletes all the related UUIDs from `store_unique_id` that are related to the
- * specified Unique ID of Licensee, Species, or Animal category in question.
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-03-21
- * @param record_type Whether to delete data related to `store_licensee_id`, `store_species_id`, or `store_name_id` from within
- * the Google LevelDB database.
- * @param record_id The Unique ID relating to the Licensee, Species, or Animal category in question that's to be deleted.
- * @return Whether the operation was a success or not.
- */
-bool GkDbWrite::mass_del_uuid(const GkRecords::MiscRecordType &record_type, const std::string &record_id)
-{
-    try {
-        if (!record_id.empty()) {
-            using namespace GkRecords;
-            leveldb::WriteOptions write_options;
-            write_options.sync = true;
-            leveldb::WriteBatch batch;
-
-            std::ostringstream oss;
-            auto record_cache = gkDbRead->get_uuids();
-            bool write_db = false;
-
-            if (!record_cache.empty()) {
-                switch (record_type) {
-                    case MiscRecordType::gkLicensee:
-                    {
-                        for (const auto &id: record_cache) {
-                            if (id.second.licensee_id != record_id) {
-                                oss << id.first << "," << id.second.licensee_id << "," << id.second.species_id << ","
-                                    << id.second.name_id << std::endl;
-                                write_db = true;
-                            }
-                        }
-                    }
-
-                        break;
-                    case MiscRecordType::gkSpecies:
-                    {
-                        for (const auto &id: record_cache) {
-                            if (id.second.species_id != record_id) {
-                                oss << id.first << "," << id.second.licensee_id << "," << id.second.species_id << ","
-                                    << id.second.name_id << std::endl;
-                                write_db = true;
-                            }
-                        }
-                    }
-
-                        break;
-                    case MiscRecordType::gkId:
-                    {
-                        for (const auto &id: record_cache) {
-                            if (id.second.name_id != record_id) {
-                                oss << id.first << "," << id.second.licensee_id << "," << id.second.species_id << ","
-                                    << id.second.name_id << std::endl;
-                                write_db = true;
-                            }
-                        }
-                    }
-
-                        break;
-                    default:
-                        throw std::runtime_error(tr("Unable to delete records from the database!").toStdString());
-                }
-            } else {
-                throw std::runtime_error(tr("There are no entries to delete!").toStdString());
-            }
-
-            batch.Delete(LEVELDB_STORE_RECORD_ID);
-            if (write_db) { // There is at least one key/value pair that needs to be written back to the database
-                batch.Put(LEVELDB_STORE_RECORD_ID, oss.str());
-            }
-
-            std::lock_guard<std::mutex> locker(db_mutex);
-            leveldb::Status s;
-            s = db_conn.db->Write(write_options, &batch);
-            if (!s.ok()) {
-                throw std::runtime_error(s.ToString());
-            }
-
-            return true;
-        } else {
-            throw std::invalid_argument(tr("One of the given Unique IDs are empty!").toStdString());
-        }
-    } catch (const std::exception &e) {
-        QMessageBox::warning(nullptr, tr("Error!"), e.what(), QMessageBox::Ok);
-    }
-
-    return false;
-}
-
-/**
  * @brief GkDbWrite::mass_del_id Will delete any number of records (depending on what's associated) from the Google LevelDB
  * database in one, swift go.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
@@ -573,47 +483,57 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
     try {
         if (!record_id.empty()) {
             using namespace GkRecords;
-
-            // TODO: Finish writing this function!
             switch (record_type) {
                 case MiscRecordType::gkLicensee:
                 {
                     if (recursive) {
                         del_cat_key_vals(MiscRecordType::gkLicensee, record_id);
+                        return true;
                     } else {
                         // Must firstly determine what species and animals are associated with this licensee record
-                        auto record_cache = gkDbRead->get_uuids();
-                        std::vector<MiscUniqueIds> cat_id_vec;
+                        auto uuid_cache = gkDbRead->get_uuids();
+                        QMap<std::string, std::string> unique_species_map; // <Key: UUID, Value: Category>
+                        QMap<std::string, std::string> unique_animals_map; // <Key: UUID, Value: Category>
 
-                        for (const auto &cached_id: record_cache) {
-                            if (cached_id.second.licensee_id == record_id) {
-                                MiscUniqueIds unique_id_struc;
-                                unique_id_struc.licensee_id = record_id;
-                                unique_id_struc.species_id = cached_id.second.species_id;
-                                unique_id_struc.name_id = cached_id.second.name_id;
+                        for (const auto &uuid: uuid_cache) {
+                            if (uuid.second.licensee_id == record_id) {
+                                if (!unique_species_map.contains(uuid.second.species_id)) {
+                                    unique_species_map.insert(uuid.first, uuid.second.species_id);
+                                }
 
-                                cat_id_vec.push_back(unique_id_struc);
+                                if (!unique_animals_map.contains(uuid.second.name_id)) {
+                                    unique_animals_map.insert(uuid.first, uuid.second.name_id);
+                                }
                             }
                         }
 
-                        del_cat_key_vals(MiscRecordType::gkLicensee, record_id); // This deletes the `Licensee ID`
+                        bool ret = gkStrOp->del_cat_msg_box(uuid_cache, unique_species_map, unique_animals_map,
+                                                            record_id, MiscRecordType::gkLicensee);
+                        if (ret) {
+                            QVector<std::string> unique_uuid_vec;
+                            del_cat_key_vals(MiscRecordType::gkLicensee, record_id); // This deletes the `Licensee ID`
 
-                        QVector<std::string> already_del_species;
-                        QVector<std::string> already_del_animals;
-                        for (const auto &cat: cat_id_vec) {
-                            if (!already_del_species.contains(cat.species_id)) {
-                                mass_del_cat(MiscRecordType::gkSpecies, cat.species_id, true); // Deletes `Species ID`
-                                already_del_species.push_back(cat.species_id);
+                            for (auto it = unique_species_map.begin(); it != unique_species_map.end(); ++it) {
+                                mass_del_cat(MiscRecordType::gkSpecies, it.value(), true);
+
+                                if (!unique_uuid_vec.contains(it.key())) {
+                                    unique_uuid_vec.push_back(it.key());
+                                }
                             }
 
-                            if (!already_del_animals.contains(cat.name_id)) {
-                                mass_del_cat(MiscRecordType::gkId, cat.name_id, true); // Deletes `Animal ID`
-                                already_del_animals.push_back(cat.name_id);
+                            for (auto it = unique_animals_map.begin(); it != unique_animals_map.end(); ++it) {
+                                mass_del_cat(MiscRecordType::gkId, it.value(), true);
+
+                                if (!unique_uuid_vec.contains(it.key())) {
+                                    unique_uuid_vec.push_back(it.key());
+                                }
+                            }
+
+                            for (const auto &uuid: unique_uuid_vec) {
+                                // Now delete the main UUID itself!
+                                del_uuid(uuid);
                             }
                         }
-
-                        // Now delete the main UUID itself!
-                        mass_del_uuid(MiscRecordType::gkLicensee, record_id);
                     }
                 }
 
@@ -622,40 +542,52 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
                 {
                     if (recursive) {
                         del_cat_key_vals(MiscRecordType::gkSpecies, record_id);
+                        return true;
                     } else {
                         // We must determine what licensees and animals are associated with this species record.
-                        auto record_cache = gkDbRead->get_uuids();
-                        std::vector<MiscUniqueIds> cat_id_vec;
+                        auto uuid_cache = gkDbRead->get_uuids();
+                        QMap<std::string, std::string> unique_licensees_map; // <Key: UUID, Value: Category>
+                        QMap<std::string, std::string> unique_animals_map; // <Key: UUID, Value: Category>
 
-                        for (const auto &cached_id: record_cache) {
-                            if (cached_id.second.species_id == record_id) {
-                                MiscUniqueIds unique_id_struc;
-                                unique_id_struc.licensee_id = cached_id.second.licensee_id;
-                                unique_id_struc.species_id = record_id;
-                                unique_id_struc.name_id = cached_id.second.name_id;
+                        for (const auto &uuid: uuid_cache) {
+                            if (uuid.second.species_id == record_id) {
+                                if (!unique_licensees_map.contains(uuid.first)) {
+                                    unique_licensees_map.insert(uuid.first, uuid.second.licensee_id);
+                                }
 
-                                cat_id_vec.push_back(unique_id_struc);
+                                if (!unique_animals_map.contains(uuid.first)) {
+                                    unique_animals_map.insert(uuid.first, uuid.second.name_id);
+                                }
                             }
                         }
 
-                        del_cat_key_vals(MiscRecordType::gkSpecies, record_id); // This deletes the `Species ID`
+                        bool ret = gkStrOp->del_cat_msg_box(uuid_cache, unique_licensees_map, unique_animals_map,
+                                                            record_id, MiscRecordType::gkSpecies);
+                        if (ret) {
+                            QVector<std::string> unique_uuid_vec;
+                            del_cat_key_vals(MiscRecordType::gkSpecies, record_id); // This deletes the `Species ID`
 
-                        QVector<std::string> already_del_licensees;
-                        QVector<std::string> already_del_animals;
-                        for (const auto &cat: cat_id_vec) {
-                            if (!already_del_licensees.contains(cat.licensee_id)) {
-                                mass_del_cat(MiscRecordType::gkLicensee, cat.licensee_id, true); // Deletes `Licensee ID`
-                                already_del_licensees.push_back(cat.licensee_id);
+                            for (auto it = unique_licensees_map.begin(); it != unique_licensees_map.end(); ++it) {
+                                mass_del_cat(MiscRecordType::gkLicensee, it.value(), true);
+
+                                if (!unique_uuid_vec.contains(it.key())) {
+                                    unique_uuid_vec.push_back(it.key());
+                                }
                             }
 
-                            if (!already_del_animals.contains(cat.name_id)) {
-                                mass_del_cat(MiscRecordType::gkId, cat.name_id, true); // Deletes `Animal ID`
-                                already_del_animals.push_back(cat.name_id);
+                            for (auto it = unique_animals_map.begin(); it != unique_animals_map.end(); ++it) {
+                                mass_del_cat(MiscRecordType::gkId, it.value(), true);
+
+                                if (!unique_uuid_vec.contains(it.key())) {
+                                    unique_uuid_vec.push_back(it.key());
+                                }
+                            }
+
+                            for (const auto &uuid: unique_uuid_vec) {
+                                // Now delete the main UUID itself!
+                                del_uuid(uuid);
                             }
                         }
-
-                        // Now delete the main UUID itself!
-                        mass_del_uuid(MiscRecordType::gkSpecies, record_id);
                     }
                 }
 
@@ -664,40 +596,52 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
                 {
                     if (recursive) {
                         del_cat_key_vals(MiscRecordType::gkId, record_id);
+                        return true;
                     } else {
                         // We must determine what licensees and species are associated with this animal record.
-                        auto record_cache = gkDbRead->get_uuids();
-                        std::vector<MiscUniqueIds> cat_id_vec;
+                        auto uuid_cache = gkDbRead->get_uuids();
+                        QMap<std::string, std::string> unique_licensees_map; // <Key: UUID, Value: Category>
+                        QMap<std::string, std::string> unique_species_map; // <Key: UUID, Value: Category>
 
-                        for (const auto &cached_id: record_cache) {
-                            if (cached_id.second.name_id == record_id) {
-                                MiscUniqueIds unique_id_struc;
-                                unique_id_struc.licensee_id = cached_id.second.licensee_id;
-                                unique_id_struc.species_id = cached_id.second.species_id;
-                                unique_id_struc.name_id = record_id;
+                        for (const auto &uuid: uuid_cache) {
+                            if (uuid.second.name_id == record_id) {
+                                if (!unique_licensees_map.contains(uuid.first)) {
+                                    unique_licensees_map.insert(uuid.first, uuid.second.licensee_id);
+                                }
 
-                                cat_id_vec.push_back(unique_id_struc);
+                                if (!unique_species_map.contains(uuid.first)) {
+                                    unique_species_map.insert(uuid.first, uuid.second.species_id);
+                                }
                             }
                         }
 
-                        del_cat_key_vals(MiscRecordType::gkId, record_id); // This deletes the `Animal ID`
+                        bool ret = gkStrOp->del_cat_msg_box(uuid_cache, unique_licensees_map, unique_species_map,
+                                                            record_id, MiscRecordType::gkId);
+                        if (ret) {
+                            QVector<std::string> unique_uuid_vec;
+                            del_cat_key_vals(MiscRecordType::gkId, record_id); // This deletes the `Animal ID`
 
-                        QVector<std::string> already_del_licensees;
-                        QVector<std::string> already_del_species;
-                        for (const auto &cat: cat_id_vec) {
-                            if (!already_del_licensees.contains(cat.licensee_id)) {
-                                mass_del_cat(MiscRecordType::gkLicensee, cat.licensee_id, true); // Deletes `Licensee ID`
-                                already_del_licensees.push_back(cat.licensee_id);
+                            for (auto it = unique_licensees_map.begin(); it != unique_licensees_map.end(); ++it) {
+                                mass_del_cat(MiscRecordType::gkLicensee, it.value(), true);
+
+                                if (!unique_uuid_vec.contains(it.key())) {
+                                    unique_uuid_vec.push_back(it.key());
+                                }
                             }
 
-                            if (!already_del_species.contains(cat.species_id)) {
-                                mass_del_cat(MiscRecordType::gkSpecies, cat.species_id, true); // Deletes `Species ID`
-                                already_del_species.push_back(cat.species_id);
+                            for (auto it = unique_species_map.begin(); it != unique_species_map.end(); ++it) {
+                                mass_del_cat(MiscRecordType::gkSpecies, it.value(), true);
+
+                                if (!unique_uuid_vec.contains(it.key())) {
+                                    unique_uuid_vec.push_back(it.key());
+                                }
+                            }
+
+                            for (const auto &uuid: unique_uuid_vec) {
+                                // Now delete the main UUID itself!
+                                del_uuid(uuid);
                             }
                         }
-
-                        // Now delete the main UUID itself!
-                        mass_del_uuid(MiscRecordType::gkId, record_id);
                     }
                 }
 
@@ -724,6 +668,7 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
  */
 std::string GkDbWrite::create_uuid()
 {
+    // TODO: Check to see if UUID already exists in the database or not...
     boost::mt19937 ran;
     std::random_device rd;
     ran.seed(rd());

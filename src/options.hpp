@@ -43,8 +43,11 @@
 #ifndef GKOPTIONS_HPP
 #define GKOPTIONS_HPP
 
+#include <boost/exception/all.hpp>
 #include <boost/filesystem.hpp>
 #include <leveldb/db.h>
+#include <leveldb/options.h>
+#include <exception>
 #include <memory>
 #include <string>
 #include <chrono>

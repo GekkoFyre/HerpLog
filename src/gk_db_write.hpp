@@ -70,7 +70,6 @@ public:
     bool add_uuid(const std::string &uuid, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
                   const GkRecords::GkId &id);
     bool del_uuid(const std::string &uuid);
-    bool mass_del_uuid(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
     bool mass_del_cat(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
                       const bool &recursive = false);
     std::string create_uuid();

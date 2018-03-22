@@ -46,9 +46,8 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/random.hpp>
-#include <boost/crc.hpp>
+#include <QMessageBox>
 #include <random>
-#include <chrono>
 #include <sstream>
 
 using namespace GekkoFyre;
@@ -57,24 +56,6 @@ GkStringOp::GkStringOp(QObject *parent) : QObject(parent)
 
 GkStringOp::~GkStringOp()
 {}
-
-/**
- * @brief GkStringOp::getCrc32 will calculate the CRC32 hash of any given string.
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-02-21
- * @note <http://www.boost.org/doc/libs/1_65_1/libs/crc/crc_example.cpp>
- * @param input The string in question, for which the hash is to be calculated henceforth.
- * @return The CRC32 hash of the given input.
- */
-std::string GkStringOp::getCrc32(const std::string &input)
-{
-    boost::crc_32_type hash;
-    hash.process_bytes(input.data(), input.length());
-    std::ostringstream oss;
-    oss << std::hex << std::uppercase << hash.checksum();
-
-    return oss.str();
-}
 
 std::string GkStringOp::random_hash()
 {
@@ -112,4 +93,74 @@ std::string GkStringOp::multipart_key(const std::initializer_list<std::string> &
     }
 
     return ret_val.str();
+}
+
+/**
+ * @brief GkStringOp::del_cat_msg_box will pose a QMessageBox to the user of HerpLog and ask them if they want to proceed
+ * with the action of deleting the specified categories in question (`Licensee`, `Species`, or `Animal ID`) from
+ * the Google LevelDB database.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-21
+ * @param uuid_cache The cache of UUIDs that have been passed on from the previous function.
+ * @param record_id The specified and unique Record ID in question that's to be deleted.
+ * @param record_type The type of category we are dealing with in this instance (`Licensee`, `Species`, or `Animal ID`).
+ * @return Whether the user wants to delete the specified categories in question (TRUE) or not (FALSE).
+ * @see GekkoFyre::GkDbWrite::mass_del_cat()
+ */
+bool GkStringOp::del_cat_msg_box(const QMap<std::string, std::string> &cat_map_one,
+                                 const QMap<std::string, std::string> &cat_map_two, const std::string &record_id,
+                                 const GkRecords::MiscRecordType &record_type)
+{
+    if ((!record_id.empty())) {
+        using namespace GkRecords;
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Proceed?"));
+        msgBox.setText(tr("Are you sure about deleting all of the specified `categories` and `log entries`?"));
+        msgBox.setStandardButtons(QMessageBox::YesToAll | QMessageBox::No | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::No);
+
+        int count_licensees = 0, count_species = 0, count_animal_ids = 0, count_log_entries = 0;
+        switch (record_type) {
+            case MiscRecordType::gkLicensee:
+            {
+                count_licensees += 1;
+                // Calculate the numbers of each `category` that will be deleted
+
+                // Calculate the amount of `log entries` that will be deleted
+            }
+
+                break;
+            case MiscRecordType::gkSpecies:
+            {
+                // Calculate the numbers of each `category` that will be deleted
+                ++count_species;
+
+                // Calculate the amount of `log entries` that will be deleted
+            }
+
+                break;
+            case MiscRecordType::gkId:
+            {
+                // Calculate the numbers of each `category` that will be deleted
+                ++count_animal_ids;
+
+                // Calculate the amount of `log entries` that will be deleted
+            }
+
+                break;
+            default:
+                throw std::runtime_error(tr("Unable to perform calculation for deletion of records from the database!")
+                                                 .toStdString());
+        }
+
+        msgBox.setDetailedText(tr("Total number of deletions include...\n\n%1 Licensees\n%2 Species\n%3 Animal IDs\n\n%4 Log entries")
+                                       .arg(QString::number(count_licensees))
+                                       .arg(QString::number(count_species))
+                                       .arg(QString::number(count_animal_ids))
+                                       .arg(QString::number(count_log_entries)));
+    } else {
+        throw std::invalid_argument(tr("One of the given UUID caches are empty!").toStdString());
+    }
+
+    return false;
 }
