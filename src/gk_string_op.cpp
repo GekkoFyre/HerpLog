@@ -117,6 +117,7 @@ bool GkStringOp::del_cat_msg_box(const GkRecords::GkCategories &cat_struct, cons
             msgBox.setText(tr("Are you sure about deleting all of the specified `categories` and `log entries`?"));
             msgBox.setStandardButtons(QMessageBox::YesToAll | QMessageBox::No | QMessageBox::Cancel);
             msgBox.setDefaultButton(QMessageBox::No);
+            msgBox.setParent(nullptr);
 
             int count_licensees = 0, count_species = 0, count_animal_ids = 0, count_log_entries = 0;
             switch (record_type) {

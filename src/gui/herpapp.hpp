@@ -133,10 +133,12 @@ private:
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
+    void comboboxes_clear(const bool &disable = false);
 
     void insert_charts();
     void update_charts(const bool &update_caches = false);
-    inline void update_all(const bool &view_records = false, const std::string &del_uuid = "");
+    inline void update_all(const bool &view_records = false, const std::string &del_uuid = "",
+                           const bool &update_comboBoxes = false);
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;

@@ -83,7 +83,7 @@ void MainWindow::on_button_create_db_clicked()
                 gkFileIo->compress_files(temp_dir.string(), zip_file.string());
 
                 this->close();
-                QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, temp_dir.string(), zip_file.string(), gkFileIo, this);
+                QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, temp_dir.string(), zip_file.string(), gkFileIo, nullptr);
                 herpAppWin->setWindowFlags(Qt::Window);
                 herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
                 QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
@@ -114,7 +114,7 @@ void MainWindow::on_button_open_db_clicked()
                     db_ptr = gkDbConn->open_database(tmp_extraction_loc);
 
                     this->close();
-                    QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, fileName_str, gkFileIo, this);
+                    QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, fileName_str, gkFileIo, nullptr);
                     herpAppWin->setWindowFlags(Qt::Window);
                     herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
                     QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));

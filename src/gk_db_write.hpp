@@ -84,7 +84,6 @@ private:
     std::shared_ptr<GkDbRead> gkDbRead;
 
     std::mutex db_mutex;
-    std::mutex mass_modify_mutex;
 };
 }
 

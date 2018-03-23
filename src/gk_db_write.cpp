@@ -144,7 +144,6 @@ bool GkDbWrite::del_log_entry(const std::string &uuid, const bool &pose_msg_box)
 {
     try {
         if (!uuid.empty()) {
-            std::lock_guard<std::mutex> locker(mass_modify_mutex);
             bool msg_box_proceed = false;
 
             if (pose_msg_box) {
@@ -153,6 +152,7 @@ bool GkDbWrite::del_log_entry(const std::string &uuid, const bool &pose_msg_box)
                 msgBox.setText(tr("Are you really sure about deleting this record?"));
                 msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
                 msgBox.setDefaultButton(QMessageBox::Yes);
+                msgBox.setParent(nullptr);
                 int ret = msgBox.exec();
 
                 switch (ret) {
@@ -551,7 +551,6 @@ bool GkDbWrite::mass_del_cat(const GkRecords::MiscRecordType &record_type, const
 {
     try {
         if (!record_id.empty()) {
-            std::lock_guard<std::mutex> locker(mass_modify_mutex);
             using namespace GkRecords;
             switch (record_type) {
                 case MiscRecordType::gkLicensee:
