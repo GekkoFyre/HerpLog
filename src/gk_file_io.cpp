@@ -142,7 +142,7 @@ std::string GkFileIo::decompress_file(const std::string &fileLoc)
         std::vector<unsigned char> unzipped_data_csv;
         unzipper.extractEntryToMemory(GkFile::GkCsv::zip_contents_csv, unzipped_data_csv);
 
-        csv::istringstream iss(std::string(reinterpret_cast<const char *>(unzipped_data_csv.data())));
+        csv::istringstream iss(std::string(reinterpret_cast<const char *>(unzipped_data_csv.data()), unzipped_data_csv.size()));
         std::string csv_file_entry, csv_hash_entry, hashType;
         fs::path fileName = fs::path(fileLoc).filename();
 

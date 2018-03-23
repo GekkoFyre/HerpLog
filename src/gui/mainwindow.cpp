@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     gkDbConn = std::make_unique<GkDbConn>(this);
-    gkFileIo = std::make_shared<GkFileIo>(this);
+    gkFileIo = std::make_shared<GkFileIo>(nullptr);
 }
 
 MainWindow::~MainWindow()

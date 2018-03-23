@@ -67,11 +67,11 @@ public:
 
     void add_item_db(const std::string &record_id, const std::string &key, std::string value);
     void del_item_db(const std::string &record_id, const std::string &key);
+    bool del_log_entry(const std::string &uuid, const bool &pose_msg_box = false);
     bool add_uuid(const std::string &uuid, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
                   const GkRecords::GkId &id);
     bool del_uuid(const std::string &uuid);
-    bool mass_del_cat(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
-                      const bool &recursive = false);
+    bool mass_del_cat(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
     std::string create_uuid();
 
 private:
@@ -84,6 +84,7 @@ private:
     std::shared_ptr<GkDbRead> gkDbRead;
 
     std::mutex db_mutex;
+    std::mutex mass_modify_mutex;
 };
 }
 

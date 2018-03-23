@@ -261,7 +261,7 @@ bool GkStringOp::del_cat_msg_box(const GkRecords::GkCategories &cat_struct, cons
                                                      .toStdString());
             }
 
-            msgBox.setDetailedText(tr("Total number of deletions include...\n\n%1 Licensees\n%2 Species\n%3 Animal IDs\n\n%4 Log entries")
+            msgBox.setDetailedText(tr("Total number of deletions include...\n\n%1 x Licensees\n%2 x Species\n%3 x Animal IDs\n\n%4 x Log entries")
                                            .arg(QString::number(count_licensees))
                                            .arg(QString::number(count_species))
                                            .arg(QString::number(count_animal_ids))
