@@ -47,11 +47,8 @@
 #include <boost/lexical_cast.hpp>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QToolButton>
 #include <QDateTime>
 #include <QString>
-#include <exception>
-#include <random>
 #include <vector>
 #include <iostream>
 
@@ -93,6 +90,7 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     }
 
     charts_tab_enabled = false;
+    ui->action_File_1->setEnabled(false);
     update_all();
     insert_charts();
 }
@@ -138,12 +136,6 @@ void HerpApp::on_action_New_Database_triggered()
 }
 
 void HerpApp::on_action_Open_Database_triggered()
-{
-    QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
-    return;
-}
-
-void HerpApp::on_action_Disconnect_triggered()
 {
     QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
     return;
@@ -203,6 +195,7 @@ void HerpApp::on_actionSave_As_triggered()
 
 void HerpApp::on_action_Print_triggered()
 {
+    // https://doc.qt.io/qt-5.10/qtprintsupport-index.html
     QMessageBox::information(this, tr("Notice"), tr("The ability to print is not available yet, so check back soon!"), QMessageBox::Ok);
     return;
 }
@@ -238,6 +231,12 @@ void HerpApp::on_action_About_triggered()
     aboutDialog->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
     QObject::connect(aboutDialog, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
     aboutDialog->show();
+    return;
+}
+
+void HerpApp::on_actionIm_port_CSV_triggered()
+{
+    QMessageBox::information(this, tr("Notice"), tr("Documentation is not available yet, so check back soon!"), QMessageBox::Ok);
     return;
 }
 
@@ -291,6 +290,10 @@ void HerpApp::on_pushButton_browse_submit_clicked()
                 ui->interface_tabWidget->setTabEnabled(2, true);
             }
 
+            emit on_comboBox_view_charts_select_licensee_currentIndexChanged(0);
+            emit on_comboBox_existing_license_id_currentIndexChanged(0);
+            emit on_comboBox_view_records_licensee_currentIndexChanged(0);
+
             ui->interface_tabWidget->setCurrentIndex(2);
 
             viewed_records.clear();
@@ -325,8 +328,11 @@ void HerpApp::on_toolButton_add_record_update_datetime_clicked()
     ui->dateTime_add_record->setTime(QTime::currentTime());
 }
 
-void HerpApp::on_toolButton_records_calendar_popup_clicked()
-{}
+void HerpApp::on_toolButton_view_records_cal_popup_clicked()
+{
+    QMessageBox::information(this, tr("Notice"), tr("This function will be available soon, whereby it will pop-up a "
+                                                            "calendar for your perusal."), QMessageBox::Ok);
+}
 
 void HerpApp::on_comboBox_view_charts_select_licensee_currentIndexChanged(int index)
 {
@@ -620,74 +626,83 @@ bool HerpApp::submit_log_entry()
                     submit.weight = ui->spinBox_weight->value();
 
                     if ((!unique_id.empty()) && (!submit.licensee.licensee_id.empty()) && (!submit.species.species_id.empty()) &&
-                            (!submit.identifier.name_id.empty())) {
-                        gkDbWrite->add_uuid(unique_id, submit.licensee, submit.species, submit.identifier);
-                        gkDbWrite->add_item_db(unique_id, dateTime, std::to_string(submit.date_time));
-                        gkDbWrite->add_item_db(unique_id, furtherNotes, submit.further_notes);
-                        gkDbWrite->add_item_db(unique_id, vitaminNotes, submit.vitamin_notes);
-                        gkDbWrite->add_item_db(unique_id, toiletNotes, submit.toilet_notes);
-                        gkDbWrite->add_item_db(unique_id, tempNotes, submit.temp_notes);
-                        gkDbWrite->add_item_db(unique_id, weightNotes, submit.weight_notes);
-                        gkDbWrite->add_item_db(unique_id, hydrationNotes, submit.hydration_notes);
-                        gkDbWrite->add_item_db(unique_id, boolWentToilet, std::to_string(submit.went_toilet));
-                        gkDbWrite->add_item_db(unique_id, boolHadHydration, std::to_string(submit.had_hydration));
-                        gkDbWrite->add_item_db(unique_id, boolHadVitamins, std::to_string(submit.had_vitamins));
-                        gkDbWrite->add_item_db(unique_id, weightMeasure, std::to_string(submit.weight));
+                            (!submit.identifier.name_id.empty()) && (submit.date_time > 0)) {
+                        // Make sure at least one field regarding notes is filled in!
+                        if ((!submit.further_notes.empty()) || (!submit.vitamin_notes.empty()) || (!submit.toilet_notes.empty()) ||
+                                (!submit.temp_notes.empty()) || (!submit.weight_notes.empty()) || (!submit.hydration_notes.empty())) {
+                            gkDbWrite->add_uuid(unique_id, submit.licensee, submit.species, submit.identifier);
+                            gkDbWrite->add_item_db(unique_id, dateTime, std::to_string(submit.date_time));
+                            gkDbWrite->add_item_db(unique_id, furtherNotes, submit.further_notes);
+                            gkDbWrite->add_item_db(unique_id, vitaminNotes, submit.vitamin_notes);
+                            gkDbWrite->add_item_db(unique_id, toiletNotes, submit.toilet_notes);
+                            gkDbWrite->add_item_db(unique_id, tempNotes, submit.temp_notes);
+                            gkDbWrite->add_item_db(unique_id, weightNotes, submit.weight_notes);
+                            gkDbWrite->add_item_db(unique_id, hydrationNotes, submit.hydration_notes);
+                            gkDbWrite->add_item_db(unique_id, boolWentToilet, std::to_string(submit.went_toilet));
+                            gkDbWrite->add_item_db(unique_id, boolHadHydration, std::to_string(submit.had_hydration));
+                            gkDbWrite->add_item_db(unique_id, boolHadVitamins, std::to_string(submit.had_vitamins));
+                            gkDbWrite->add_item_db(unique_id, weightMeasure, std::to_string(submit.weight));
 
-                        // Reset all the input fields
-                        ui->dateTime_add_record->setDate(QDate::currentDate());
-                        ui->dateTime_add_record->setTime(QTime::currentTime());
-                        ui->lineEdit_new_license_id->clear();
-                        ui->lineEdit_new_species->clear();
-                        ui->lineEdit_new_id->clear();
-                        ui->lineEdit_toilet_notes->clear();
-                        ui->lineEdit_hydration_notes->clear();
-                        ui->lineEdit_vitamins_notes->clear();
-                        ui->lineEdit_temperature_notes->clear();
-                        ui->lineEdit_weight_notes->clear();
-                        ui->checkBox_toilet->setChecked(false);
-                        ui->checkBox_hydration->setChecked(false);
-                        ui->checkBox_vitamins->setChecked(false);
-                        ui->spinBox_weight->setValue(0.000);
-                        ui->plainTextEdit_furtherNotes->clear();
+                            // Reset all the input fields
+                            ui->dateTime_add_record->setDate(QDate::currentDate());
+                            ui->dateTime_add_record->setTime(QTime::currentTime());
+                            ui->lineEdit_new_license_id->clear();
+                            ui->lineEdit_new_species->clear();
+                            ui->lineEdit_new_id->clear();
+                            ui->lineEdit_toilet_notes->clear();
+                            ui->lineEdit_hydration_notes->clear();
+                            ui->lineEdit_vitamins_notes->clear();
+                            ui->lineEdit_temperature_notes->clear();
+                            ui->lineEdit_weight_notes->clear();
+                            ui->checkBox_toilet->setChecked(false);
+                            ui->checkBox_hydration->setChecked(false);
+                            ui->checkBox_vitamins->setChecked(false);
+                            ui->spinBox_weight->setValue(0.000);
+                            ui->plainTextEdit_furtherNotes->clear();
 
-                        ui->comboBox_existing_license_id->setCurrentIndex(0);
-                        ui->comboBox_existing_species->setCurrentIndex(0);
-                        ui->comboBox_existing_id->setCurrentIndex(0);
-                        ui->comboBox_view_records_licensee->setCurrentIndex(0);
-                        ui->comboBox_view_records_species->setCurrentIndex(0);
-                        ui->comboBox_view_records_animal_name->setCurrentIndex(0);
-                        ui->comboBox_view_charts_select_licensee->setCurrentIndex(0);
-                        ui->comboBox_view_charts_select_species->setCurrentIndex(0);
-                        ui->comboBox_view_charts_select_id->setCurrentIndex(0);
+                            ui->comboBox_existing_license_id->setCurrentIndex(0);
+                            ui->comboBox_existing_species->setCurrentIndex(0);
+                            ui->comboBox_existing_id->setCurrentIndex(0);
+                            ui->comboBox_view_records_licensee->setCurrentIndex(0);
+                            ui->comboBox_view_records_species->setCurrentIndex(0);
+                            ui->comboBox_view_records_animal_name->setCurrentIndex(0);
+                            ui->comboBox_view_charts_select_licensee->setCurrentIndex(0);
+                            ui->comboBox_view_charts_select_species->setCurrentIndex(0);
+                            ui->comboBox_view_charts_select_id->setCurrentIndex(0);
 
-                        emit on_comboBox_existing_license_id_currentIndexChanged(0);
-                        emit on_comboBox_existing_species_currentIndexChanged(0);
-                        emit on_comboBox_existing_id_currentIndexChanged(0);
-                        emit on_comboBox_view_records_licensee_currentIndexChanged(0);
-                        emit on_comboBox_view_records_species_currentIndexChanged(0);
-                        emit on_comboBox_view_records_animal_name_currentIndexChanged(0);
-                        emit on_comboBox_view_charts_select_licensee_currentIndexChanged(0);
-                        emit on_comboBox_view_charts_select_species_currentIndexChanged(0);
-                        emit on_comboBox_view_charts_select_id_currentIndexChanged(0);
+                            emit on_comboBox_existing_license_id_currentIndexChanged(0);
+                            emit on_comboBox_existing_species_currentIndexChanged(0);
+                            emit on_comboBox_existing_id_currentIndexChanged(0);
+                            emit on_comboBox_view_records_licensee_currentIndexChanged(0);
+                            emit on_comboBox_view_records_species_currentIndexChanged(0);
+                            emit on_comboBox_view_records_animal_name_currentIndexChanged(0);
+                            emit on_comboBox_view_charts_select_licensee_currentIndexChanged(0);
+                            emit on_comboBox_view_charts_select_species_currentIndexChanged(0);
+                            emit on_comboBox_view_charts_select_id_currentIndexChanged(0);
 
-                        on_toolButton_new_hash_clicked();
-                        update_all();
+                            on_toolButton_new_hash_clicked();
+                            update_all();
 
-                        return true;
+                            return true;
+                        } else {
+                            QMessageBox::information(this, tr("Missing data!"), tr("At least one field needs to be filled in!"), QMessageBox::Ok);
+                            return false;
+                        }
                     }
                 } else {
                     QMessageBox::information(this, tr("Missing data!"), tr("You need to fill-in/select an animal name or ID!"), QMessageBox::Ok);
+                    return false;
                 }
             } else {
                 QMessageBox::information(this, tr("Missing data!"), tr("You need to fill-in/select an animal species!"), QMessageBox::Ok);
+                return false;
             }
         } else {
             QMessageBox::information(this, tr("Missing data!"), tr("You need to fill-in/select a licensee!"), QMessageBox::Ok);
+            return false;
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
-        return false;
     }
 
     return false;
@@ -759,32 +774,29 @@ void HerpApp::refresh_caches()
 
             if (!caches_enabled) {
                 caches_enabled = true;
+
+                if (!ui->viewRecords->isEnabled()) {
+                    ui->viewRecords->setEnabled(true);
+                }
+
+                if (!ui->viewCharts->isEnabled()) {
+                    ui->viewCharts->setEnabled(true);
+                }
             }
 
             return;
         } else {
             caches_enabled = false;
+
+            ui->viewRecords->setEnabled(false);
+            ui->viewCharts->setEnabled(false);
+            ui->interface_tabWidget->setCurrentIndex(0);
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
 
     return;
-}
-
-/**
- * @brief HerpApp::find_date_ranges will find the most minimum/maximum possible date ranges for existing records between
- * the given `min_date_time` and `max_date_time` parameters.
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-03-18
- * @param min_date_time The minimum applicable date and time.
- * @param max_date_time The maximum applicable date and time.
- * @return The found most <minimum/maximum> possible dates as dependent on what records exist between the values given
- * for the two parameters.
- */
-std::pair<long int, long int> HerpApp::find_date_ranges(const long &min_date_time, const long &max_date_time)
-{
-    return std::make_pair(0, 0);
 }
 
 /**
@@ -1256,9 +1268,11 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
             } else {
                 QMessageBox::information(this, tr("No data!"), tr("There is no information to present with the given variables. Please try another selection."),
                                          QMessageBox::Ok);
+                return;
             }
         } else {
             archive_clear_forms();
+            return;
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
@@ -1399,12 +1413,17 @@ void HerpApp::update_charts(const bool &update_caches)
 void HerpApp::update_all(const bool &view_records, const std::string &del_uuid, const bool &update_comboBoxes)
 {
     try {
-        // Charts related data
-        weight_measurements.clear();
+        if (view_records) {
+            // Charts related data
+            weight_measurements.clear();
+        }
 
         // General caches
         set_date_ranges();
-        update_charts();
+
+        if (caches_enabled) {
+            update_charts();
+        }
 
         // This concerns the tab `viewRecords`
         if (view_records) {
