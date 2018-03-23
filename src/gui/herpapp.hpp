@@ -51,7 +51,6 @@
 #include <boost/filesystem.hpp>
 #include <QObject>
 #include <QMainWindow>
-#include <QResizeEvent>
 #include <QPointer>
 #include <QtCharts>
 #include <QMultiMap>
@@ -80,7 +79,6 @@ public:
 private slots:
     void on_action_New_Database_triggered();
     void on_action_Open_Database_triggered();
-    void on_action_Disconnect_triggered();
     void on_action_Save_triggered();
     void on_actionSave_As_triggered();
     void on_action_Print_triggered();
@@ -89,6 +87,7 @@ private slots:
     void on_action_Settings_triggered();
     void on_action_Documentation_triggered();
     void on_action_About_triggered();
+    void on_actionIm_port_CSV_triggered();
     void on_pushButton_archive_next_clicked();
     void on_pushButton_archive_prev_clicked();
     void on_pushButton_archive_delete_clicked();
@@ -96,7 +95,7 @@ private slots:
     void on_pushButton_add_data_clicked();
     void on_toolButton_new_hash_clicked();
     void on_toolButton_add_record_update_datetime_clicked();
-    void on_toolButton_records_calendar_popup_clicked();
+    void on_toolButton_view_records_cal_popup_clicked();
     void on_comboBox_view_charts_select_licensee_currentIndexChanged(int index);
     void on_comboBox_view_charts_select_species_currentIndexChanged(int index);
     void on_comboBox_view_charts_select_id_currentIndexChanged(int index);
@@ -115,7 +114,6 @@ private:
 
     bool remove_files(const fs::path &tmpDirLoc);
     void refresh_caches();
-    std::pair<long int, long int> find_date_ranges(const long int &min_date_time = 0, const long int &max_date_time = 0);
     void set_date_ranges();
 
     std::string find_comboBox_id(const GkRecords::MiscRecordType &record_type,

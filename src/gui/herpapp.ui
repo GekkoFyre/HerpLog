@@ -588,6 +588,51 @@
                     </spacer>
                    </item>
                    <item>
+                    <widget class="QFrame" name="frame_browse_title">
+                     <property name="frameShape">
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_12">
+                      <item>
+                       <spacer name="horizontalSpacer_7">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_browse_title">
+                        <property name="text">
+                         <string>Choose a Date/Time range...</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_8">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>40</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QFrame" name="frame">
                      <property name="frameShape">
                       <enum>QFrame::NoFrame</enum>
@@ -612,7 +657,7 @@
                       <item>
                        <widget class="QDateTimeEdit" name="dateTimeEdit_browse_start">
                         <property name="toolTip">
-                         <string>The start date of when to search for records from henceforth</string>
+                         <string>The date at the beginning of the range</string>
                         </property>
                         <property name="displayFormat">
                          <string>dd/MM/yyyy HH:mm</string>
@@ -635,7 +680,7 @@
                       <item>
                        <widget class="QDateTimeEdit" name="dateTimeEdit_browse_end">
                         <property name="toolTip">
-                         <string>The end date of when to search for records up towards</string>
+                         <string>The date at the end of the range</string>
                         </property>
                         <property name="displayFormat">
                          <string>dd/MM/yyyy HH:mm</string>
@@ -685,6 +730,9 @@
                       </item>
                       <item>
                        <widget class="QPushButton" name="pushButton_browse_submit">
+                        <property name="toolTip">
+                         <string>Begin browsing the records found within the specified date/time range!</string>
+                        </property>
                         <property name="text">
                          <string>Browse</string>
                         </property>
@@ -950,7 +998,7 @@
                           <x>0</x>
                           <y>0</y>
                           <width>419</width>
-                          <height>574</height>
+                          <height>572</height>
                          </rect>
                         </property>
                         <layout class="QFormLayout" name="formLayout_5">
@@ -964,7 +1012,7 @@
                          <item row="0" column="1">
                           <widget class="QFrame" name="frame_records_datetime">
                            <property name="frameShape">
-                            <enum>QFrame::StyledPanel</enum>
+                            <enum>QFrame::NoFrame</enum>
                            </property>
                            <property name="frameShadow">
                             <enum>QFrame::Raised</enum>
@@ -993,7 +1041,7 @@
                              </widget>
                             </item>
                             <item>
-                             <widget class="QToolButton" name="toolButton_records_calendar_popup">
+                             <widget class="QToolButton" name="toolButton_view_records_cal_popup">
                               <property name="text">
                                <string>...</string>
                               </property>
@@ -1439,10 +1487,15 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuOpen_Recent">
+     <property name="title">
+      <string>Open &amp;Recent</string>
+     </property>
+     <addaction name="action_File_1"/>
+    </widget>
     <addaction name="action_New_Database"/>
     <addaction name="action_Open_Database"/>
-    <addaction name="separator"/>
-    <addaction name="action_Disconnect"/>
+    <addaction name="menuOpen_Recent"/>
     <addaction name="separator"/>
     <addaction name="action_Save"/>
     <addaction name="actionSave_As"/>
@@ -1456,6 +1509,7 @@
      <string>&amp;Tools</string>
     </property>
     <addaction name="actionF_ind"/>
+    <addaction name="actionIm_port_CSV"/>
     <addaction name="separator"/>
     <addaction name="action_Settings"/>
    </widget>
@@ -1482,18 +1536,10 @@
   </action>
   <action name="action_Open_Database">
    <property name="text">
-    <string>&amp;Open Database</string>
+    <string>&amp;Open...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="action_Disconnect">
-   <property name="text">
-    <string>&amp;Disconnect</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+D</string>
    </property>
   </action>
   <action name="action_Save">
@@ -1512,14 +1558,6 @@
     <string>Ctrl+Alt+S</string>
    </property>
   </action>
-  <action name="actionSave_A_ll">
-   <property name="text">
-    <string>Save A&amp;ll</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
-   </property>
-  </action>
   <action name="action_Print">
    <property name="text">
     <string>&amp;Print</string>
@@ -1534,46 +1572,6 @@
    </property>
    <property name="shortcut">
     <string>Esc</string>
-   </property>
-  </action>
-  <action name="action_Undo">
-   <property name="text">
-    <string>&amp;Undo</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Z</string>
-   </property>
-  </action>
-  <action name="action_Redo">
-   <property name="text">
-    <string>&amp;Redo</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Y, Ctrl+Shift+Z</string>
-   </property>
-  </action>
-  <action name="actionCu_t">
-   <property name="text">
-    <string>Cu&amp;t</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+X</string>
-   </property>
-  </action>
-  <action name="action_Copy">
-   <property name="text">
-    <string>&amp;Copy</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
-   </property>
-  </action>
-  <action name="action_Paste">
-   <property name="text">
-    <string>&amp;Paste</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="actionF_ind">
@@ -1597,6 +1595,19 @@
   <action name="action_About">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="action_File_1">
+   <property name="text">
+    <string>&lt;File...&gt;</string>
+   </property>
+  </action>
+  <action name="actionIm_port_CSV">
+   <property name="text">
+    <string>Im&amp;port CSV</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>
@@ -1631,7 +1642,7 @@
   <tabstop>pushButton_browse_submit</tabstop>
   <tabstop>scrollArea_view_records_left</tabstop>
   <tabstop>lineEdit_records_dateTime</tabstop>
-  <tabstop>toolButton_records_calendar_popup</tabstop>
+  <tabstop>toolButton_view_records_cal_popup</tabstop>
   <tabstop>lineEdit_records_toilet_notes</tabstop>
   <tabstop>lineEdit_records_hydration_notes</tabstop>
   <tabstop>lineEdit_records_vitamins_notes</tabstop>
