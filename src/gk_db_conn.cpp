@@ -69,14 +69,14 @@ GkDbConn::GkDbConn(QObject *parent) : QObject(parent) {}
 GkDbConn::~GkDbConn() {}
 
 /**
- * @brief GkDb::openDatabase creates a database connection within the applications memory from the database files on
+ * @brief GkDb::open_database creates a database connection within the applications memory from the database files on
  * the local storage of the users computer, ready to be used for inserting/modifying/deleting records.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2017-12-17
  * @param dbFile The location of the database files on the local storage of the users computer.
  * @return A pointer to the connection opened within memory with regard to the database.
  */
-GkFile::FileDb GkDbConn::openDatabase(const std::string &dbFile)
+GkFile::FileDb GkDbConn::open_database(const std::string &dbFile)
 {
     leveldb::Status s;
     GkFile::FileDb db_struct;

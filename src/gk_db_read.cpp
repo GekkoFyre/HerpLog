@@ -86,7 +86,7 @@ std::string GkDbRead::read_item_db(const std::string &record_id, const std::stri
     }
 }
 
-long int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_ids)
+long int GkDbRead::determine_min_date_time(const std::vector<std::string> &record_ids)
 {
     std::lock_guard<std::mutex> locker(analyze_mutex);
     if (!record_ids.empty()) {
@@ -111,7 +111,7 @@ long int GkDbRead::determineMinimumDate(const std::vector<std::string> &record_i
     return 0;
 }
 
-long int GkDbRead::determineMaximumDate(const std::vector<std::string> &record_ids)
+long int GkDbRead::determine_max_date_time(const std::vector<std::string> &record_ids)
 {
     std::lock_guard<std::mutex> locker(analyze_mutex);
     if (!record_ids.empty()) {
@@ -177,14 +177,14 @@ std::unordered_map<std::string, GkRecords::MiscUniqueIds> GkDbRead::get_uuids()
 }
 
 /**
- * @brief GkDbRead::get_misc_key_vals will obtain all the Unique Identifiers from the database for the given key, IF it's related
+ * @brief GkDbRead::get_cat_key_vals will obtain all the Unique Identifiers from the database for the given key, IF it's related
  * to GkRecords::GkSpecies or GkRecords::GkId ONLY.
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-21
  * @param record_type Whether to get data from `store_species_id` or `store_name_id` within the Google LevelDB database.
  * @return The information that was retrieved from the database; <Key: Species ID/Name ID, Value: Species Name/Name Value>
  */
-QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords::MiscRecordType &record_type)
+QMultiMap<std::string, std::string> GkDbRead::get_cat_key_vals(const GkRecords::MiscRecordType &record_type)
 {
     try {
         leveldb::ReadOptions read_opt;
@@ -229,15 +229,16 @@ QMultiMap<std::string, std::string> GkDbRead::get_misc_key_vals(const GkRecords:
 }
 
 /**
- * @brief GkDbRead::extractRecords will extract whatever Record IDs that lay within a given date range, depending on when
- * they were `submitted`.
+ * @brief GkDbRead::extract_records will extract whatever category-related Record IDs that lay within a given date range,
+ * depending on when they were `submitted` to the Google LevelDB database (i.e. the Date/Time that was specified by the
+ * user of HerpLog at time of submission).
  * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
  * @date 2018-02-28
  * @param dateStart The beginning of the date range, as UNIX Epoch Time.
  * @param dateEnd The end of the date range, as UNIX Epoch Time.
  * @return The extracted Record IDs that lay within the given date range.
  */
-std::list<std::string> GkDbRead::extractRecords(const long int &dateStart, const long int &dateEnd)
+std::list<std::string> GkDbRead::extract_records(const long int &dateStart, const long int &dateEnd)
 {
     // Extract all the possible Record IDs from the database
     std::lock_guard<std::mutex> locker(analyze_mutex);

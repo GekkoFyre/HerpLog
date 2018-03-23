@@ -83,14 +83,8 @@ private slots:
     void on_action_Disconnect_triggered();
     void on_action_Save_triggered();
     void on_actionSave_As_triggered();
-    void on_actionSave_A_ll_triggered();
     void on_action_Print_triggered();
     void on_actionE_xit_triggered();
-    void on_action_Undo_triggered();
-    void on_action_Redo_triggered();
-    void on_actionCu_t_triggered();
-    void on_action_Copy_triggered();
-    void on_action_Paste_triggered();
     void on_actionF_ind_triggered();
     void on_action_Settings_triggered();
     void on_action_Documentation_triggered();
@@ -135,16 +129,16 @@ private:
     void record_animals_index(const std::list<GkRecords::GkId> &animals_list,
                               const GkRecords::comboBoxType &comboBox_type);
 
-    bool submit_record();
-    bool delete_record(const std::string &record_id);
+    bool submit_log_entry();
     std::string browse_records(const std::list<std::string> &records, const bool &forward);
     void archive_clear_forms();
     void archive_fill_form_data(const std::string &record_id);
-
-    bool delete_category_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
+    void comboboxes_clear(const bool &disable = false);
 
     void insert_charts();
     void update_charts(const bool &update_caches = false);
+    inline void update_all(const bool &view_records = false, const std::string &del_uuid = "",
+                           const bool &update_comboBoxes = false);
 
     GkFile::FileDb db_ptr;
     std::unique_ptr<GkDbWrite> gkDbWrite;
@@ -162,13 +156,13 @@ private:
     long int maxDateTime;
 
     std::unordered_map<std::string, GkRecords::MiscUniqueIds> unique_id_map; // A unordered map of all the Unique IDs
-    std::list<std::string> archive_records;
+    std::list<std::string> archive_records; // A cache of records that have been determined to be within the specified minimum/maximum date/time range.
     QMultiMap<std::string, std::pair<std::string, int>> licensee_cache; // <Key: Licensee ID, Value: <Licensee Name, Index No.>>
     QMultiMap<std::string, std::string> species_cache; // <Key: Licensee ID, Value: Species ID>
     QMultiMap<std::string, std::string> animal_cache; // <Key: Species ID, Value: Animal ID>
     // Records are added to `viewed_records` as the `Next Record` button is pressed, and removed as
     // the `Previous Record` button is pressed.
-    std::list<std::string> viewed_records;
+    std::list<std::string> viewed_records; // The `Log Entries` that have been already viewed under the `viewRecords` tab
     std::string archive_curr_sel_record; // The currently selected record within the tab `viewRecords`.
 
     // Cached values for the comboBox selections

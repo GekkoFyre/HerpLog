@@ -1446,22 +1446,10 @@
     <addaction name="separator"/>
     <addaction name="action_Save"/>
     <addaction name="actionSave_As"/>
-    <addaction name="actionSave_A_ll"/>
     <addaction name="separator"/>
     <addaction name="action_Print"/>
     <addaction name="separator"/>
     <addaction name="actionE_xit"/>
-   </widget>
-   <widget class="QMenu" name="menu_Edit">
-    <property name="title">
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="action_Undo"/>
-    <addaction name="action_Redo"/>
-    <addaction name="separator"/>
-    <addaction name="actionCu_t"/>
-    <addaction name="action_Copy"/>
-    <addaction name="action_Paste"/>
    </widget>
    <widget class="QMenu" name="menu_Tools">
     <property name="title">
@@ -1480,7 +1468,6 @@
     <addaction name="action_About"/>
    </widget>
    <addaction name="menu_File"/>
-   <addaction name="menu_Edit"/>
    <addaction name="menu_Tools"/>
    <addaction name="menu_Help"/>
   </widget>

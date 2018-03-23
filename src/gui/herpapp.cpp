@@ -53,7 +53,7 @@
 #include <exception>
 #include <random>
 #include <vector>
-#include <future>
+#include <iostream>
 
 namespace sys = boost::system;
 HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_path, const std::string &db_file_path,
@@ -67,9 +67,9 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     global_db_file_path = db_file_path; // The file-path to the (currently opened/newly created) database
     gkFileIo = file_io_ptr;
 
-    gkStrOp = std::make_shared<GkStringOp>(this);
-    gkDbRead = std::make_shared<GkDbRead>(db_ptr, gkStrOp, this);
-    gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkDbRead, gkStrOp, this);
+    gkStrOp = std::make_shared<GkStringOp>(nullptr);
+    gkDbRead = std::make_shared<GkDbRead>(db_ptr, gkStrOp, nullptr);
+    gkDbWrite = std::make_unique<GkDbWrite>(db_ptr, gkDbRead, gkStrOp, nullptr);
 
     ui->interface_tabWidget->setCurrentIndex(0);
     ui->interface_tabWidget->setTabEnabled(2, false);
@@ -81,9 +81,19 @@ HerpApp::HerpApp(const GkFile::FileDb &database, const std::string &temp_dir_pat
     ui->dateTime_add_record->setDate(QDate::currentDate());
     ui->dateTime_add_record->setTime(QTime::currentTime());
 
+    fs::path db_path = db_file_path;
+    QString db_file_name = db_path.filename().c_str();
+
+    if (db_file_name.length() < 24) {
+        ui->action_Save->setText(tr("Save \"%1\"").arg(db_file_name));
+        ui->actionSave_As->setText(tr("Save \"%1\" As").arg(db_file_name));
+    } else {
+        ui->action_Save->setText(tr("Save \"...\"").arg(db_file_name));
+        ui->actionSave_As->setText(tr("Save \"...\" As").arg(db_file_name));
+    }
+
     charts_tab_enabled = false;
-    set_date_ranges();
-    update_charts();
+    update_all();
     insert_charts();
 }
 
@@ -107,14 +117,14 @@ bool HerpApp::remove_files(const fs::path &tmpDirLoc)
         sys::error_code ec;
         if (fs::is_directory(tmpDirLoc, ec)) {
             if (!fs::remove_all(tmpDirLoc, ec)) {
-                QMessageBox::warning(this, tr("Error!"), QString::fromStdString(ec.message()), QMessageBox::Ok);
+                std::cout << ec.message() << std::endl;
                 return false;
             } else {
                 return true;
             }
         }
     } catch (const std::exception &e) {
-        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+        std::cout << e.what() << std::endl;
         return false;
     }
 
@@ -191,43 +201,35 @@ void HerpApp::on_actionSave_As_triggered()
     return;
 }
 
-void HerpApp::on_actionSave_A_ll_triggered()
+void HerpApp::on_action_Print_triggered()
+{
+    QMessageBox::information(this, tr("Notice"), tr("The ability to print is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
+
+void HerpApp::on_actionE_xit_triggered()
+{
+    QApplication::quit();
+    return;
+}
+
+void HerpApp::on_actionF_ind_triggered()
 {
     QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
     return;
 }
 
-void HerpApp::on_action_Print_triggered()
-{}
-
-void HerpApp::on_actionE_xit_triggered()
+void HerpApp::on_action_Settings_triggered()
 {
-    QApplication::quit();
+    QMessageBox::information(this, tr("Notice"), tr("This feature is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
 }
 
-void HerpApp::on_action_Undo_triggered()
-{}
-
-void HerpApp::on_action_Redo_triggered()
-{}
-
-void HerpApp::on_actionCu_t_triggered()
-{}
-
-void HerpApp::on_action_Copy_triggered()
-{}
-
-void HerpApp::on_action_Paste_triggered()
-{}
-
-void HerpApp::on_actionF_ind_triggered()
-{}
-
-void HerpApp::on_action_Settings_triggered()
-{}
-
 void HerpApp::on_action_Documentation_triggered()
-{}
+{
+    QMessageBox::information(this, tr("Notice"), tr("Documentation is not available yet, so check back soon!"), QMessageBox::Ok);
+    return;
+}
 
 void HerpApp::on_action_About_triggered()
 {
@@ -261,8 +263,15 @@ void HerpApp::on_pushButton_archive_delete_clicked()
 {
     // `Delete Record`
     if (!archive_curr_sel_record.empty()) {
-        delete_record(archive_curr_sel_record);
-        archive_curr_sel_record.clear();
+        int ret = gkDbWrite->del_log_entry(archive_curr_sel_record, true);
+        if (ret) {
+            archive_curr_sel_record.clear();
+            update_all();
+            archive_clear_forms();
+            std::string prev_record = browse_records(archive_records, false);
+            archive_curr_sel_record = prev_record;
+            archive_fill_form_data(prev_record);
+        }
     }
 
     return;
@@ -275,14 +284,13 @@ void HerpApp::on_pushButton_browse_submit_clicked()
         int dateTimeEnd = ui->dateTimeEdit_browse_end->dateTime().toTime_t();
 
         archive_records.clear();
-        if (archive_records.empty()) {
-            archive_records = gkDbRead->extractRecords(dateTimeStart, dateTimeEnd);
-        } else {
-            throw std::runtime_error(tr("There was an error in gathering the data. Please exit the program and try again!").toStdString());
-        }
+        archive_records = gkDbRead->extract_records(dateTimeStart, dateTimeEnd);
 
         if (!archive_records.empty()) {
-            ui->interface_tabWidget->setTabEnabled(2, true);
+            if (!ui->interface_tabWidget->isTabEnabled(2)) {
+                ui->interface_tabWidget->setTabEnabled(2, true);
+            }
+
             ui->interface_tabWidget->setCurrentIndex(2);
 
             viewed_records.clear();
@@ -302,7 +310,7 @@ void HerpApp::on_pushButton_browse_submit_clicked()
 
 void HerpApp::on_pushButton_add_data_clicked()
 {
-    submit_record();
+    submit_log_entry();
 }
 
 void HerpApp::on_toolButton_new_hash_clicked()
@@ -422,57 +430,132 @@ void HerpApp::on_comboBox_view_records_animal_name_currentIndexChanged(int index
 
 void HerpApp::on_toolButton_view_records_licensee_clicked()
 {
-    // Delete `Licensee` entry
-    // TODO: Finish this!
-    if (!licensee_cache.empty()) {
-        int curr_sel = ui->comboBox_view_records_licensee->currentIndex();
-        std::string licensee_id;
-        for (auto it = licensee_cache.begin(); it != licensee_cache.end(); ++it) {
-            if (it.value().second == curr_sel) {
-                licensee_id = it.key();
-                break;
+    try {
+        // Delete `Licensee` entry
+        if ((!licensee_cache.empty()) && (!archive_records.empty())) {
+            if (caches_enabled) {
+                int curr_sel = ui->comboBox_view_records_licensee->currentIndex();
+                std::string licensee_id;
+                for (auto it = licensee_cache.begin(); it != licensee_cache.end(); ++it) {
+                    if (it.value().second == curr_sel) {
+                        licensee_id = it.key();
+                        break;
+                    }
+                }
+
+                comboBox_species.clear();
+                comboBox_animals.clear();
+                gkDbWrite->mass_del_cat(GkRecords::MiscRecordType::gkLicensee, licensee_id);
+                update_all(true, licensee_id);
+
+                if (!licensee_cache.empty()) {
+                    emit on_comboBox_view_charts_select_licensee_currentIndexChanged(0);
+                    emit on_comboBox_existing_license_id_currentIndexChanged(0);
+                    emit on_comboBox_view_records_licensee_currentIndexChanged(0);
+                } else {
+                    comboboxes_clear(true);
+                }
+
+                comboBox_add_records_licensee_sel = 0;
+                comboBox_add_records_species_sel = 0;
+                comboBox_add_records_animals_sel = 0;
+                comboBox_view_records_animals_sel = 0;
             }
         }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
+
+    return;
 }
 
 void HerpApp::on_toolButton_view_records_species_clicked()
 {
-    // Delete `Species` entry
-    // TODO: Finish this!
-    if (!comboBox_species.empty()) {
-        int curr_sel = ui->comboBox_view_records_species->currentIndex();
-        std::string species_id;
-        for (auto it = comboBox_species.begin(); it != comboBox_species.end(); ++it) {
-            if (it.value().comboBox.comboBox_type == GkRecords::comboBoxType::ViewRecords) {
-                if (it.value().comboBox.index_no == curr_sel) {
-                    species_id = it.value().species_id;
-                    break;
+    try {
+        // Delete `Species` entry
+        if ((!comboBox_species.empty()) && (!archive_records.empty())) {
+            if (caches_enabled) {
+                int curr_sel = ui->comboBox_view_records_species->currentIndex();
+                std::string species_id;
+                for (auto it = comboBox_species.begin(); it != comboBox_species.end(); ++it) {
+                    if (it.value().comboBox.comboBox_type == GkRecords::comboBoxType::ViewRecords) {
+                        if (it.value().comboBox.index_no == curr_sel) {
+                            species_id = it.value().species_id;
+                            break;
+                        }
+                    }
                 }
+
+                comboBox_species.clear();
+                comboBox_animals.clear();
+                gkDbWrite->mass_del_cat(GkRecords::MiscRecordType::gkSpecies, species_id);
+                update_all(true, species_id);
+
+                if (!species_cache.empty()) {
+                    emit on_comboBox_view_charts_select_licensee_currentIndexChanged(0);
+                    emit on_comboBox_existing_license_id_currentIndexChanged(0);
+                    emit on_comboBox_view_records_licensee_currentIndexChanged(0);
+                } else {
+                    comboboxes_clear(true);
+                }
+
+                comboBox_add_records_licensee_sel = 0;
+                comboBox_add_records_species_sel = 0;
+                comboBox_add_records_animals_sel = 0;
+                comboBox_view_records_animals_sel = 0;
             }
         }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
+
+    return;
 }
 
 void HerpApp::on_toolButton_view_records_animal_clicked()
 {
-    // Delete `Animals` entry
-    // TODO: Finish this!
-    if (!comboBox_animals.empty()) {
-        int curr_sel = ui->comboBox_view_records_animal_name->currentIndex();
-        std::string animal_id;
-        for (auto it = comboBox_animals.begin(); it != comboBox_animals.end(); ++it) {
-            if (it.value().comboBox.comboBox_type == GkRecords::comboBoxType::ViewRecords) {
-                if (it.value().comboBox.index_no == curr_sel) {
-                    animal_id = it.value().name_id;
-                    break;
+    try {
+        // Delete `Animals` entry
+        if ((!comboBox_animals.empty()) && (!archive_records.empty())) {
+            if (caches_enabled) {
+                int curr_sel = ui->comboBox_view_records_animal_name->currentIndex();
+                std::string animal_id;
+                for (auto it = comboBox_animals.begin(); it != comboBox_animals.end(); ++it) {
+                    if (it.value().comboBox.comboBox_type == GkRecords::comboBoxType::ViewRecords) {
+                        if (it.value().comboBox.index_no == curr_sel) {
+                            animal_id = it.value().name_id;
+                            break;
+                        }
+                    }
                 }
+
+                comboBox_species.clear();
+                comboBox_animals.clear();
+                gkDbWrite->mass_del_cat(GkRecords::MiscRecordType::gkId, animal_id);
+                update_all(true, animal_id);
+
+                if (!animal_cache.empty()) {
+                    emit on_comboBox_view_charts_select_licensee_currentIndexChanged(0);
+                    emit on_comboBox_existing_license_id_currentIndexChanged(0);
+                    emit on_comboBox_view_records_licensee_currentIndexChanged(0);
+                } else {
+                    comboboxes_clear(true);
+                }
+
+                comboBox_add_records_licensee_sel = 0;
+                comboBox_add_records_species_sel = 0;
+                comboBox_add_records_animals_sel = 0;
+                comboBox_view_records_animals_sel = 0;
             }
         }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
+
+    return;
 }
 
-bool HerpApp::submit_record()
+bool HerpApp::submit_log_entry()
 {
     try {
         if (!ui->comboBox_existing_license_id->currentText().isEmpty() || !ui->lineEdit_new_license_id->text().isEmpty()) {
@@ -481,10 +564,10 @@ bool HerpApp::submit_record()
                     using namespace GkRecords;
 
                     GkSubmit submit;
-                    std::string unique_id = gkDbWrite->create_unique_id();
+                    std::string unique_id = gkDbWrite->create_uuid();
                     if (!ui->lineEdit_new_license_id->text().isEmpty()) {
                         submit.licensee.licensee_name = ui->lineEdit_new_license_id->text().toStdString();
-                        submit.licensee.licensee_id = gkDbWrite->create_unique_id();
+                        submit.licensee.licensee_id = gkDbWrite->create_uuid();
                     } else {
                         if (!ui->comboBox_existing_license_id->currentText().isEmpty()) {
                             submit.licensee.licensee_name = ui->comboBox_existing_license_id->currentText().toStdString();
@@ -498,7 +581,7 @@ bool HerpApp::submit_record()
 
                     if (!ui->lineEdit_new_species->text().isEmpty()) {
                         submit.species.species_name = ui->lineEdit_new_species->text().toStdString();
-                        submit.species.species_id = gkDbWrite->create_unique_id();
+                        submit.species.species_id = gkDbWrite->create_uuid();
                     } else {
                         if (!ui->comboBox_existing_species->currentText().isEmpty()) {
                             submit.species.species_name = ui->comboBox_existing_species->currentText().toStdString();
@@ -512,7 +595,7 @@ bool HerpApp::submit_record()
 
                     if (!ui->lineEdit_new_id->text().isEmpty()) {
                         submit.identifier.identifier_str = ui->lineEdit_new_id->text().toStdString();
-                        submit.identifier.name_id = gkDbWrite->create_unique_id();
+                        submit.identifier.name_id = gkDbWrite->create_uuid();
                     } else {
                         if (!ui->comboBox_existing_id->currentText().isEmpty()) {
                             submit.identifier.identifier_str = ui->comboBox_existing_id->currentText().toStdString();
@@ -589,8 +672,7 @@ bool HerpApp::submit_record()
                         emit on_comboBox_view_charts_select_id_currentIndexChanged(0);
 
                         on_toolButton_new_hash_clicked();
-                        set_date_ranges();
-                        update_charts();
+                        update_all();
 
                         return true;
                     }
@@ -611,71 +693,6 @@ bool HerpApp::submit_record()
     return false;
 }
 
-/**
- * @brief HerpApp::delete_record Will delete a given database entry and all of its related data from the Google LevelDB
- * database when given a specified unique Record ID.
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-03-13
- * @param record_id The unique Record ID of all the database entries that must be deleted.
- * @return Whether the operation was a success or not.
- */
-bool HerpApp::delete_record(const std::string &record_id)
-{
-    try {
-        if ((!record_id.empty()) && (!unique_id_map.empty())) {
-            QMessageBox msgBox;
-            msgBox.setText(tr("Delete Record..."));
-            msgBox.setInformativeText(tr("Are you really sure about deleting this record?"));
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-            msgBox.setDefaultButton(QMessageBox::Yes);
-            int ret = msgBox.exec();
-
-            switch (ret) {
-                case QMessageBox::Yes:
-                    // Delete the record
-                {
-                    using namespace GkRecords;
-                    gkDbWrite->del_item_db(record_id, dateTime);
-                    gkDbWrite->del_item_db(record_id, furtherNotes);
-                    gkDbWrite->del_item_db(record_id, vitaminNotes);
-                    gkDbWrite->del_item_db(record_id, toiletNotes);
-                    gkDbWrite->del_item_db(record_id, tempNotes);
-                    gkDbWrite->del_item_db(record_id, weightNotes);
-                    gkDbWrite->del_item_db(record_id, hydrationNotes);
-                    gkDbWrite->del_item_db(record_id, boolWentToilet);
-                    gkDbWrite->del_item_db(record_id, boolHadHydration);
-                    gkDbWrite->del_item_db(record_id, boolHadVitamins);
-                    gkDbWrite->del_item_db(record_id, weightMeasure);
-                    gkDbWrite->del_uuid(record_id);
-
-                    set_date_ranges();
-                    update_charts();
-                    archive_clear_forms();
-                    std::string prev_record = browse_records(archive_records, false);
-                    archive_curr_sel_record = prev_record;
-                    archive_fill_form_data(prev_record);
-                }
-                    return true;
-                case QMessageBox::No:
-                    // Do not delete the record
-                    return true;
-                case QMessageBox::Cancel:
-                    // Do not delete the record
-                    return true;
-                default:
-                    // Should never be reached
-                    return true;
-            }
-        } else {
-            throw std::invalid_argument(tr("Unable to read Record ID!").toStdString());
-        }
-    } catch (const std::exception &e) {
-        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
-    }
-
-    return false;
-}
-
 void HerpApp::refresh_caches()
 {
     try {
@@ -684,9 +701,9 @@ void HerpApp::refresh_caches()
         unique_id_map.clear();
         unique_id_map = gkDbRead->get_uuids();
 
-        auto licensee_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkLicensee);
+        licensee_cache.clear();
+        auto licensee_temp_cache = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkLicensee);
         if (!licensee_temp_cache.empty()) {
-            licensee_cache.clear();
             ui->comboBox_existing_license_id->clear();
             ui->comboBox_view_records_licensee->clear();
             ui->comboBox_view_charts_select_licensee->clear();
@@ -700,10 +717,11 @@ void HerpApp::refresh_caches()
             }
         }
 
+        species_cache.clear();
+        animal_cache.clear();
         if (!unique_id_map.empty()) {
             std::vector<std::string> record_ids;
-            auto animal_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
-            animal_cache.clear();
+            auto animal_temp_cache = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkId);
 
             for (const auto &ids: unique_id_map) {
                 if (!ids.first.empty()) {
@@ -711,7 +729,7 @@ void HerpApp::refresh_caches()
                 }
 
                 if (!species_cache.contains(ids.second.licensee_id, ids.second.species_id)) {
-                    auto species_temp_cache = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
+                    auto species_temp_cache = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkSpecies);
                     if (!species_temp_cache.empty()) {
                         for (auto it = species_temp_cache.begin(); it != species_temp_cache.end(); ++it) {
                             if (it.key() == ids.second.species_id) {
@@ -735,8 +753,8 @@ void HerpApp::refresh_caches()
             }
 
             if (!record_ids.empty()) {
-                minDateTime = gkDbRead->determineMinimumDate(record_ids);
-                maxDateTime = gkDbRead->determineMaximumDate(record_ids);
+                minDateTime = gkDbRead->determine_min_date_time(record_ids);
+                maxDateTime = gkDbRead->determine_max_date_time(record_ids);
             }
 
             if (!caches_enabled) {
@@ -744,11 +762,14 @@ void HerpApp::refresh_caches()
             }
 
             return;
+        } else {
+            caches_enabled = false;
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
-        return;
     }
+
+    return;
 }
 
 /**
@@ -909,7 +930,7 @@ std::list<GkRecords::GkSpecies> HerpApp::find_species_names(const GkRecords::com
                 throw std::runtime_error(tr("An error occurred whilst filling a comboBox with info from the database!").toStdString());
         }
 
-        auto tmp_species_db = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
+        auto tmp_species_db = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkSpecies);
         std::list<GkRecords::GkSpecies> output; // A list of Species Data that correspond to the given licensee.
         int counter = 0;
         if ((!licensee_id.empty()) && (!species_cache.empty())) {
@@ -999,7 +1020,7 @@ std::list<GkRecords::GkId> HerpApp::find_animal_names(const GkRecords::comboBoxT
                     GkRecords::GkId animal;
                     animal.name_id = animal_id;
 
-                    auto tmp_animals_db = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
+                    auto tmp_animals_db = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkId);
                     for (auto it_tmp = tmp_animals_db.begin(); it_tmp != tmp_animals_db.end(); ++it_tmp) {
                         if (it_tmp.key() == animal_id) {
                             switch (dropbox_type) {
@@ -1048,16 +1069,17 @@ void HerpApp::record_species_index(const std::list<GkRecords::GkSpecies> &specie
 {
     try {
         if (!species_list.empty()) {
+            using namespace GkRecords;
             if (!comboBox_species.empty()) {
                 switch (comboBox_type) {
-                    case GkRecords::comboBoxType::AddRecord:
-                        comboBox_species.remove(GkRecords::comboBoxType::AddRecord);
+                    case comboBoxType::AddRecord:
+                        comboBox_species.remove(comboBoxType::AddRecord);
                         break;
-                    case GkRecords::comboBoxType::ViewRecords:
-                        comboBox_species.remove(GkRecords::comboBoxType::ViewRecords);
+                    case comboBoxType::ViewRecords:
+                        comboBox_species.remove(comboBoxType::ViewRecords);
                         break;
-                    case GkRecords::comboBoxType::ViewCharts:
-                        comboBox_species.remove(GkRecords::comboBoxType::ViewCharts);
+                    case comboBoxType::ViewCharts:
+                        comboBox_species.remove(comboBoxType::ViewCharts);
                         break;
                     default:
                         throw std::runtime_error(tr("An error had occurred whilst filling a QComboBox with information!").toStdString());
@@ -1157,9 +1179,9 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
             }
 
             if ((!submit_data.licensee.licensee_id.empty()) && (!submit_data.species.species_id.empty())) {
-                auto licensee_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkLicensee);
-                auto species_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkSpecies);
-                auto ident_data = gkDbRead->get_misc_key_vals(GkRecords::MiscRecordType::gkId);
+                auto licensee_data = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkLicensee);
+                auto species_data = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkSpecies);
+                auto ident_data = gkDbRead->get_cat_key_vals(GkRecords::MiscRecordType::gkId);
 
                 for (auto it = licensee_data.begin(); it != licensee_data.end(); ++it) {
                     if (it.key() == submit_data.licensee.licensee_id) {
@@ -1245,44 +1267,31 @@ void HerpApp::archive_fill_form_data(const std::string &record_id)
     return;
 }
 
-/**
- * @brief HerpApp::delete_category_id
- * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
- * @date 2018-03-19
- * @param record_type
- * @param record_id
- * @return
- */
-bool HerpApp::delete_category_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id)
+void HerpApp::comboboxes_clear(const bool &disable)
 {
-    try {
-        if (!record_id.empty()) {
-            using namespace GkRecords;
-            switch (record_type) {
-                case MiscRecordType::gkLicensee:
-                {
-                    gkDbWrite->mass_del_id(MiscRecordType::gkLicensee, record_id);
-                }
-                    return true;
-                case MiscRecordType::gkSpecies:
-                {
-                    gkDbWrite->mass_del_id(MiscRecordType::gkSpecies, record_id);
-                }
-                    return true;
-                case MiscRecordType::gkId:
-                {
-                    gkDbWrite->mass_del_id(MiscRecordType::gkId, record_id);
-                }
-                    return true;
-                default:
-                    throw std::runtime_error(tr("An error occurred whilst deleting records from the database!").toStdString());
-            }
-        }
-    } catch (const std::exception &e) {
-        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
+    ui->comboBox_view_records_licensee->clear();
+    ui->comboBox_view_records_species->clear();
+    ui->comboBox_view_records_animal_name->clear();
+    ui->comboBox_existing_license_id->clear();
+    ui->comboBox_existing_species->clear();
+    ui->comboBox_existing_id->clear();
+    ui->comboBox_view_charts_select_licensee->clear();
+    ui->comboBox_view_charts_select_species->clear();
+    ui->comboBox_view_charts_select_id->clear();
+
+    if (disable) {
+        ui->comboBox_view_records_licensee->setEnabled(false);
+        ui->comboBox_view_records_species->setEnabled(false);
+        ui->comboBox_view_records_animal_name->setEnabled(false);
+        ui->comboBox_existing_license_id->setEnabled(false);
+        ui->comboBox_existing_species->setEnabled(false);
+        ui->comboBox_existing_id->setEnabled(false);
+        ui->comboBox_view_charts_select_licensee->setEnabled(false);
+        ui->comboBox_view_charts_select_species->setEnabled(false);
+        ui->comboBox_view_charts_select_id->setEnabled(false);
     }
 
-    return false;
+    return;
 }
 
 /**
@@ -1323,7 +1332,7 @@ void HerpApp::update_charts(const bool &update_caches)
 
         if (!unique_id_map.empty()) {
             using namespace GkRecords;
-            auto dated_record_ids = gkDbRead->extractRecords(minDateTime, maxDateTime);
+            auto dated_record_ids = gkDbRead->extract_records(minDateTime, maxDateTime);
             long int date_time;
 
             if ((!dated_record_ids.empty()) && (!species_cache.empty()) && (!animal_cache.empty())) { // Check that the values we're using aren't empty
@@ -1376,7 +1385,71 @@ void HerpApp::update_charts(const bool &update_caches)
         }
     } catch (const std::exception &e) {
         QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
-        return;
+    }
+
+    return;
+}
+
+/**
+ * @brief HerpApp::update_all is a convenience function that updates the most widely used caches.
+ * @author Phobos Aryn'dythyrn D'thorga <phobos.gekko@gmail.com>
+ * @date 2018-03-23
+ * @param view_records Whether to update the `archive_records` std::list or not.
+ */
+void HerpApp::update_all(const bool &view_records, const std::string &del_uuid, const bool &update_comboBoxes)
+{
+    try {
+        // Charts related data
+        weight_measurements.clear();
+
+        // General caches
+        set_date_ranges();
+        update_charts();
+
+        // This concerns the tab `viewRecords`
+        if (view_records) {
+            int dateTimeStart = ui->dateTimeEdit_browse_start->dateTime().toTime_t();
+            int dateTimeEnd = ui->dateTimeEdit_browse_end->dateTime().toTime_t();
+            archive_records.clear();
+            archive_records = gkDbRead->extract_records(dateTimeStart, dateTimeEnd);
+            viewed_records.clear();
+
+            if (!archive_records.empty()) { // Update the tab `viewRecords`!
+                if (!del_uuid.empty()) {
+                    if (!ui->interface_tabWidget->isTabEnabled(2)) {
+                        ui->interface_tabWidget->setTabEnabled(2, true);
+                    }
+
+                    // Delete the now gone `Log Entry` from the variable, `viewed_records`S
+                    if (viewed_records.size() > 1) {
+                        std::list<std::string> tmp_viewed_records;
+                        for (const auto &id: viewed_records) {
+                            if (id != del_uuid) {
+                                tmp_viewed_records.push_back(id);
+                            }
+                        }
+
+                        viewed_records = tmp_viewed_records;
+                    } else {
+                        viewed_records.clear();
+                    }
+                } else {
+                    throw std::invalid_argument(tr("One of the given UUIDs are empty!").toStdString());
+                }
+
+                std::string next_record = browse_records(archive_records, true);
+                archive_curr_sel_record = next_record;
+                archive_fill_form_data(next_record);
+
+                if (update_comboBoxes) { // Update the contents of the QComboBoxes containing the categories!
+
+                }
+
+                return;
+            }
+        }
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, tr("Error!"), e.what(), QMessageBox::Ok);
     }
 
     return;

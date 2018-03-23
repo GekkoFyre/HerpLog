@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     gkDbConn = std::make_unique<GkDbConn>(this);
-    gkFileIo = std::make_shared<GkFileIo>(this);
+    gkFileIo = std::make_shared<GkFileIo>(nullptr);
 }
 
 MainWindow::~MainWindow()
@@ -76,14 +76,14 @@ void MainWindow::on_button_create_db_clicked()
                 fs::path dirName = fs::path(saveFileName.toStdString()).filename();
                 fs::path temp_dir = std::string(QDir::tempPath().toStdString() + fs::path::preferred_separator + dirName.string());
                 gkFileIo->checkExistingTempDir(temp_dir, false, true);
-                db_ptr = gkDbConn->openDatabase(temp_dir.string());
+                db_ptr = gkDbConn->open_database(temp_dir.string());
 
                 fs::path parent_path = fs::path(saveFileName.toStdString()).parent_path();
                 fs::path zip_file = std::string(parent_path.string() + fs::path::preferred_separator + dirName.string() + "." + "hdb");
                 gkFileIo->compress_files(temp_dir.string(), zip_file.string());
 
                 this->close();
-                QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, temp_dir.string(), zip_file.string(), gkFileIo, this);
+                QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, temp_dir.string(), zip_file.string(), gkFileIo, nullptr);
                 herpAppWin->setWindowFlags(Qt::Window);
                 herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
                 QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));
@@ -111,10 +111,10 @@ void MainWindow::on_button_open_db_clicked()
             if (!fileName.isEmpty() && fs::exists(fileName_str, ec)) {
                 std::string tmp_extraction_loc = gkFileIo->decompress_file(fileName_str);
                 if (!tmp_extraction_loc.empty() && fs::is_directory(tmp_extraction_loc, ec)) {
-                    db_ptr = gkDbConn->openDatabase(tmp_extraction_loc);
+                    db_ptr = gkDbConn->open_database(tmp_extraction_loc);
 
                     this->close();
-                    QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, fileName_str, gkFileIo, this);
+                    QPointer<HerpApp> herpAppWin = new HerpApp(db_ptr, tmp_extraction_loc, fileName_str, gkFileIo, nullptr);
                     herpAppWin->setWindowFlags(Qt::Window);
                     herpAppWin->setAttribute(Qt::WA_DeleteOnClose, true); // Delete itself on closing
                     QObject::connect(herpAppWin, SIGNAL(destroyed(QObject*)), this, SLOT(show()));

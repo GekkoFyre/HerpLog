@@ -67,19 +67,17 @@ public:
 
     void add_item_db(const std::string &record_id, const std::string &key, std::string value);
     void del_item_db(const std::string &record_id, const std::string &key);
+    bool del_log_entry(const std::string &uuid, const bool &pose_msg_box = false);
     bool add_uuid(const std::string &uuid, const GkRecords::GkLicensee &licensee, const GkRecords::GkSpecies &species,
                   const GkRecords::GkId &id);
-    bool del_uuid(const std::string &uuid,
-                  const GkRecords::MiscRecordType &record_type = GkRecords::MiscRecordType::None,
-                  const std::string &misc_id = "");
-    bool mass_del_id(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
-                     const bool &recursive = false);
-    std::string create_unique_id();
+    bool del_uuid(const std::string &uuid);
+    bool mass_del_cat(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
+    std::string create_uuid();
 
 private:
-    void add_misc_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
-                           const std::string &value);
-    void del_misc_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
+    void add_cat_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id,
+                          const std::string &value);
+    void del_cat_key_vals(const GkRecords::MiscRecordType &record_type, const std::string &record_id);
 
     std::shared_ptr<GkStringOp> gkStrOp;
     GkFile::FileDb db_conn;

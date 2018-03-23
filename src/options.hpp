@@ -43,8 +43,12 @@
 #ifndef GKOPTIONS_HPP
 #define GKOPTIONS_HPP
 
+#include <boost/exception/all.hpp>
 #include <boost/filesystem.hpp>
 #include <leveldb/db.h>
+#include <leveldb/options.h>
+#include <QMap>
+#include <exception>
 #include <memory>
 #include <string>
 #include <chrono>
@@ -143,6 +147,13 @@ namespace GekkoFyre {
             std::string licensee_id;        // The licensee Unique ID, for database purposes
             std::string species_id;         // The species Unique ID, for database purposes
             std::string name_id;            // Self-explanatory, for database purposes
+        };
+
+        struct GkCategories {
+            std::string spec_record_id;
+            QMap<std::string, std::string> licensee_cache;
+            QMap<std::string, std::pair<std::string, std::string>> species_cache;
+            QMap<std::string, std::pair<std::string, std::string>> animals_cache;
         };
 
         enum MiscRecordType {
