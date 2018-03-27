@@ -6,7 +6,7 @@ If you wish to contribute your own code to this project then [GekkoFyre](https:/
 
 Binaries
 ----------
-There are no binaries and/or install-wizards available at this time, due to the fact that this software project is in a stage of intense development right now. Once a state of stability is reached that will allow for an alpha release, binaries will then be uploaded to [Vitticeps](https://www.vitticeps.org/) for both Microsoft Windows and Linux operating systems. If you wish to be notified of major developments like this, then feel free to subscribe to the newsletter on the right-hand side of this page. Emails will only be sent intermittently at most so as not to create any spam, since I hate spam as much as anyone else does :)
+There are no binaries and/or install-wizards available at this time, due to the fact that this software project is in a stage of intense development right now. Once a state of stability is reached that will allow for an alpha release, binaries will then be uploaded to [Vitticeps](https://www.vitticeps.org/) for both Microsoft Windows and Linux operating systems. If you wish to be notified of major developments like this, then feel free to [subscribe to the newsletter](https://www.vitticeps.org/software/herplog/newsletter/subscribe-modify.html). Emails will only be sent intermittently at most so as not to create any spam, since I hate spam as much as anyone else does :)
 
 Screenshots
 ----------
